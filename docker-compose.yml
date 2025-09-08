@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # Service MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: grammachat-mongodb
+    restart: unless-stopped
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-grammachat}
+    volumes:
+      - mongodb_data:/data/db
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - grammachat-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Service API Node.js
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: grammachat-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      MONGODB_URI: mongodb://mongodb:27017/${MONGODB_DATABASE:-grammachat}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      LANGUAGETOOL_API_URL: ${LANGUAGETOOL_API_URL:-https://api.languagetool.org/v2/check}
+      LANGUAGETOOL_API_KEY: ${LANGUAGETOOL_API_KEY}
+      XP_PER_CHARACTER: ${XP_PER_CHARACTER:-1}
+      XP_BONUS_NO_ERRORS: ${XP_BONUS_NO_ERRORS:-10}
+      XP_PENALTY_PER_ERROR: ${XP_PENALTY_PER_ERROR:-5}
+      LEVEL_UP_THRESHOLD: ${LEVEL_UP_THRESHOLD:-100}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000,http://localhost:19006}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - grammachat-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Service Redis (pour cache et sessions)
+  redis:
+    image: redis:7.2-alpine
+    container_name: grammachat-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - grammachat-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  grammachat-network:
+    driver: bridge
