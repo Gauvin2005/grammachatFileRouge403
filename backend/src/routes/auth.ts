@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { authenticateToken } from '@/middleware/auth';
+import { authenticateToken } from '../middleware/auth';
 import {
   register,
   login,
   getProfile,
   validateRegister,
   validateLogin
-} from '@/controllers/authController';
+} from '../controllers/authController';
 
 const router = Router();
 

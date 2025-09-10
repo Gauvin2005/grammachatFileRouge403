@@ -3,17 +3,17 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useAppSelector } from '@/hooks/redux';
-import { RootStackParamList, MainTabParamList } from '@/types';
+import { useAppSelector } from '../hooks/redux';
+import { RootStackParamList, MainTabParamList } from '../types';
 
 // Screens
-import LoginScreen from '@/screens/LoginScreen';
-import RegisterScreen from '@/screens/RegisterScreen';
-import ChatScreen from '@/screens/ChatScreen';
-import ProfileScreen from '@/screens/ProfileScreen';
-import LeaderboardScreen from '@/screens/LeaderboardScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import ChatScreen from '../screens/ChatScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import LeaderboardScreen from '../screens/LeaderboardScreen';
 
-import { colors } from '@/utils/theme';
+import { colors } from '../utils/theme';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();

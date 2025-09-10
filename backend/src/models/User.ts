@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { User as IUser } from '@/types';
+import { User as IUser } from '../types';
 
-export interface UserDocument extends IUser, Document {
+export interface UserDocument extends Omit<IUser, '_id'>, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
   calculateLevel(): number;
   addXP(amount: number): Promise<UserDocument>;
@@ -50,7 +50,8 @@ const UserSchema = new Schema<UserDocument>({
   timestamps: true,
   toJSON: {
     transform: function(doc, ret) {
-      delete ret.password;
+      delete (ret as any).password;
+      delete (ret as any).__v;
       return ret;
     }
   }

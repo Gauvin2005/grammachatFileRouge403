@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { Message as IMessage, LanguageToolError } from '@/types';
+import { Message as IMessage, LanguageToolError } from '../types';
 
-export interface MessageDocument extends IMessage, Document {}
+export interface MessageDocument extends Omit<IMessage, '_id'>, Document {}
 
 const LanguageToolErrorSchema = new Schema({
   message: String,
@@ -23,7 +23,7 @@ const LanguageToolErrorSchema = new Schema({
 
 const MessageSchema = new Schema<MessageDocument>({
   senderId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     ref: 'User',
     required: [true, 'ID de l\'expéditeur requis']
   },

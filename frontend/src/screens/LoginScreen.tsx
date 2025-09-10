@@ -17,10 +17,10 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { loginUser, clearError } from '@/store/authSlice';
-import { LoginFormData } from '@/types';
-import { colors, spacing, typography } from '@/utils/theme';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { loginUser, clearError } from '../store/authSlice';
+import { LoginFormData } from '../types';
+import { colors, spacing, typography } from '../utils/theme';
 
 const LoginScreen: React.FC = () => {
   const dispatch = useAppDispatch();

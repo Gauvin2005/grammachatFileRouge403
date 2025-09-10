@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { query, validationResult } from 'express-validator';
-import User from '@/models/User';
-import { ApiResponse, PaginationParams, PaginatedResponse } from '@/types';
+import User from '../models/User';
+import { ApiResponse, PaginationParams, PaginatedResponse } from '../types';
 
 /**
  * Récupérer tous les utilisateurs (admin seulement)
@@ -116,7 +116,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     const { username } = req.body;
 
     // Vérifier que l'utilisateur met à jour son propre profil
-    if (req.user!._id.toString() !== userId && req.user!.role !== 'admin') {
+    if (req.user!._id?.toString() !== userId && req.user!.role !== 'admin') {
       res.status(403).json({
         success: false,
         message: 'Accès non autorisé'
@@ -185,7 +185,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     const userId = req.params.id;
 
     // Empêcher l'auto-suppression
-    if (req.user!._id.toString() === userId) {
+    if (req.user!._id?.toString() === userId) {
       res.status(400).json({
         success: false,
         message: 'Vous ne pouvez pas supprimer votre propre compte'

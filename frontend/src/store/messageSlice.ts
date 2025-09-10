@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { MessageState, Message, MessageRequest, PaginationParams } from '@/types';
-import apiService from '@/services/api';
+import { MessageState, Message, MessageRequest, PaginationParams } from '../types';
+import apiService from '../services/api';
 
 const initialState: MessageState = {
   messages: [],

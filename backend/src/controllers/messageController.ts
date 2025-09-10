@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { body, validationResult, query } from 'express-validator';
-import Message from '@/models/Message';
-import User from '@/models/User';
-import { LanguageToolService } from '@/services/LanguageToolService';
-import { ApiResponse, MessageRequest, PaginationParams, PaginatedResponse } from '@/types';
+import Message from '../models/Message';
+import User from '../models/User';
+import { LanguageToolService } from '../services/LanguageToolService';
+import { ApiResponse, MessageRequest, PaginationParams, PaginatedResponse } from '../types';
 
 const languageToolService = new LanguageToolService();
 
@@ -121,9 +121,9 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
           xpEarned: message.xpEarned,
           errorsFound: message.errorsFound,
           sender: {
-            id: message.senderId._id,
-            username: message.senderId.username,
-            email: message.senderId.email
+            id: (message.senderId as any)._id,
+            username: (message.senderId as any).username,
+            email: (message.senderId as any).email
           }
         })),
         pagination: {
@@ -184,9 +184,9 @@ export const getMessage = async (req: Request, res: Response): Promise<void> => 
           xpEarned: message.xpEarned,
           errorsFound: message.errorsFound,
           sender: {
-            id: message.senderId._id,
-            username: message.senderId.username,
-            email: message.senderId.email
+            id: (message.senderId as any)._id,
+            username: (message.senderId as any).username,
+            email: (message.senderId as any).email
           }
         }
       }

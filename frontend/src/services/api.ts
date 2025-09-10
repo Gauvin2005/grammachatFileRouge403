@@ -9,7 +9,7 @@ import {
   Message, 
   LeaderboardEntry,
   PaginationParams 
-} from '@/types';
+} from '../types';
 
 class ApiService {
   private api: AxiosInstance;

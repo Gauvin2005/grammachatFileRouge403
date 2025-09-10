@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import User from '@/models/User';
-import { generateToken } from '@/middleware/auth';
-import { ApiResponse, RegisterRequest, AuthRequest } from '@/types';
+import User from '../models/User';
+import { generateToken } from '../middleware/auth';
+import { ApiResponse, RegisterRequest, AuthRequest } from '../types';
 
 /**
  * Inscription d'un nouvel utilisateur
@@ -48,7 +48,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     await user.save();
 
     // Générer le token JWT
-    const token = generateToken(user._id.toString());
+    const token = generateToken(user._id?.toString() || '');
 
     const response: ApiResponse = {
       success: true,
@@ -115,7 +115,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Générer le token JWT
-    const token = generateToken(user._id.toString());
+    const token = generateToken(user._id?.toString() || '');
 
     const response: ApiResponse = {
       success: true,

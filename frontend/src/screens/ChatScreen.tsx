@@ -19,11 +19,11 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { sendMessage, fetchMessages, clearError } from '@/store/messageSlice';
-import { updateUserXP } from '@/store/authSlice';
-import { MessageFormData, Message } from '@/types';
-import { colors, spacing, typography } from '@/utils/theme';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { sendMessage, fetchMessages, clearError } from '../store/messageSlice';
+import { updateUserXP } from '../store/authSlice';
+import { MessageFormData, Message } from '../types';
+import { colors, spacing, typography } from '../utils/theme';
 
 const ChatScreen: React.FC = () => {
   const dispatch = useAppDispatch();

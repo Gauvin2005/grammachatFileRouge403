@@ -8,9 +8,9 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 // Routes
-import authRoutes from '@/routes/auth';
-import messageRoutes from '@/routes/messages';
-import userRoutes from '@/routes/users';
+import authRoutes from './routes/auth';
+import messageRoutes from './routes/messages';
+import userRoutes from './routes/users';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -119,20 +119,28 @@ const startServer = async (): Promise<void> => {
 };
 
 // Gestion des signaux de fermeture
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('🛑 Signal SIGTERM reçu, fermeture du serveur...');
-  mongoose.connection.close(() => {
+  try {
+    await mongoose.connection.close();
     console.log('✅ Connexion MongoDB fermée');
     process.exit(0);
-  });
+  } catch (error) {
+    console.error('❌ Erreur lors de la fermeture MongoDB:', error);
+    process.exit(1);
+  }
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('🛑 Signal SIGINT reçu, fermeture du serveur...');
-  mongoose.connection.close(() => {
+  try {
+    await mongoose.connection.close();
     console.log('✅ Connexion MongoDB fermée');
     process.exit(0);
-  });
+  } catch (error) {
+    console.error('❌ Erreur lors de la fermeture MongoDB:', error);
+    process.exit(1);
+  }
 });
 
 // Démarrer le serveur

@@ -14,9 +14,9 @@ import {
 } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { LeaderboardEntry } from '@/types';
-import { colors, spacing, typography } from '@/utils/theme';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { LeaderboardEntry } from '../types';
+import { colors, spacing, typography } from '../utils/theme';
 
 const LeaderboardScreen: React.FC = () => {
   const dispatch = useAppDispatch();

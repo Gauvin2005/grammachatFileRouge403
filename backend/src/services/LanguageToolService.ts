@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LanguageToolResponse, LanguageToolError, XPCalculationResult } from '@/types';
+import { LanguageToolResponse, LanguageToolError, XPCalculationResult } from '../types';
 
 export class LanguageToolService {
   private apiUrl: string;

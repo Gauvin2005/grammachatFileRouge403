@@ -29,8 +29,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-notifications",
-      "expo-secure-store"
+      "expo-notifications"
     ],
     "notification": {
       "icon": "./assets/notification-icon.png",
@@ -38,8 +37,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "your-project-id"
+        "projectId": "0ff4ca6f-09d3-4931-b376-b14d33f855dc"
       }
-    }
+    },
+    "owner": "gauvin"
   }
 }

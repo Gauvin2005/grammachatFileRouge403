@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import User, { UserDocument } from '@/models/User';
+import User, { UserDocument } from '../models/User';
 
 // Étendre l'interface Request pour inclure user
 declare global {
@@ -101,7 +101,7 @@ export const requireOwnership = (req: Request, res: Response, next: NextFunction
 
   const userId = req.params.userId || req.params.id;
   
-  if (req.user.role !== 'admin' && req.user._id.toString() !== userId) {
+  if (req.user.role !== 'admin' && req.user._id?.toString() !== userId) {
     res.status(403).json({
       success: false,
       message: 'Accès non autorisé à cette ressource'
@@ -123,5 +123,5 @@ export const generateToken = (userId: string): string => {
     throw new Error('JWT_SECRET non configuré');
   }
 
-  return jwt.sign({ userId }, jwtSecret, { expiresIn: jwtExpiresIn });
+  return jwt.sign({ userId }, jwtSecret, { expiresIn: jwtExpiresIn } as jwt.SignOptions);
 };

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken } from '@/middleware/auth';
+import { authenticateToken } from '../middleware/auth';
 import {
   sendMessage,
   getMessages,
@@ -7,7 +7,7 @@ import {
   deleteMessage,
   validateMessage,
   validatePagination
-} from '@/controllers/messageController';
+} from '../controllers/messageController';
 
 const router = Router();
 
