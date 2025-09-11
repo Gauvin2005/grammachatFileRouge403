@@ -61,6 +61,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   username: string;
+  role?: 'user' | 'admin';
 }
 
 export interface MessageRequest {
@@ -162,6 +163,7 @@ export interface RegisterFormData {
   password: string;
   confirmPassword: string;
   username: string;
+  role: 'user' | 'admin';
 }
 
 export interface MessageFormData {

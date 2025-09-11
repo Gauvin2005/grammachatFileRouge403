@@ -45,6 +45,12 @@ class NotificationService {
    */
   async registerForPushNotifications(): Promise<string | null> {
     try {
+      // Sur le web, les notifications push nécessitent une configuration VAPID
+      if (Platform.OS === 'web') {
+        console.log('Notifications push non supportées sur le web en mode développement');
+        return null;
+      }
+
       const hasPermission = await this.requestPermissions();
       if (!hasPermission) {
         console.log('Permission de notification refusée');

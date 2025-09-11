@@ -3,6 +3,7 @@
     "name": "Grammachat",
     "slug": "grammachat",
     "version": "1.0.0",
+    "sdkVersion": "53.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -26,14 +27,16 @@
       "package": "com.grammachat.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-notifications"
     ],
     "notification": {
       "icon": "./assets/notification-icon.png",
-      "color": "#6366f1"
+      "color": "#6366f1",
+      "vapidPublicKey": "BEl62iUYgUivxIkv69yViEuiBIa40HI0Qy_3Vg9bkPkmpd1QEWXybX7xMvD15HInu_1kUcBQk4n4gnYHPXdtY4E"
     },
     "extra": {
       "eas": {

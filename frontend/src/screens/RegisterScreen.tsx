@@ -13,6 +13,7 @@ import {
   Button,
   Card,
   ActivityIndicator,
+  RadioButton,
 } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,6 +40,7 @@ const RegisterScreen: React.FC = () => {
       password: '',
       confirmPassword: '',
       username: '',
+      role: 'user',
     },
   });
 
@@ -50,9 +52,10 @@ const RegisterScreen: React.FC = () => {
         email: data.email,
         password: data.password,
         username: data.username,
+        role: data.role,
       })).unwrap();
       
-      Alert.alert('Succès', 'Compte créé avec succès !');
+      Alert.alert('Succès', `Compte ${data.role} créé avec succès !`);
     } catch (error) {
       Alert.alert('Erreur', 'Échec de la création du compte');
     }
@@ -218,6 +221,38 @@ const RegisterScreen: React.FC = () => {
               <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>
             )}
 
+            <Text style={styles.roleLabel}>Type de compte :</Text>
+            <Controller
+              control={control}
+              name="role"
+              rules={{
+                required: 'Veuillez sélectionner un type de compte',
+              }}
+              render={({ field: { onChange, value } }) => (
+                <View style={styles.roleContainer}>
+                  <View style={styles.roleOption}>
+                    <RadioButton
+                      value="user"
+                      status={value === 'user' ? 'checked' : 'unchecked'}
+                      onPress={() => onChange('user')}
+                    />
+                    <Text style={styles.roleText}>Utilisateur</Text>
+                  </View>
+                  <View style={styles.roleOption}>
+                    <RadioButton
+                      value="admin"
+                      status={value === 'admin' ? 'checked' : 'unchecked'}
+                      onPress={() => onChange('admin')}
+                    />
+                    <Text style={styles.roleText}>Administrateur</Text>
+                  </View>
+                </View>
+              )}
+            />
+            {errors.role && (
+              <Text style={styles.errorText}>{errors.role.message}</Text>
+            )}
+
             {error && (
               <Text style={styles.errorText}>{error}</Text>
             )}
@@ -307,6 +342,27 @@ const styles = StyleSheet.create({
   linkText: {
     color: colors.primary,
     fontWeight: 'bold',
+  },
+  roleLabel: {
+    ...typography.body,
+    color: colors.text,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+    fontWeight: 'bold',
+  },
+  roleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: spacing.sm,
+  },
+  roleOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  roleText: {
+    ...typography.body,
+    color: colors.text,
+    marginLeft: spacing.xs,
   },
 });
 

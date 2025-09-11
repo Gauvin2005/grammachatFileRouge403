@@ -34,7 +34,7 @@ const UserSchema = new Schema<UserDocument>({
   role: {
     type: String,
     enum: ['user', 'admin'],
-    default: 'user'
+    required: true
   },
   xp: {
     type: Number,

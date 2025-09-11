@@ -20,7 +20,16 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const { email, password, username }: RegisterRequest = req.body;
+    const { email, password, username, role }: RegisterRequest = req.body;
+
+    // Valider le rôle
+    if (!role || !['user', 'admin'].includes(role)) {
+      res.status(400).json({
+        success: false,
+        message: 'Rôle invalide. Doit être "user" ou "admin"'
+      });
+      return;
+    }
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({
@@ -40,7 +49,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       email,
       password,
       username,
-      role: 'user',
+      role,
       xp: 0,
       level: 1
     });

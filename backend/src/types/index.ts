@@ -72,6 +72,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   username: string;
+  role?: 'user' | 'admin';
 }
 
 export interface MessageRequest {
