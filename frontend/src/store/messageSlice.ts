@@ -30,7 +30,7 @@ export const sendMessage = createAsyncThunk(
 
 export const fetchMessages = createAsyncThunk(
   'messages/fetch',
-  async (params?: PaginationParams, { rejectWithValue }) => {
+  async (params: PaginationParams = {}, { rejectWithValue }) => {
     try {
       const response = await apiService.getMessages(params);
       if (response.success && response.data) {

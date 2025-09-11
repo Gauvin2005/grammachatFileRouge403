@@ -44,7 +44,7 @@ const ChatScreen: React.FC = () => {
 
   useEffect(() => {
     // Charger les messages au montage du composant
-    dispatch(fetchMessages());
+    dispatch(fetchMessages({}));
   }, [dispatch]);
 
   const onSubmit = async (data: MessageFormData) => {
@@ -52,19 +52,23 @@ const ChatScreen: React.FC = () => {
       const result = await dispatch(sendMessage(data)).unwrap();
       
       // Mettre à jour l'XP de l'utilisateur
-      if (result.xpCalculation) {
+      if (result && 'xpCalculation' in result && result.xpCalculation) {
+        const xpCalc = result.xpCalculation as any;
         dispatch(updateUserXP({
-          xp: user?.xp + result.xpCalculation.totalXP || 0,
-          level: result.xpCalculation.newLevel || user?.level || 1,
+          xp: user?.xp + xpCalc.totalXP || 0,
+          level: xpCalc.newLevel || user?.level || 1,
         }));
       }
 
       // Afficher un message de succès avec les détails XP
-      if (result.xpCalculation?.levelUp) {
-        Alert.alert(
-          '🎉 Félicitations !',
-          `Vous avez gagné ${result.xpCalculation.totalXP} XP et êtes passé au niveau ${result.xpCalculation.newLevel} !`
-        );
+      if (result && 'xpCalculation' in result && result.xpCalculation) {
+        const xpCalc = result.xpCalculation as any;
+        if (xpCalc.levelUp) {
+          Alert.alert(
+            '🎉 Félicitations !',
+            `Vous avez gagné ${xpCalc.totalXP} XP et êtes passé au niveau ${xpCalc.newLevel} !`
+          );
+        }
       }
 
       reset();

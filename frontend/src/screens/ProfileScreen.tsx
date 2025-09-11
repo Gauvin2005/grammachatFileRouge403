@@ -122,7 +122,7 @@ const ProfileScreen: React.FC = () => {
               user?.username
             )}
             left={(props) => <List.Icon {...props} icon="account" />}
-            right={
+            right={() => (
               !isEditing ? (
                 <Button 
                   mode="text" 
@@ -143,7 +143,7 @@ const ProfileScreen: React.FC = () => {
                   Annuler
                 </Button>
               )
-            }
+            )}
           />
           
           <Divider style={styles.divider} />

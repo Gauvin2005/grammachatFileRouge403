@@ -35,8 +35,7 @@
     ],
     "notification": {
       "icon": "./assets/notification-icon.png",
-      "color": "#6366f1",
-      "vapidPublicKey": "BEl62iUYgUivxIkv69yViEuiBIa40HI0Qy_3Vg9bkPkmpd1QEWXybX7xMvD15HInu_1kUcBQk4n4gnYHPXdtY4E"
+      "color": "#6366f1"
     },
     "extra": {
       "eas": {
