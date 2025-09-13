@@ -17,7 +17,7 @@ class ApiService {
 
   constructor() {
     this.baseURL = __DEV__ 
-      ? 'http://localhost:3000/api' 
+      ? 'http://10.8.251.43:3000/api' 
       : 'https://your-production-api.com/api';
     
     this.api = axios.create({

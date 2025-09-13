@@ -52,19 +52,38 @@ cd frontend
 npm install
 ```
 
-4. **Lancer l'application mobile**
+4. **Créer le premier administrateur**
 ```bash
+cd backend
+npm run create-admin
+```
+
+5. **Lancer l'application mobile**
+```bash
+cd frontend
 npm start
+```
+
+6. **Tester l'application**
+```bash
+# Tests automatisés
+cd backend && npm test
+
+# Tests d'intégration
+./scripts/test-integration.sh
 ```
 
 ## 📱 Fonctionnalités MVP
 
-- ✅ Authentification utilisateur (inscription/connexion)
-- ✅ Envoi de messages texte
-- ✅ Vérification orthographique avec LanguageTool
-- ✅ Système de gamification (XP, niveaux)
-- ✅ Profil utilisateur
-- ✅ Rôles utilisateur (Standard/Admin)
+- ✅ **Authentification complète** : Inscription/connexion avec gestion des rôles
+- ✅ **Interface d'inscription moderne** : Formulaire React Native avec validation
+- ✅ **Gestion des rôles** : Utilisateurs normaux et administrateurs
+- ✅ **Sécurité JWT** : Authentification stateless sécurisée
+- ✅ **Envoi de messages** : Messagerie avec vérification orthographique
+- ✅ **Système de gamification** : XP, niveaux et classement
+- ✅ **Profil utilisateur** : Gestion des données personnelles
+- ✅ **API sécurisée** : Routes protégées selon les rôles
+- ✅ **Tests complets** : Tests automatisés et manuels
 
 ## 🛠️ Technologies
 
@@ -78,10 +97,12 @@ npm start
 ## 📖 Documentation
 
 Voir le dossier `docs/` pour la documentation complète :
+- [Guide de démarrage rapide](docs/quick-start-guide.md)
+- [Authentification et rôles](docs/authentication-and-roles.md)
 - [Guide d'installation](docs/installation.md)
-- [API Documentation](docs/api.md)
+- [API Documentation](docs/api/README.md)
 - [Architecture](docs/architecture.md)
-- [Tests](docs/tests.md)
+- [Tests manuels](tests/manual/role-testing.md)
 
 ## 🎨 Design
 

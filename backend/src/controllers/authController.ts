@@ -5,7 +5,7 @@ import { generateToken } from '../middleware/auth';
 import { ApiResponse, RegisterRequest, AuthRequest } from '../types';
 
 /**
- * Inscription d'un nouvel utilisateur
+ * Inscription d'un nouvel utilisateur (rôle 'user' par défaut)
  */
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -20,16 +20,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const { email, password, username, role }: RegisterRequest = req.body;
+    const { email, password, username, role = 'user' }: RegisterRequest = req.body;
 
-    // Valider le rôle
-    if (!role || !['user', 'admin'].includes(role)) {
-      res.status(400).json({
-        success: false,
-        message: 'Rôle invalide. Doit être "user" ou "admin"'
-      });
-      return;
-    }
+    // Forcer le rôle 'user' pour l'inscription publique
+    const userRole = 'user';
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({
@@ -49,7 +43,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       email,
       password,
       username,
-      role,
+      role: userRole,
       xp: 0,
       level: 1
     });
@@ -61,7 +55,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const response: ApiResponse = {
       success: true,
-      message: 'Compte créé avec succès',
+      message: 'Compte utilisateur créé avec succès',
       data: {
         user: {
           id: user._id,
@@ -205,6 +199,74 @@ export const validateRegister = [
 ];
 
 /**
+ * Création d'un compte administrateur (réservé aux admins)
+ */
+export const createAdmin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Validation des erreurs
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({
+        success: false,
+        message: 'Données invalides',
+        error: errors.array()[0].msg
+      });
+      return;
+    }
+
+    const { email, password, username }: Omit<RegisterRequest, 'role'> = req.body;
+
+    // Vérifier si l'utilisateur existe déjà
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (existingUser) {
+      res.status(409).json({
+        success: false,
+        message: existingUser.email === email ? 'Email déjà utilisé' : 'Nom d\'utilisateur déjà utilisé'
+      });
+      return;
+    }
+
+    // Créer le nouvel administrateur
+    const admin = new User({
+      email,
+      password,
+      username,
+      role: 'admin',
+      xp: 0,
+      level: 1
+    });
+
+    await admin.save();
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Compte administrateur créé avec succès',
+      data: {
+        user: {
+          id: admin._id,
+          email: admin.email,
+          username: admin.username,
+          role: admin.role,
+          xp: admin.xp,
+          level: admin.level
+        }
+      }
+    };
+
+    res.status(201).json(response);
+  } catch (error) {
+    console.error('Erreur lors de la création de l\'administrateur:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur serveur lors de la création de l\'administrateur'
+    });
+  }
+};
+
+/**
  * Validation pour la connexion
  */
 export const validateLogin = [
@@ -215,4 +277,22 @@ export const validateLogin = [
   body('password')
     .notEmpty()
     .withMessage('Mot de passe requis')
+];
+
+/**
+ * Validation pour la création d'admin
+ */
+export const validateCreateAdmin = [
+  body('email')
+    .isEmail()
+    .withMessage('Email invalide')
+    .normalizeEmail(),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Le mot de passe doit contenir au moins 6 caractères'),
+  body('username')
+    .isLength({ min: 3, max: 20 })
+    .withMessage('Le nom d\'utilisateur doit contenir entre 3 et 20 caractères')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Le nom d\'utilisateur ne peut contenir que des lettres, chiffres et underscores')
 ];

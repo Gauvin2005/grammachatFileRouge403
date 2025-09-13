@@ -13,6 +13,7 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
+    "create-admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts",
     "docker:build": "docker build -t grammachat-api .",
     "docker:run": "docker run -p 3000:3000 grammachat-api"
   },

@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, requireAdmin } from '../middleware/auth';
 import {
   register,
   login,
   getProfile,
+  createAdmin,
   validateRegister,
-  validateLogin
+  validateLogin,
+  validateCreateAdmin
 } from '../controllers/authController';
 
 const router = Router();
@@ -30,5 +32,12 @@ router.post('/login', validateLogin, login);
  * @access  Private
  */
 router.get('/profile', authenticateToken, getProfile);
+
+/**
+ * @route   POST /api/auth/create-admin
+ * @desc    Créer un compte administrateur
+ * @access  Private (Admin only)
+ */
+router.post('/create-admin', authenticateToken, requireAdmin, validateCreateAdmin, createAdmin);
 
 export default router;
