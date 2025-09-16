@@ -204,12 +204,17 @@ const ProfileScreen: React.FC = () => {
         <Card.Content>
           <Text style={styles.cardTitle}>Paramètres</Text>
           
+          {/* 🔔 NOTIFICATIONS TEMPORAIREMENT DÉSACTIVÉES */}
+          {/* TODO: Réactiver quand les fonctionnalités prioritaires seront terminées */}
+          {/* Voir NOTIFICATIONS-TEMPORARY-DISABLE.md pour plus d'informations */}
+          {/* 
           <List.Item
             title="Notifications"
             description="Recevoir des notifications push"
             left={(props) => <List.Icon {...props} icon="bell" />}
             right={() => <Switch value={true} onValueChange={() => {}} />}
           />
+          */}
           
           <Divider style={styles.divider} />
           

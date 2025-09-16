@@ -1,3 +1,7 @@
+// 🔔 NOTIFICATIONS TEMPORAIREMENT DÉSACTIVÉES
+// Ce service est préservé pour réactivation future
+// Voir NOTIFICATIONS-TEMPORARY-DISABLE.md pour plus d'informations
+
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';

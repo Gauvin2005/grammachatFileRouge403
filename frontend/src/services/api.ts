@@ -17,8 +17,13 @@ class ApiService {
 
   constructor() {
     this.baseURL = __DEV__ 
-      ? 'http://localhost:3000/api' 
+      ? 'http://10.8.252.163:3000/api'  // IP de l'ordinateur pour mobile physique
       : 'https://your-production-api.com/api';
+    
+    console.log('🔧 Configuration API:', {
+      baseURL: this.baseURL,
+      isDev: __DEV__
+    });
     
     this.api = axios.create({
       baseURL: this.baseURL,
@@ -66,8 +71,24 @@ class ApiService {
 
   // Méthodes d'authentification
   async login(credentials: AuthRequest): Promise<ApiResponse<{ user: User; token: string }>> {
-    const response = await this.api.post('/auth/login', credentials);
-    return response.data;
+    try {
+      console.log('🌐 Envoi requête login vers:', `${this.baseURL}/auth/login`);
+      console.log('📤 Données envoyées:', { email: credentials.email, password: '[HIDDEN]' });
+      
+      const response = await this.api.post('/auth/login', credentials);
+      console.log('📥 Réponse reçue:', response.status, response.data);
+      
+      return response.data;
+    } catch (error: any) {
+      console.log('❌ Erreur API login:', error);
+      console.log('❌ Détails erreur:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        url: error.config?.url
+      });
+      throw error;
+    }
   }
 
   async register(userData: RegisterRequest): Promise<ApiResponse<{ user: User; token: string }>> {
@@ -126,8 +147,15 @@ class ApiService {
 
   // Méthodes utilitaires
   async checkHealth(): Promise<ApiResponse> {
-    const response = await this.api.get('/health');
-    return response.data;
+    try {
+      console.log('🏥 Test de connectivité vers:', `${this.baseURL}/health`);
+      const response = await this.api.get('/health');
+      console.log('✅ Serveur accessible:', response.status);
+      return response.data;
+    } catch (error: any) {
+      console.log('❌ Serveur inaccessible:', error.message);
+      throw error;
+    }
   }
 
   // Gestion du token

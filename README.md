@@ -11,7 +11,7 @@ Grammachat est une application mobile de messagerie gamifiée qui récompense le
 - **Base de données**: MongoDB (NoSQL)
 - **Containérisation**: Docker
 - **Vérification orthographique**: LanguageTool API
-- **Notifications**: Expo Notifications
+- **Notifications**: Expo Notifications (⚠️ Temporairement désactivées - voir `NOTIFICATIONS-TEMPORARY-DISABLE.md`)
 
 ## 📁 Structure du Projet
 

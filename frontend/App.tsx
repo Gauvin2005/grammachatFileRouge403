@@ -12,7 +12,8 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { theme } from './src/utils/theme';
 import { initializeAuth } from './src/store/authSlice';
 import { useAppDispatch } from './src/hooks/redux';
-import notificationService from './src/services/notificationService';
+// 🔔 NOTIFICATIONS TEMPORAIREMENT DÉSACTIVÉES
+// import notificationService from './src/services/notificationService';
 
 // Empêcher l'auto-hide du splash screen
 SplashScreen.preventAutoHideAsync();
@@ -26,16 +27,18 @@ const AppContent: React.FC = () => {
         // Initialiser l'authentification
         await dispatch(initializeAuth());
         
-        // Configurer les notifications push
-        await notificationService.configureAndroidNotifications();
-        await notificationService.setupNotificationListeners();
-        
-        // Enregistrer pour les notifications push et récupérer le token
-        const pushToken = await notificationService.registerForPushNotifications();
-        if (pushToken) {
-          console.log('Token de notification push obtenu:', pushToken);
-          // Ici tu peux envoyer le token à ton backend
-        }
+        // 🔔 NOTIFICATIONS TEMPORAIREMENT DÉSACTIVÉES
+        // TODO: Réactiver les notifications quand les fonctionnalités prioritaires seront terminées
+        // Voir NOTIFICATIONS-TEMPORARY-DISABLE.md pour plus d'informations
+        // await notificationService.configureAndroidNotifications();
+        // await notificationService.setupNotificationListeners();
+        // 
+        // // Enregistrer pour les notifications push et récupérer le token
+        // const pushToken = await notificationService.registerForPushNotifications();
+        // if (pushToken) {
+        //   console.log('Token de notification push obtenu:', pushToken);
+        //   // Ici tu peux envoyer le token à ton backend
+        // }
       } catch (error) {
         console.error('Erreur d\'initialisation:', error);
       } finally {

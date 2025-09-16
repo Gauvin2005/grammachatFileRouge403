@@ -40,9 +40,15 @@ const LoginScreen: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await dispatch(loginUser(data)).unwrap();
-    } catch (error) {
-      Alert.alert('Erreur', 'Échec de la connexion');
+      console.log('🚀 Début de la connexion avec:', data.email);
+      const result = await dispatch(loginUser(data)).unwrap();
+      console.log('✅ Connexion réussie:', result);
+    } catch (error: any) {
+      console.log('❌ Erreur de connexion dans onSubmit:', error);
+      const errorMessage = typeof error === 'string' ? error : 
+                          error?.message || 
+                          'Échec de la connexion';
+      Alert.alert('Erreur de connexion', errorMessage);
     }
   };
 
@@ -88,6 +94,7 @@ const LoginScreen: React.FC = () => {
                   value={value}
                   onBlur={onBlur}
                   onChangeText={onChange}
+                  onChange={typeof window !== 'undefined' ? (e: any) => onChange(e.target.value) : undefined}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
@@ -118,6 +125,7 @@ const LoginScreen: React.FC = () => {
                   value={value}
                   onBlur={onBlur}
                   onChangeText={onChange}
+                  onChange={typeof window !== 'undefined' ? (e: any) => onChange(e.target.value) : undefined}
                   secureTextEntry={!showPassword}
                   autoComplete="password"
                   error={!!errors.password}
