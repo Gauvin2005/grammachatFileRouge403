@@ -3,7 +3,7 @@
 ## 📋 Prérequis
 
 ### Système
-- **Node.js** : Version 18 ou supérieure
+- **Node.js** : Version 18 ou supérieure (pour Express.js)
 - **npm** : Version 8 ou supérieure
 - **Docker** : Version 20.10 ou supérieure
 - **Docker Compose** : Version 2.0 ou supérieure
@@ -60,7 +60,7 @@ npm run ios
 
 ## 🔧 Installation Détaillée
 
-### Backend (API Node.js)
+### Backend (API Express.js)
 
 #### 1. Installation des dépendances
 ```bash
@@ -156,7 +156,7 @@ npm run build:ios
 ```bash
 # Le fichier docker-compose.yml est déjà configuré
 # Il inclut :
-# - API Node.js
+# - API Express.js
 # - MongoDB
 # - Redis (pour le cache)
 
@@ -253,7 +253,7 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-#### 3. Problèmes de dépendances Node.js
+#### 3. Problèmes de dépendances Express.js
 ```bash
 # Nettoyer le cache npm
 npm cache clean --force

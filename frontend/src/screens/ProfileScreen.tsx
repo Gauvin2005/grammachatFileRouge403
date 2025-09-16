@@ -70,17 +70,17 @@ const ProfileScreen: React.FC = () => {
           label={user?.username.charAt(0).toUpperCase() || 'U'}
           style={styles.avatar}
         />
-        <Text style={styles.userName}>{user?.username}</Text>
-        <Text style={styles.userEmail}>{user?.email}</Text>
+        <Text style={styles.userName}>{user?.username || 'Utilisateur'}</Text>
+        <Text style={styles.userEmail}>{user?.email || 'email@example.com'}</Text>
         
         <View style={styles.levelContainer}>
           <View style={styles.levelInfo}>
             <Ionicons name="trophy" size={24} color={colors.level} />
-            <Text style={styles.levelText}>Niveau {user?.level}</Text>
+            <Text style={styles.levelText}>Niveau {user?.level || 1}</Text>
           </View>
           <View style={styles.xpInfo}>
             <Ionicons name="star" size={24} color={colors.xp} />
-            <Text style={styles.xpText}>{user?.xp} XP</Text>
+            <Text style={styles.xpText}>{user?.xp || 0} XP</Text>
           </View>
         </View>
 
@@ -94,7 +94,7 @@ const ProfileScreen: React.FC = () => {
             />
           </View>
           <Text style={styles.progressText}>
-            {Math.round(getLevelProgress())}% vers le niveau {user ? user.level + 1 : 1}
+            {Math.round(getLevelProgress())}% vers le niveau {(user?.level || 1) + 1}
           </Text>
         </View>
       </View>
@@ -150,7 +150,7 @@ const ProfileScreen: React.FC = () => {
           
           <List.Item
             title="Email"
-            description={user?.email}
+            description={user?.email || 'email@example.com'}
             left={(props) => <List.Icon {...props} icon="email" />}
           />
           
@@ -179,13 +179,13 @@ const ProfileScreen: React.FC = () => {
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
               <Ionicons name="star" size={32} color={colors.xp} />
-              <Text style={styles.statValue}>{user?.xp}</Text>
+              <Text style={styles.statValue}>{user?.xp || 0}</Text>
               <Text style={styles.statLabel}>XP Total</Text>
             </View>
             
             <View style={styles.statItem}>
               <Ionicons name="trophy" size={32} color={colors.level} />
-              <Text style={styles.statValue}>{user?.level}</Text>
+              <Text style={styles.statValue}>{user?.level || 1}</Text>
               <Text style={styles.statLabel}>Niveau</Text>
             </View>
             

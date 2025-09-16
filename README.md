@@ -7,7 +7,7 @@ Grammachat est une application mobile de messagerie gamifiée qui récompense le
 ## 🏗️ Architecture
 
 - **Frontend Mobile**: React Native avec Expo (iOS/Android)
-- **Backend API**: Node.js avec Express
+- **Backend API**: Express.js avec TypeScript
 - **Base de données**: MongoDB (NoSQL)
 - **Containérisation**: Docker
 - **Vérification orthographique**: LanguageTool API
@@ -18,7 +18,7 @@ Grammachat est une application mobile de messagerie gamifiée qui récompense le
 ```
 grammachat/
 ├── frontend/          # Application React Native/Expo
-├── backend/           # API Node.js
+├── backend/           # API Express.js
 ├── docker/            # Configuration Docker
 ├── docs/              # Documentation
 ├── tests/             # Tests d'intégration
@@ -88,7 +88,7 @@ cd backend && npm test
 ## 🛠️ Technologies
 
 - **Frontend**: React Native, Expo, TypeScript
-- **Backend**: Node.js, Express, TypeScript
+- **Backend**: Express.js, TypeScript
 - **Base de données**: MongoDB
 - **Authentification**: JWT
 - **Tests**: Jest, Supertest

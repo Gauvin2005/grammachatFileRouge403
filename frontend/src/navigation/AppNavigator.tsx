@@ -1,4 +1,5 @@
 import React from 'react';
+import { View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -79,7 +80,7 @@ const AppNavigator: React.FC = () => {
 
   if (isLoading) {
     // Afficher un écran de chargement ou splash screen
-    return null;
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }} />;
   }
 
   return (

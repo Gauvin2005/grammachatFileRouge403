@@ -86,7 +86,7 @@ const ChatScreen: React.FC = () => {
       styles.messageCard,
       item.sender.id === user?.id ? styles.ownMessage : styles.otherMessage
     ]}>
-      <Card.Content>
+      <Card.Content style={styles.messageContentContainer}>
         <View style={styles.messageHeader}>
           <Avatar.Text 
             size={32} 
@@ -94,8 +94,16 @@ const ChatScreen: React.FC = () => {
             style={styles.avatar}
           />
           <View style={styles.messageInfo}>
-            <Text style={styles.senderName}>{item.sender.username}</Text>
-            <Text style={styles.timestamp}>
+            <Text style={[
+              styles.senderName,
+              item.sender.id === user?.id ? styles.ownSenderName : styles.otherSenderName
+            ]}>
+              {item.sender.username}
+            </Text>
+            <Text style={[
+              styles.timestamp,
+              item.sender.id === user?.id ? styles.ownTimestamp : styles.otherTimestamp
+            ]}>
               {new Date(item.timestamp).toLocaleTimeString('fr-FR', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -113,7 +121,12 @@ const ChatScreen: React.FC = () => {
           )}
         </View>
         
-        <Text style={styles.messageContent}>{item.content}</Text>
+        <Text style={[
+          styles.messageContent,
+          item.sender.id === user?.id ? styles.ownMessageContent : styles.otherMessageContent
+        ]}>
+          {item.content || 'Message vide'}
+        </Text>
         
         {item.errorsFound && item.errorsFound.length > 0 && (
           <View style={styles.errorsContainer}>
@@ -150,9 +163,9 @@ const ChatScreen: React.FC = () => {
             style={styles.userAvatar}
           />
           <View>
-            <Text style={styles.userName}>{user?.username}</Text>
+            <Text style={styles.userName}>{user?.username || 'Utilisateur'}</Text>
             <Text style={styles.userStats}>
-              Niveau {user?.level} • {user?.xp} XP
+              Niveau {user?.level || 1} • {user?.xp || 0} XP
             </Text>
           </View>
         </View>
@@ -264,6 +277,11 @@ const styles = StyleSheet.create({
   messageCard: {
     marginBottom: spacing.sm,
     maxWidth: '80%',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   ownMessage: {
     alignSelf: 'flex-end',
@@ -272,6 +290,10 @@ const styles = StyleSheet.create({
   otherMessage: {
     alignSelf: 'flex-start',
     backgroundColor: colors.surface,
+  },
+  messageContentContainer: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
   messageHeader: {
     flexDirection: 'row',
@@ -303,7 +325,27 @@ const styles = StyleSheet.create({
   },
   messageContent: {
     ...typography.body,
+    lineHeight: 20,
+    marginTop: spacing.xs,
+  },
+  ownMessageContent: {
+    color: colors.surface,
+    fontWeight: '500',
+  },
+  otherMessageContent: {
     color: colors.text,
+  },
+  ownSenderName: {
+    color: colors.surface,
+  },
+  otherSenderName: {
+    color: colors.text,
+  },
+  ownTimestamp: {
+    color: colors.surface + 'CC',
+  },
+  otherTimestamp: {
+    color: colors.textSecondary,
   },
   errorsContainer: {
     marginTop: spacing.sm,
