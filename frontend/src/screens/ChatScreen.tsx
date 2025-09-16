@@ -163,9 +163,9 @@ const ChatScreen: React.FC = () => {
             style={styles.userAvatar}
           />
           <View>
-            <Text style={styles.userName}>{user?.username || 'Utilisateur'}</Text>
+            <Text style={styles.userName}>{user?.username}</Text>
             <Text style={styles.userStats}>
-              Niveau {user?.level || 1} • {user?.xp || 0} XP
+              Niveau {user?.level} • {user?.xp} XP
             </Text>
           </View>
         </View>

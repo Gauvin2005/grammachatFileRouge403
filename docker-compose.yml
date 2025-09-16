@@ -45,20 +45,6 @@ services:
       - "${API_PORT:-3000}:3000"
     env_file:
       - .env
-    environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      PORT: ${API_PORT:-3000}
-      MONGODB_URI: ${MONGODB_URI:-mongodb://mongodb:27017/grammachat}
-      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
-      LANGUAGETOOL_API_URL: ${LANGUAGETOOL_API_URL:-https://api.languagetool.org/v2/check}
-      LANGUAGETOOL_API_KEY: ${LANGUAGETOOL_API_KEY:-}
-      XP_PER_CHARACTER: ${XP_PER_CHARACTER:-1}
-      XP_BONUS_NO_ERRORS: ${XP_BONUS_NO_ERRORS:-10}
-      XP_PENALTY_PER_ERROR: ${XP_PENALTY_PER_ERROR:-5}
-      LEVEL_UP_THRESHOLD: ${LEVEL_UP_THRESHOLD:-100}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000,http://localhost:19006}
     depends_on:
       mongodb:
         condition: service_healthy

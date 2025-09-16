@@ -79,7 +79,6 @@ const AppNavigator: React.FC = () => {
   const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
 
   if (isLoading) {
-    // Afficher un écran de chargement ou splash screen
     return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }} />;
   }
 

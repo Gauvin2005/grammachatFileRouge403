@@ -46,17 +46,13 @@ async function createDefaultAccounts() {
     console.log('🔄 Création des comptes par défaut...');
 
     for (const account of defaultAccounts) {
-      // Hacher le mot de passe
-      const hashedPassword = await bcrypt.hash(account.password, 12);
-      
-      // Créer l'utilisateur
+      // Créer l'utilisateur (le mot de passe sera hashé automatiquement par le middleware)
       const user = new User({
         username: account.username,
         email: account.email,
-        password: hashedPassword,
+        password: account.password,
         role: account.role,
-        xp: account.xp,
-        isEmailVerified: true
+        xp: account.xp
       });
 
       await user.save();

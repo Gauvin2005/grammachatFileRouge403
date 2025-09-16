@@ -120,14 +120,14 @@ const LeaderboardScreen: React.FC = () => {
                 style={styles.xpChip}
                 textStyle={styles.chipText}
               >
-                {item.xp || 0} XP
+                {item.xp} XP
               </Chip>
               <Chip 
                 icon="trophy" 
                 style={styles.levelChip}
                 textStyle={styles.chipText}
               >
-                Niveau {item.level || 1}
+                Niveau {item.level}
               </Chip>
             </View>
           </View>

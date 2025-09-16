@@ -13,7 +13,6 @@ import { theme } from './src/utils/theme';
 import { initializeAuth } from './src/store/authSlice';
 import { useAppDispatch } from './src/hooks/redux';
 import notificationService from './src/services/notificationService';
-import ErrorBoundary from './src/components/ErrorBoundary';
 
 // Empêcher l'auto-hide du splash screen
 SplashScreen.preventAutoHideAsync();
@@ -49,16 +48,14 @@ const AppContent: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <ErrorBoundary>
-      <SafeAreaProvider>
-        <PaperProvider theme={theme}>
-          <NavigationContainer>
-            <AppNavigator />
-            <StatusBar style="auto" />
-          </NavigationContainer>
-        </PaperProvider>
-      </SafeAreaProvider>
-    </ErrorBoundary>
+    <SafeAreaProvider>
+      <PaperProvider theme={theme}>
+        <NavigationContainer>
+          <AppNavigator />
+          <StatusBar style="auto" />
+        </NavigationContainer>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 };
 
