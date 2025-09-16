@@ -7,7 +7,7 @@ Ce guide couvre les bonnes pratiques de développement pour Grammachat, incluant
 ## 📋 Prérequis
 
 ### Outils de développement
-- **Node.js** : Version 18+ (pour Express.js)
+- **Express.js** : Version 18+
 - **npm** : Version 8+
 - **Git** : Version 2.30+
 - **Docker** : Version 20.10+

@@ -3,7 +3,7 @@
 ## 📋 Prérequis
 
 ### Système
-- **Node.js** : Version 18 ou supérieure (pour Express.js)
+- **Express.js** : Version 18 ou supérieure
 - **npm** : Version 8 ou supérieure
 - **Docker** : Version 20.10 ou supérieure
 - **Docker Compose** : Version 2.0 ou supérieure
