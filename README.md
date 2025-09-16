@@ -18,7 +18,7 @@ Grammachat est une application mobile de messagerie gamifiée qui récompense le
 ```
 grammachat/
 ├── frontend/          # Application React Native/Expo
-├── backend/           # API Node.js
+├── backend/           # API Express
 ├── docker/            # Configuration Docker
 ├── docs/              # Documentation
 ├── tests/             # Tests d'intégration
