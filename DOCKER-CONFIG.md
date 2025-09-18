@@ -1,6 +1,6 @@
-# 🐳 Configuration Docker Personnalisée - Grammachat
+#  Configuration Docker Personnalisée - Grammachat
 
-## 🚀 Démarrage Rapide
+##  Démarrage Rapide
 
 ### Option 1 : Configuration Automatique (Recommandée)
 ```bash
@@ -19,9 +19,9 @@ nano .env
 docker-compose up -d
 ```
 
-## ⚙️ Configuration du Fichier .env
+##  Configuration du Fichier .env
 
-### 🔐 Sécurité
+###  Sécurité
 ```bash
 # Clé secrète JWT (OBLIGATOIRE - changez en production)
 JWT_SECRET=clé-secrète-très-longue-et-complexe
@@ -30,7 +30,7 @@ JWT_SECRET=clé-secrète-très-longue-et-complexe
 LANGUAGETOOL_API_KEY=clé-api-languagetool
 ```
 
-### 🔌 Ports
+###  Ports
 ```bash
 # Ports personnalisables
 API_PORT=3000          # Port de l'API backend
@@ -38,7 +38,7 @@ MONGODB_PORT=27017     # Port de MongoDB
 REDIS_PORT=6379        # Port de Redis
 ```
 
-### 🎮 Gamification
+###  Gamification
 ```bash
 # Configuration du système XP
 XP_PER_CHARACTER=1           # XP gagné par caractère
@@ -47,7 +47,7 @@ XP_PENALTY_PER_ERROR=5       # Pénalité XP par erreur
 LEVEL_UP_THRESHOLD=100       # XP requis pour monter de niveau
 ```
 
-### 🌐 CORS et Notifications
+###  CORS et Notifications
 ```bash
 # Origines autorisées (ajoutez vos domaines)
 CORS_ORIGIN=http://localhost:3000,http://localhost:19006,https://domaine.com
@@ -56,7 +56,7 @@ CORS_ORIGIN=http://localhost:3000,http://localhost:19006,https://domaine.com
 EXPO_PUSH_TOKEN=token-expo-push
 ```
 
-## 🛠️ Commandes Docker Utiles
+##  Commandes Docker Utiles
 
 ### Gestion des Services
 ```bash
@@ -106,7 +106,7 @@ docker-compose build --no-cache api
 docker-compose pull
 ```
 
-## 🔧 Configuration Avancée
+##  Configuration Avancée
 
 ### Variables d'Environnement Personnalisées
 ```bash
@@ -147,7 +147,7 @@ networks:
         - subnet: 172.20.0.0/16
 ```
 
-## 🐛 Dépannage
+##  Dépannage
 
 ### Problèmes Courants
 
@@ -206,7 +206,7 @@ docker-compose logs --tail=100 api
 docker-compose logs --since="2024-01-01T00:00:00" api
 ```
 
-## 📊 Monitoring
+##  Monitoring
 
 ### Health Checks
 ```bash
@@ -235,7 +235,7 @@ docker system df
 docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
 ```
 
-## 🔒 Sécurité
+##  Sécurité
 
 ### Bonnes Pratiques
 1. **Changez toujours le JWT_SECRET** en production

@@ -12,6 +12,9 @@ import authRoutes from './routes/auth';
 import messageRoutes from './routes/messages';
 import userRoutes from './routes/users';
 
+// Swagger
+import { setupSwagger } from './config/swagger';
+
 // Charger les variables d'environnement
 dotenv.config();
 
@@ -54,6 +57,39 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('combined'));
 }
 
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Vérifier l'état de l'API
+ *     description: Retourne l'état de santé de l'API avec des informations système
+ *     tags: [System]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: API fonctionnelle
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "API Grammachat fonctionnelle"
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2023-12-01T10:00:00.000Z"
+ *                 environment:
+ *                   type: string
+ *                   example: "development"
+ *                 version:
+ *                   type: string
+ *                   example: "1.0.0"
+ */
 // Route de santé
 app.get('/api/health', (req, res) => {
   res.json({
@@ -64,6 +100,9 @@ app.get('/api/health', (req, res) => {
     version: '1.0.0'
   });
 });
+
+// Configuration Swagger
+setupSwagger(app);
 
 // Routes API
 app.use('/api/auth', authRoutes);

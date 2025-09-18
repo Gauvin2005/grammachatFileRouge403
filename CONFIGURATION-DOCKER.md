@@ -1,6 +1,6 @@
-# 🐳 Configuration Docker Personnalisée - Grammachat
+#  Configuration Docker Personnalisée - Grammachat
 
-## 🚀 Démarrage Rapide
+##  Démarrage Rapide
 
 ### Option 1 : Script Automatique (Recommandé)
 ```bash
@@ -20,18 +20,18 @@ docker-compose up -d mongodb redis
 cd backend && node src/simple-server.js
 ```
 
-## ⚙️ Configuration du Fichier .env
+##  Configuration du Fichier .env
 
-### 🔐 Sécurité (OBLIGATOIRE)
+###  Sécurité (OBLIGATOIRE)
 ```bash
 # Clé secrète JWT - CHANGEZ EN PRODUCTION !
-JWT_SECRET=clé-secrète-très-longue-et-complexe-2024
+JWT_SECRET=clé-secrète-très-longue-et-complexe-2025
 
 # Clé API LanguageTool (optionnelle)
 LANGUAGETOOL_API_KEY=clé-api-languagetool
 ```
 
-### 🔌 Ports Personnalisables
+###  Ports Personnalisables
 ```bash
 # Ports de mon choix
 API_PORT=3000          # Port de l'API backend
@@ -48,7 +48,7 @@ XP_PENALTY_PER_ERROR=5       # Pénalité XP par erreur
 LEVEL_UP_THRESHOLD=100       # XP requis pour monter de niveau
 ```
 
-### 🌐 CORS et Notifications
+###  CORS et Notifications
 ```bash
 # Domaines autorisés (ajoutez vos domaines)
 CORS_ORIGIN=http://localhost:3000,http://localhost:19006,https://domaine.com
@@ -109,7 +109,7 @@ CORS_ORIGIN=http://localhost:3000,http://localhost:19006,https://monapp.com
 EXPO_PUSH_TOKEN=ExponentPushToken[abc123def456ghi789]
 ```
 
-## 🔧 Commandes Docker Utiles
+##  Commandes Docker Utiles
 
 ### Gestion des Services
 ```bash
@@ -153,7 +153,7 @@ docker-compose build --no-cache api
 docker-compose pull
 ```
 
-## 🧪 Test de la Configuration
+##  Test de la Configuration
 
 ### 1. Test de l'API
 ```bash
@@ -183,7 +183,7 @@ docker exec grammachat-redis redis-cli ping
 curl http://localhost:3000/api/health
 ```
 
-## 🐛 Dépannage
+##  Dépannage
 
 ### Problèmes Courants
 
@@ -223,7 +223,7 @@ sudo chown -R $USER:$USER .
 sudo systemctl restart docker
 ```
 
-## 🔒 Sécurité
+##  Sécurité
 
 ### Bonnes Pratiques
 1. **Changez toujours le JWT_SECRET** en production
@@ -241,7 +241,7 @@ MONGODB_URI=mongodb://admin:motdepasse@mongodb:27017/grammachat?authSource=admin
 REDIS_PASSWORD=motdepasse-redis-complexe
 ```
 
-## 📊 Monitoring
+##  Monitoring
 
 ### Health Checks
 ```bash
@@ -270,7 +270,7 @@ docker system df
 docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
 ```
 
-## 🎯 Prochaines Étapes
+##  Prochaines Étapes
 
 1. **Configurez vos paramètres** dans le fichier `.env`
 2. **Lancez le script** `./scripts/start-docker.sh`
@@ -280,5 +280,5 @@ docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
 
 ---
 
-**🎉 Ma configuration Docker est prête !**  
+** Ma configuration Docker est prête !**  
 Utilisez `./scripts/start-docker.sh` pour un démarrage automatique ou suivez le guide manuel ci-dessus.

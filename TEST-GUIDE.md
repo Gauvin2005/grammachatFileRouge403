@@ -1,13 +1,13 @@
-# 🧪 Guide de Test - Grammachat
+#  Guide de Test - Grammachat
 
-## 🚀 Services Démarrés
+##  Services Démarrés
 
-✅ **MongoDB** : `localhost:27017` (Docker)  
-✅ **Redis** : `localhost:6379` (Docker)  
-✅ **API Backend** : `localhost:3000` (Express)  
-🔄 **Frontend Expo** : En cours de démarrage...
+ **MongoDB** : `localhost:27017` (Docker)  
+ **Redis** : `localhost:6379` (Docker)  
+ **API Backend** : `localhost:3000` (Express)  
+ **Frontend Expo** : En cours de démarrage...
 
-## 📱 Test de l'Application Mobile
+##  Test de l'Application Mobile
 
 ### 1. Installer Expo Go
 - **Android** : [Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
@@ -25,7 +25,7 @@ Une fois Expo démarré, scannez le QR code affiché dans le terminal avec :
 - **Profil** : Consultez vos statistiques
 - **Classement** : Voyez votre position
 
-## 🔧 Test de l'API
+##  Test de l'API
 
 ### Health Check
 ```bash
@@ -63,9 +63,9 @@ curl http://localhost:3000/api/messages
 curl http://localhost:3000/api/users/leaderboard
 ```
 
-## 🎮 Fonctionnalités à Tester
+##  Fonctionnalités à Tester
 
-### ✅ MVP Fonctionnel
+###  MVP Fonctionnel
 - [x] **Authentification** : Inscription/Connexion
 - [x] **Messagerie** : Envoi de messages texte
 - [x] **Gamification** : Calcul d'XP (1 point par caractère)
@@ -74,14 +74,14 @@ curl http://localhost:3000/api/users/leaderboard
 - [x] **Base de données** : Persistance MongoDB
 - [x] **Cache** : Redis pour les sessions
 
-### 🔄 En Cours de Développement
+###  En Cours de Développement
 - [ ] **Vérification orthographique** : LanguageTool API
 - [ ] **Notifications push** : Expo Notifications
 - [ ] **Interface mobile** : Écrans React Native
 - [ ] **Authentification JWT** : Tokens sécurisés
 - [ ] **Validation avancée** : Contrôles de sécurité
 
-## 📊 Données de Test
+##  Données de Test
 
 ### Utilisateur Créé
 - **Email** : test@example.com
@@ -95,7 +95,7 @@ curl http://localhost:3000/api/users/leaderboard
 - **XP Gagné** : 38 points (nombre de caractères)
 - **Timestamp** : 2025-09-08T14:35:31.017Z
 
-## 🐛 Dépannage
+##  Dépannage
 
 ### API ne répond pas
 ```bash
@@ -124,7 +124,7 @@ npm install -g @expo/cli
 cd frontend && npm start
 ```
 
-## 🎯 Prochaines Étapes
+##  Prochaines Étapes
 
 1. **Tester l'interface mobile** avec Expo Go
 2. **Implémenter la vérification orthographique** avec LanguageTool
@@ -132,7 +132,7 @@ cd frontend && npm start
 4. **Développer les écrans React Native** complets
 5. **Ajouter les notifications push**
 
-## 📞 Support
+##  Support
 
 En cas de problème :
 - Vérifiez les logs : `docker-compose logs`
@@ -141,5 +141,5 @@ En cas de problème :
 
 ---
 
-**🎉 Grammachat MVP est opérationnel !**  
+** Grammachat MVP est opérationnel !**  
 Testez l'application et donnez votre feedback pour les améliorations.
