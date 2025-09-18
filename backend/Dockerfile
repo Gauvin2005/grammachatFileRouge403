@@ -9,14 +9,17 @@ RUN apk add --no-cache dumb-init
 # Copier les fichiers de dépendances
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm install --omit=dev --no-package-lock && npm cache clean --force
+# Installer toutes les dépendances (y compris dev pour la compilation TypeScript)
+RUN npm install --no-package-lock && npm cache clean --force
 
 # Copier le code source
 COPY . .
 
 # Compiler TypeScript
 RUN npm run build
+
+# Supprimer les dépendances de développement après compilation
+RUN npm prune --production && npm cache clean --force
 
 # Créer un utilisateur non-root pour la sécurité
 RUN addgroup -g 1001 -S nodejs
