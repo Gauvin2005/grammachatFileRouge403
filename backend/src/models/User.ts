@@ -88,9 +88,7 @@ UserSchema.methods.addXP = async function(amount: number): Promise<UserDocument>
   return this.save();
 };
 
-// Index pour optimiser les requêtes
-UserSchema.index({ email: 1 });
-UserSchema.index({ username: 1 });
+// Index pour optimiser les requêtes (email et username déjà indexés par unique: true)
 UserSchema.index({ xp: -1 });
 UserSchema.index({ level: -1 });
 
