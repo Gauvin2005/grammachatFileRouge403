@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 // Connexion MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat';
+const MONGODB_URI = 'mongodb://localhost:27017/grammachat';
 
 async function testDatabase() {
   try {

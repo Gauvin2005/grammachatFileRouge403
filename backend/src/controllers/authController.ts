@@ -74,7 +74,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     console.error('Erreur lors de l\'inscription:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de l\'inscription'
+      message: 'Erreur serveur lors de l\'inscription',
+      error: error instanceof Error ? error.message : 'Erreur inconnue'
     });
   }
 };

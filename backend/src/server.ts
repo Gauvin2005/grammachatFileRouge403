@@ -16,7 +16,7 @@ import userRoutes from './routes/users';
 import { setupSwagger } from './config/swagger';
 
 // Charger les variables d'environnement
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
