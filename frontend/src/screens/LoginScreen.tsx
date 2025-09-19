@@ -52,6 +52,22 @@ const LoginScreen: React.FC = () => {
     }
   };
 
+  // 🎭 NOUVELLE FONCTION : Mode démo
+  const onDemoMode = async () => {
+    try {
+      console.log('🎭 Activation du mode démo');
+      const demoData: LoginFormData = {
+        email: 'demo@grammachat.com',
+        password: 'demo123'
+      };
+      const result = await dispatch(loginUser(demoData)).unwrap();
+      console.log('✅ Mode démo activé:', result);
+    } catch (error: any) {
+      console.log('❌ Erreur mode démo:', error);
+      Alert.alert('Erreur mode démo', 'Impossible d\'activer le mode démo');
+    }
+  };
+
   const clearErrorMessage = () => {
     dispatch(clearError());
   };
@@ -158,6 +174,19 @@ const LoginScreen: React.FC = () => {
             >
               {isLoading ? 'Connexion...' : 'Se connecter'}
             </Button>
+
+            {/* 🎭 NOUVEAU BOUTON MODE DÉMO */}
+            <Button
+              mode="outlined"
+              onPress={onDemoMode}
+              disabled={isLoading}
+              style={styles.demoButton}
+              buttonColor={colors.surface}
+              textColor={colors.phoenix}
+              icon="play-circle"
+            >
+              🎭 Mode Démo (Test)
+            </Button>
           </Card.Content>
         </Card>
 
@@ -222,6 +251,11 @@ const styles = StyleSheet.create({
   },
   buttonContent: {
     paddingVertical: spacing.sm,
+  },
+  demoButton: {
+    marginTop: spacing.sm,
+    borderColor: colors.phoenix,
+    borderWidth: 2,
   },
   footer: {
     alignItems: 'center',

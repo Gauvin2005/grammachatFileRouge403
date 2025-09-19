@@ -14,6 +14,7 @@ import {
 class ApiService {
   private api: AxiosInstance;
   private baseURL: string;
+  private DEMO_MODE = true; // 🔧 MODE DÉMO TEMPORAIRE
 
   constructor() {
     this.baseURL = __DEV__ 
@@ -22,7 +23,8 @@ class ApiService {
     
     console.log('🔧 Configuration API:', {
       baseURL: this.baseURL,
-      isDev: __DEV__
+      isDev: __DEV__,
+      demoMode: this.DEMO_MODE
     });
     
     this.api = axios.create({
@@ -71,6 +73,40 @@ class ApiService {
 
   // Méthodes d'authentification
   async login(credentials: AuthRequest): Promise<ApiResponse<{ user: User; token: string }>> {
+    if (this.DEMO_MODE) {
+      console.log('🎭 MODE DÉMO - Connexion simulée');
+      
+      // Simuler un délai réseau
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Données utilisateur fictives
+      const demoUser: User = {
+        id: 'demo-user-1',
+        email: credentials.email,
+        username: credentials.email.split('@')[0],
+        role: 'user',
+        xp: 150,
+        level: 2,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      const demoToken = 'demo-token-' + Date.now();
+      
+      // Sauvegarder les données
+      await this.setAuthToken(demoToken);
+      await this.setUserData(demoUser);
+      
+      return {
+        success: true,
+        data: {
+          user: demoUser,
+          token: demoToken
+        },
+        message: 'Connexion réussie (mode démo)'
+      };
+    }
+
     try {
       console.log('🌐 Envoi requête login vers:', `${this.baseURL}/auth/login`);
       console.log('📤 Données envoyées:', { email: credentials.email, password: '[HIDDEN]' });
@@ -92,6 +128,37 @@ class ApiService {
   }
 
   async register(userData: RegisterRequest): Promise<ApiResponse<{ user: User; token: string }>> {
+    if (this.DEMO_MODE) {
+      console.log('🎭 MODE DÉMO - Inscription simulée');
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const demoUser: User = {
+        id: 'demo-user-' + Date.now(),
+        email: userData.email,
+        username: userData.username,
+        role: 'user',
+        xp: 0,
+        level: 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      const demoToken = 'demo-token-' + Date.now();
+      
+      await this.setAuthToken(demoToken);
+      await this.setUserData(demoUser);
+      
+      return {
+        success: true,
+        data: {
+          user: demoUser,
+          token: demoToken
+        },
+        message: 'Inscription réussie (mode démo)'
+      };
+    }
+
     const response = await this.api.post('/auth/register', userData);
     return response.data;
   }
@@ -147,6 +214,15 @@ class ApiService {
 
   // Méthodes utilitaires
   async checkHealth(): Promise<ApiResponse> {
+    if (this.DEMO_MODE) {
+      console.log('🎭 MODE DÉMO - Health check simulé');
+      return {
+        success: true,
+        data: { status: 'ok', mode: 'demo' },
+        message: 'Serveur accessible (mode démo)'
+      };
+    }
+
     try {
       console.log('🏥 Test de connectivité vers:', `${this.baseURL}/health`);
       const response = await this.api.get('/health');
