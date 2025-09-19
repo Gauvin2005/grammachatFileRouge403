@@ -164,17 +164,95 @@ class ApiService {
   }
 
   async getProfile(): Promise<ApiResponse<{ user: User }>> {
+    if (this.DEMO_MODE) {
+      console.log('🎭 MODE DÉMO - Profil simulé');
+      const userData = await this.getUserData();
+      return {
+        success: true,
+        data: { user: userData! },
+        message: 'Profil récupéré (mode démo)'
+      };
+    }
+
     const response = await this.api.get('/auth/profile');
     return response.data;
   }
 
   // Méthodes pour les messages
   async sendMessage(messageData: MessageRequest): Promise<ApiResponse<{ message: Message & { xpCalculation: any } }>> {
+    if (this.DEMO_MODE) {
+      console.log('🎭 MODE DÉMO - Message simulé');
+      
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simuler un message avec XP
+      const demoMessage = {
+        id: 'demo-message-' + Date.now(),
+        content: messageData.content,
+        timestamp: new Date().toISOString(),
+        xpEarned: Math.floor(Math.random() * 20) + 5, // 5-25 XP
+        errorsFound: [],
+        sender: {
+          id: 'demo-user-1',
+          username: 'demo',
+          email: 'demo@grammachat.com'
+        },
+        xpCalculation: {
+          baseXP: Math.floor(messageData.content.length * 0.5),
+          bonusXP: 10,
+          penaltyXP: 0,
+          totalXP: Math.floor(Math.random() * 20) + 5,
+          errorsCount: 0,
+          levelUp: false,
+          newLevel: 2
+        }
+      };
+      
+      return {
+        success: true,
+        data: { message: demoMessage },
+        message: 'Message envoyé (mode démo)'
+      };
+    }
+
     const response = await this.api.post('/messages', messageData);
     return response.data;
   }
 
   async getMessages(params?: PaginationParams): Promise<ApiResponse<{ data: Message[]; pagination: any }>> {
+    if (this.DEMO_MODE) {
+      console.log('🎭 MODE DÉMO - Messages simulés');
+      
+      // Simuler des messages
+      const demoMessages = [
+        {
+          id: 'demo-msg-1',
+          content: 'Bonjour tout le monde !',
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          xpEarned: 15,
+          errorsFound: [],
+          sender: { id: 'demo-user-1', username: 'demo', email: 'demo@grammachat.com' }
+        },
+        {
+          id: 'demo-msg-2', 
+          content: 'Comment allez-vous aujourd\'hui ?',
+          timestamp: new Date(Date.now() - 7200000).toISOString(),
+          xpEarned: 22,
+          errorsFound: [],
+          sender: { id: 'demo-user-1', username: 'demo', email: 'demo@grammachat.com' }
+        }
+      ];
+      
+      return {
+        success: true,
+        data: {
+          data: demoMessages,
+          pagination: { page: 1, limit: 10, total: 2, totalPages: 1, hasNext: false, hasPrev: false }
+        },
+        message: 'Messages récupérés (mode démo)'
+      };
+    }
+
     const response = await this.api.get('/messages', { params });
     return response.data;
   }
@@ -201,11 +279,53 @@ class ApiService {
   }
 
   async updateProfile(userId: string, userData: Partial<User>): Promise<ApiResponse<{ user: User }>> {
+    if (this.DEMO_MODE) {
+      console.log('🎭 MODE DÉMO - Mise à jour profil simulée');
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Récupérer l'utilisateur actuel et le mettre à jour
+      const currentUser = await this.getUserData();
+      const updatedUser = {
+        ...currentUser!,
+        ...userData,
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Sauvegarder les nouvelles données
+      await this.setUserData(updatedUser);
+      
+      return {
+        success: true,
+        data: { user: updatedUser },
+        message: 'Profil mis à jour (mode démo)'
+      };
+    }
+
     const response = await this.api.put(`/users/${userId}`, userData);
     return response.data;
   }
 
   async getLeaderboard(limit?: number): Promise<ApiResponse<{ leaderboard: LeaderboardEntry[] }>> {
+    if (this.DEMO_MODE) {
+      console.log('🎭 MODE DÉMO - Leaderboard simulé');
+      
+      // Simuler un leaderboard
+      const demoLeaderboard = [
+        { rank: 1, username: 'demo', xp: 150, level: 2 },
+        { rank: 2, username: 'alice', xp: 120, level: 2 },
+        { rank: 3, username: 'bob', xp: 95, level: 1 },
+        { rank: 4, username: 'charlie', xp: 80, level: 1 },
+        { rank: 5, username: 'diana', xp: 65, level: 1 }
+      ];
+      
+      return {
+        success: true,
+        data: { leaderboard: demoLeaderboard },
+        message: 'Leaderboard récupéré (mode démo)'
+      };
+    }
+
     const response = await this.api.get('/users/leaderboard', { 
       params: limit ? { limit } : undefined 
     });
