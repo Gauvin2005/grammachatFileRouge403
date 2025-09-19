@@ -94,12 +94,26 @@ const ChatScreen: React.FC = () => {
         styles.messageContainer,
         isOwnMessage ? styles.ownMessageContainer : styles.otherMessageContainer
       ]}>
+        {/* Nom et heure AU-DESSUS de la bulle */}
+        <View style={styles.messageHeaderOutside}>
+          <Text style={styles.senderNameOutside}>
+            {item.sender.username || 'NO_USERNAME'}
+          </Text>
+          <Text style={styles.timestampOutside}>
+            {new Date(item.timestamp).toLocaleTimeString('fr-FR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </Text>
+        </View>
+        
+        {/* Bulle simplifiée */}
         <Card style={[
           styles.messageCard,
           isOwnMessage ? styles.ownMessage : styles.otherMessage
         ]}>
           <Card.Content style={styles.messageContentContainer}>
-            {/* Header avec avatar et infos */}
+            {/* Avatar et XP seulement */}
             <View style={styles.messageHeader}>
               <Avatar.Text 
                 size={28} 
@@ -109,23 +123,6 @@ const ChatScreen: React.FC = () => {
                   isOwnMessage ? styles.ownAvatar : styles.otherAvatar
                 ]}
               />
-              <View style={styles.messageInfo}>
-                <Text style={[
-                  styles.senderName,
-                  isOwnMessage ? styles.ownSenderName : styles.otherSenderName
-                ]}>
-                  {item.sender.username}
-                </Text>
-                <Text style={[
-                  styles.timestamp,
-                  isOwnMessage ? styles.ownTimestamp : styles.otherTimestamp
-                ]}>
-                  {new Date(item.timestamp).toLocaleTimeString('fr-FR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </Text>
-              </View>
               {item.xpEarned > 0 && (
                 <Chip 
                   icon="star" 
@@ -139,11 +136,8 @@ const ChatScreen: React.FC = () => {
             </View>
             
             {/* Contenu du message */}
-            <Text style={[
-              styles.messageContent,
-              isOwnMessage ? styles.ownMessageContent : styles.otherMessageContent
-            ]}>
-              {item.content || 'Message vide'}
+            <Text style={styles.simpleMessageText}>
+              {item.content || item.text || item.message || 'Message vide'}
             </Text>
             
             {/* Erreurs détectées */}
@@ -308,6 +302,7 @@ const styles = StyleSheet.create({
   },
   messageCard: {
     maxWidth: '85%',
+    minWidth: 120, // Largeur minimale pour les messages courts
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -335,6 +330,7 @@ const styles = StyleSheet.create({
   messageHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: spacing.xs,
   },
   avatar: {
@@ -348,15 +344,21 @@ const styles = StyleSheet.create({
   },
   messageInfo: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   senderName: {
     ...typography.caption,
     fontWeight: 'bold',
-    color: colors.text,
+    color: '#000000', // Force couleur noire
+    fontSize: 12,
   },
   timestamp: {
     ...typography.small,
-    color: colors.textSecondary,
+    color: '#666666', // Force couleur grise
+    marginLeft: spacing.xs,
+    fontSize: 10,
   },
   xpChip: {
     backgroundColor: colors.xp,
@@ -365,19 +367,28 @@ const styles = StyleSheet.create({
     color: colors.surface,
     fontSize: 10,
   },
-  messageContent: {
-    ...typography.body,
-    lineHeight: 22,
-    marginTop: spacing.xs,
+  simpleMessageText: {
     fontSize: 16,
-  },
-  ownMessageContent: {
-    color: colors.surface,
-    fontWeight: '500',
-  },
-  otherMessageContent: {
-    color: colors.text,
+    color: '#000000', // Force couleur noire
+    marginTop: spacing.xs,
+    paddingVertical: 4,
     fontWeight: '400',
+  },
+  messageHeaderOutside: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.sm,
+  },
+  senderNameOutside: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  timestampOutside: {
+    fontSize: 10,
+    color: '#666666',
   },
   ownSenderName: {
     color: colors.surface,

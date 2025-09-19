@@ -223,7 +223,7 @@ class ApiService {
     if (this.DEMO_MODE) {
       console.log('🎭 MODE DÉMO - Messages simulés');
       
-      // Simuler des messages
+      // Simuler des messages avec différents expéditeurs
       const demoMessages = [
         {
           id: 'demo-msg-1',
@@ -238,6 +238,14 @@ class ApiService {
           content: 'Comment allez-vous aujourd\'hui ?',
           timestamp: new Date(Date.now() - 7200000).toISOString(),
           xpEarned: 22,
+          errorsFound: [],
+          sender: { id: 'demo-user-1', username: 'demo', email: 'demo@grammachat.com' }
+        },
+        {
+          id: 'demo-msg-3',
+          content: 'Salut ! Ça va bien ?',
+          timestamp: new Date(Date.now() - 1800000).toISOString(),
+          xpEarned: 18,
           errorsFound: [],
           sender: { id: 'demo-user-1', username: 'demo', email: 'demo@grammachat.com' }
         }
