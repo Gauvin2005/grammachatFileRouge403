@@ -72,6 +72,11 @@ const ChatScreen: React.FC = () => {
       }
 
       reset();
+      
+      // Scroll vers le bas après envoi
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
     } catch (error) {
       Alert.alert('Erreur', 'Échec de l\'envoi du message');
     }
@@ -81,74 +86,90 @@ const ChatScreen: React.FC = () => {
     dispatch(clearError());
   };
 
-  const renderMessage = ({ item }: { item: Message }) => (
-    <Card style={[
-      styles.messageCard,
-      item.sender.id === user?.id ? styles.ownMessage : styles.otherMessage
-    ]}>
-      <Card.Content style={styles.messageContentContainer}>
-        <View style={styles.messageHeader}>
-          <Avatar.Text 
-            size={32} 
-            label={item.sender.username.charAt(0).toUpperCase()}
-            style={styles.avatar}
-          />
-          <View style={styles.messageInfo}>
-            <Text style={[
-              styles.senderName,
-              item.sender.id === user?.id ? styles.ownSenderName : styles.otherSenderName
-            ]}>
-              {item.sender.username}
-            </Text>
-            <Text style={[
-              styles.timestamp,
-              item.sender.id === user?.id ? styles.ownTimestamp : styles.otherTimestamp
-            ]}>
-              {new Date(item.timestamp).toLocaleTimeString('fr-FR', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </Text>
-          </View>
-          {item.xpEarned > 0 && (
-            <Chip 
-              icon="star" 
-              style={styles.xpChip}
-              textStyle={styles.xpText}
-            >
-              +{item.xpEarned} XP
-            </Chip>
-          )}
-        </View>
-        
-        <Text style={[
-          styles.messageContent,
-          item.sender.id === user?.id ? styles.ownMessageContent : styles.otherMessageContent
+  const renderMessage = ({ item }: { item: Message }) => {
+    const isOwnMessage = item.sender.id === user?.id;
+    
+    return (
+      <View style={[
+        styles.messageContainer,
+        isOwnMessage ? styles.ownMessageContainer : styles.otherMessageContainer
+      ]}>
+        <Card style={[
+          styles.messageCard,
+          isOwnMessage ? styles.ownMessage : styles.otherMessage
         ]}>
-          {item.content || 'Message vide'}
-        </Text>
-        
-        {item.errorsFound && item.errorsFound.length > 0 && (
-          <View style={styles.errorsContainer}>
-            <Text style={styles.errorsTitle}>
-              <Ionicons name="warning" size={16} color={colors.warning} />{' '}
-              Erreurs détectées ({item.errorsFound.length})
+          <Card.Content style={styles.messageContentContainer}>
+            {/* Header avec avatar et infos */}
+            <View style={styles.messageHeader}>
+              <Avatar.Text 
+                size={28} 
+                label={item.sender.username.charAt(0).toUpperCase()}
+                style={[
+                  styles.avatar,
+                  isOwnMessage ? styles.ownAvatar : styles.otherAvatar
+                ]}
+              />
+              <View style={styles.messageInfo}>
+                <Text style={[
+                  styles.senderName,
+                  isOwnMessage ? styles.ownSenderName : styles.otherSenderName
+                ]}>
+                  {item.sender.username}
+                </Text>
+                <Text style={[
+                  styles.timestamp,
+                  isOwnMessage ? styles.ownTimestamp : styles.otherTimestamp
+                ]}>
+                  {new Date(item.timestamp).toLocaleTimeString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </Text>
+              </View>
+              {item.xpEarned > 0 && (
+                <Chip 
+                  icon="star" 
+                  style={styles.xpChip}
+                  textStyle={styles.xpText}
+                  compact
+                >
+                  +{item.xpEarned}
+                </Chip>
+              )}
+            </View>
+            
+            {/* Contenu du message */}
+            <Text style={[
+              styles.messageContent,
+              isOwnMessage ? styles.ownMessageContent : styles.otherMessageContent
+            ]}>
+              {item.content || 'Message vide'}
             </Text>
-            {item.errorsFound.slice(0, 3).map((error, index) => (
-              <Text key={index} style={styles.errorItem}>
-                • {error.shortMessage}
-              </Text>
-            ))}
-            {item.errorsFound.length > 3 && (
-              <Text style={styles.moreErrors}>
-                +{item.errorsFound.length - 3} autres erreurs
-              </Text>
+            
+            {/* Erreurs détectées */}
+            {item.errorsFound && item.errorsFound.length > 0 && (
+              <View style={styles.errorsContainer}>
+                <Text style={styles.errorsTitle}>
+                  <Ionicons name="warning" size={14} color={colors.warning} />{' '}
+                  Erreurs ({item.errorsFound.length})
+                </Text>
+                {item.errorsFound.slice(0, 2).map((error, index) => (
+                  <Text key={index} style={styles.errorItem}>
+                    • {error.shortMessage}
+                  </Text>
+                ))}
+                {item.errorsFound.length > 2 && (
+                  <Text style={styles.moreErrors}>
+                    +{item.errorsFound.length - 2} autres
+                  </Text>
+                )}
+              </View>
             )}
-          </View>
-        )}
-      </Card.Content>
-    </Card>
-  );
+          </Card.Content>
+        </Card>
+      </View>
+    );
+  };
 
   return (
     <KeyboardAvoidingView
@@ -179,6 +200,7 @@ const ChatScreen: React.FC = () => {
         style={styles.messagesList}
         contentContainerStyle={styles.messagesContainer}
         onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+        onLayout={() => flatListRef.current?.scrollToEnd({ animated: false })}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="chatbubbles-outline" size={64} color={colors.textSecondary} />
@@ -273,10 +295,19 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     padding: spacing.md,
+    paddingBottom: spacing.lg,
+  },
+  messageContainer: {
+    marginBottom: spacing.sm,
+  },
+  ownMessageContainer: {
+    alignItems: 'flex-end',
+  },
+  otherMessageContainer: {
+    alignItems: 'flex-start',
   },
   messageCard: {
-    marginBottom: spacing.sm,
-    maxWidth: '80%',
+    maxWidth: '85%',
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -284,12 +315,18 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   ownMessage: {
-    alignSelf: 'flex-end',
     backgroundColor: colors.primary,
+    borderTopRightRadius: 4,
+    borderTopLeftRadius: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
   },
   otherMessage: {
-    alignSelf: 'flex-start',
     backgroundColor: colors.surface,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
   },
   messageContentContainer: {
     paddingVertical: spacing.sm,
@@ -301,8 +338,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   avatar: {
-    backgroundColor: colors.accent,
     marginRight: spacing.xs,
+  },
+  ownAvatar: {
+    backgroundColor: colors.surface,
+  },
+  otherAvatar: {
+    backgroundColor: colors.accent,
   },
   messageInfo: {
     flex: 1,
@@ -325,8 +367,9 @@ const styles = StyleSheet.create({
   },
   messageContent: {
     ...typography.body,
-    lineHeight: 20,
+    lineHeight: 22,
     marginTop: spacing.xs,
+    fontSize: 16,
   },
   ownMessageContent: {
     color: colors.surface,
@@ -334,6 +377,7 @@ const styles = StyleSheet.create({
   },
   otherMessageContent: {
     color: colors.text,
+    fontWeight: '400',
   },
   ownSenderName: {
     color: colors.surface,

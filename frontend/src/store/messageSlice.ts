@@ -116,7 +116,7 @@ const messageSlice = createSlice({
       state.pagination = null;
     },
     addMessage: (state, action: PayloadAction<Message>) => {
-      state.messages.unshift(action.payload);
+      state.messages.push(action.payload);
     },
     updateMessage: (state, action: PayloadAction<Message>) => {
       const index = state.messages.findIndex(msg => msg.id === action.payload.id);
@@ -137,7 +137,7 @@ const messageSlice = createSlice({
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.messages.unshift(action.payload.message);
+        state.messages.push(action.payload.message);
         state.error = null;
       })
       .addCase(sendMessage.rejected, (state, action) => {
