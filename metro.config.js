@@ -5,4 +5,12 @@ const config = getDefaultConfig(__dirname);
 // Configurer le watchFolders pour inclure le dossier frontend
 config.watchFolders = [__dirname, `${__dirname}/frontend`];
 
+// Résolution des modules pour éviter les conflits
+config.resolver.platforms = ['ios', 'android', 'native', 'web'];
+
+// Ignorer les modules problématiques
+config.resolver.blockList = [
+  /react-native-worklets\/.*\.js$/,
+];
+
 module.exports = config;
