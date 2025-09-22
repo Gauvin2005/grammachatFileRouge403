@@ -159,7 +159,7 @@ class ApiService {
       };
     }
 
-    const response = await this.api.post('/auth/register', userData);
+    const response = await this.api.post('/users', userData);
     return response.data;
   }
 

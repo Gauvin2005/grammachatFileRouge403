@@ -1,0 +1,24 @@
+{
+  "name": "grammachat-tests",
+  "version": "1.0.0",
+  "description": "Tests automatisés pour Grammachat",
+  "main": "createUser.test.js",
+  "scripts": {
+    "test": "node createUser.test.js",
+    "test:create-user": "node createUser.test.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "mongodb": "^6.0.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "test",
+    "automation",
+    "puppeteer",
+    "mongodb",
+    "docker"
+  ],
+  "author": "Grammachat Team",
+  "license": "MIT"
+}

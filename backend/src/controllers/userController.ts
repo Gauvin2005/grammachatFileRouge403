@@ -1,7 +1,106 @@
 import { Request, Response } from 'express';
-import { query, validationResult } from 'express-validator';
+import { query, validationResult, body } from 'express-validator';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import { ApiResponse, PaginationParams, PaginatedResponse } from '../types';
+
+/**
+ * Créer un nouvel utilisateur (rôle forcé à 'user')
+ */
+export const createUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log('🚀 Création d\'un nouvel utilisateur:', req.body);
+
+    const { email, password, username } = req.body;
+
+    // Validation des données requises
+    if (!email || !password || !username) {
+      res.status(400).json({
+        success: false,
+        message: 'Email, mot de passe et nom d\'utilisateur sont requis'
+      });
+      return;
+    }
+
+    // Vérifier si l'email existe déjà
+    const existingUserByEmail = await User.findOne({ email });
+    if (existingUserByEmail) {
+      res.status(409).json({
+        success: false,
+        message: 'Un compte avec cet email existe déjà'
+      });
+      return;
+    }
+
+    // Vérifier si le nom d'utilisateur existe déjà
+    const existingUserByUsername = await User.findOne({ username });
+    if (existingUserByUsername) {
+      res.status(409).json({
+        success: false,
+        message: 'Ce nom d\'utilisateur est déjà pris'
+      });
+      return;
+    }
+
+    // Hasher le mot de passe
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Créer l'utilisateur avec rôle forcé à 'user'
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+      username,
+      role: 'user', // Rôle forcé à 'user' par défaut
+      xp: 0,
+      level: 1
+    });
+
+    await newUser.save();
+    console.log('✅ Utilisateur créé avec succès:', newUser._id);
+
+    // Générer un token JWT
+    const token = jwt.sign(
+      { 
+        userId: newUser._id, 
+        email: newUser.email, 
+        role: newUser.role 
+      },
+      process.env.JWT_SECRET || 'fallback-secret',
+      { expiresIn: '7d' }
+    );
+
+    // Retourner la réponse sans le mot de passe
+    const userResponse = {
+      id: newUser._id,
+      email: newUser.email,
+      username: newUser.username,
+      role: newUser.role,
+      xp: newUser.xp,
+      level: newUser.level,
+      createdAt: newUser.createdAt,
+      updatedAt: newUser.updatedAt
+    };
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Utilisateur créé avec succès',
+      data: {
+        user: userResponse,
+        token: token
+      }
+    };
+
+    res.status(201).json(response);
+  } catch (error) {
+    console.error('❌ Erreur lors de la création de l\'utilisateur:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur serveur lors de la création de l\'utilisateur'
+    });
+  }
+};
 
 /**
  * Récupérer tous les utilisateurs (admin seulement)

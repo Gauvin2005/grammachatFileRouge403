@@ -6,10 +6,87 @@ import {
   updateProfile,
   deleteUser,
   getLeaderboard,
-  validatePagination
+  validatePagination,
+  createUser
 } from '../controllers/userController';
 
 const router = Router();
+
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Créer un nouvel utilisateur
+ *     description: Crée un nouveau compte utilisateur avec rôle forcé à "user" (route publique)
+ *     tags: [Users]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - username
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "user@example.com"
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *                 example: "password123"
+ *               username:
+ *                 type: string
+ *                 minLength: 3
+ *                 maxLength: 20
+ *                 example: "johndoe"
+ *           examples:
+ *             example1:
+ *               summary: Création utilisateur standard
+ *               value:
+ *                 email: "user@example.com"
+ *                 password: "password123"
+ *                 username: "johndoe"
+ *     responses:
+ *       201:
+ *         description: Utilisateur créé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur créé avec succès"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *                     token:
+ *                       type: string
+ *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *       400:
+ *         description: Données invalides
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Email ou nom d'utilisateur déjà utilisé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post('/', createUser);
 
 /**
  * @swagger
