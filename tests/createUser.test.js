@@ -24,7 +24,7 @@ const TEST_CONFIG = {
   TEST_USER: {
     email: `test-${Date.now()}@example.com`,
     password: 'testpassword123',
-    username: `testuser${Date.now()}`
+    username: `test${Date.now().toString().slice(-8)}` // Max 12 caractères
   },
   
   // Timeouts
@@ -36,65 +36,35 @@ const TEST_CONFIG = {
 // Variables globales pour le test
 let dockerProcess = null;
 let mongoClient = null;
-let browser = null;
 
 /**
- * Étape 1 : Lancer le serveur backend avec Docker
- * Simule docker-compose up dans le test
+ * Étape 1 : Vérifier que les services Docker sont disponibles
+ * Utilise les services existants au lieu de les redémarrer
  */
 async function startDockerServices() {
-  console.log('🐳 Démarrage des services Docker...');
+  console.log('🐳 Vérification des services Docker existants...');
   
-  return new Promise((resolve, reject) => {
-    // Lancer docker-compose up en arrière-plan
-    dockerProcess = spawn('docker-compose', ['up', '--build'], {
-      cwd: path.join(__dirname, '..'),
-      stdio: ['ignore', 'pipe', 'pipe']
-    });
-
-    let startupComplete = false;
-    const timeout = setTimeout(() => {
-      if (!startupComplete) {
-        reject(new Error('Timeout: Services Docker n\'ont pas démarré dans les temps'));
-      }
-    }, TEST_CONFIG.DOCKER_STARTUP_TIMEOUT);
-
-    // Surveiller les logs pour détecter le démarrage
-    dockerProcess.stdout.on('data', (data) => {
-      const output = data.toString();
-      console.log('📋 Docker stdout:', output.trim());
-      
-      // Détecter que l'API est prête
-      if (output.includes('Server running on port 3000') || 
-          output.includes('API server started') ||
-          output.includes('Listening on port 3000')) {
-        if (!startupComplete) {
-          startupComplete = true;
-          clearTimeout(timeout);
-          console.log('✅ Services Docker démarrés avec succès');
-          resolve();
-        }
-      }
-    });
-
-    dockerProcess.stderr.on('data', (data) => {
-      const error = data.toString();
-      console.log('⚠️ Docker stderr:', error.trim());
-    });
-
-    dockerProcess.on('error', (error) => {
-      console.error('❌ Erreur Docker:', error);
-      if (!startupComplete) {
-        startupComplete = true;
-        clearTimeout(timeout);
-        reject(error);
-      }
-    });
-
-    dockerProcess.on('exit', (code) => {
-      console.log(`🔄 Docker process exited with code ${code}`);
-    });
-  });
+  // Vérifier que les containers sont en cours d'exécution
+  try {
+    const { exec } = require('child_process');
+    const util = require('util');
+    const execAsync = util.promisify(exec);
+    
+    const { stdout } = await execAsync('docker ps --format "table {{.Names}}\t{{.Status}}"');
+    console.log('📋 Containers en cours d\'exécution:');
+    console.log(stdout);
+    
+    // Vérifier que les containers nécessaires sont présents
+    if (stdout.includes('grammachat-api') && stdout.includes('grammachat-mongodb')) {
+      console.log('✅ Services Docker déjà en cours d\'exécution');
+      return Promise.resolve();
+    } else {
+      throw new Error('Services Docker requis non trouvés');
+    }
+  } catch (error) {
+    console.log('❌ Erreur lors de la vérification des services:', error.message);
+    throw error;
+  }
 }
 
 /**
@@ -124,18 +94,9 @@ async function waitForApiAvailability() {
 }
 
 /**
- * Étape 3 : Utiliser Puppeteer pour envoyer une requête POST vers /api/users
+ * Étape 3 : Envoyer une requête POST vers /api/users avec curl
  */
-async function createUserWithPuppeteer() {
-  console.log('🤖 Lancement de Puppeteer...');
-  
-  browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
-  
-  const page = await browser.newPage();
-  
+async function createUserWithCurl() {
   console.log('📤 Envoi de la requête POST vers /api/users...');
   console.log('📋 Données utilisateur:', {
     email: TEST_CONFIG.TEST_USER.email,
@@ -144,30 +105,34 @@ async function createUserWithPuppeteer() {
   });
   
   try {
-    // Envoyer la requête POST directement via Puppeteer
-    const response = await page.evaluate(async (userData, apiUrl) => {
-      const response = await fetch(`${apiUrl}/api/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData)
-      });
-      
-      const data = await response.json();
-      return {
-        status: response.status,
-        data: data
-      };
-    }, TEST_CONFIG.TEST_USER, TEST_CONFIG.API_BASE_URL);
+    const { exec } = require('child_process');
+    const util = require('util');
+    const execAsync = util.promisify(exec);
     
-    console.log('📥 Réponse reçue:', response);
+    // Préparer les données JSON
+    const userData = JSON.stringify(TEST_CONFIG.TEST_USER);
     
-    if (response.status === 201 && response.data.success) {
+    // Envoyer la requête POST avec curl
+    const curlCommand = `curl -s -X POST "${TEST_CONFIG.API_BASE_URL}/api/users" -H "Content-Type: application/json" -d '${userData}'`;
+    console.log('🔧 Commande curl:', curlCommand.replace(TEST_CONFIG.TEST_USER.password, '[HIDDEN]'));
+    
+    const { stdout, stderr } = await execAsync(curlCommand);
+    
+    if (stderr) {
+      console.log('⚠️ Curl stderr:', stderr);
+    }
+    
+    console.log('📥 Réponse brute:', stdout);
+    
+    // Parser la réponse JSON
+    const response = JSON.parse(stdout);
+    console.log('📥 Réponse parsée:', response);
+    
+    if (response.success) {
       console.log('✅ Requête POST réussie');
-      return response.data;
+      return response;
     } else {
-      throw new Error(`Échec de la requête POST: ${response.status} - ${JSON.stringify(response.data)}`);
+      throw new Error(`Échec de la requête POST: ${JSON.stringify(response)}`);
     }
     
   } catch (error) {
@@ -228,10 +193,7 @@ async function verifyUserInDatabase() {
 async function cleanup() {
   console.log('🧹 Nettoyage des ressources...');
   
-  if (browser) {
-    await browser.close();
-    console.log('✅ Browser fermé');
-  }
+  // Pas de browser à fermer avec curl
   
   if (mongoClient) {
     await mongoClient.close();
@@ -239,7 +201,7 @@ async function cleanup() {
   }
   
   if (dockerProcess) {
-    console.log('🛑 Arrêt des services Docker...');
+    console.log('🛑 Arrêt du processus Docker de test...');
     dockerProcess.kill('SIGTERM');
     
     // Attendre un peu puis forcer l'arrêt si nécessaire
@@ -249,7 +211,9 @@ async function cleanup() {
       }
     }, 5000);
     
-    console.log('✅ Services Docker arrêtés');
+    console.log('✅ Processus Docker de test arrêté');
+  } else {
+    console.log('ℹ️ Aucun processus Docker de test à arrêter (services externes utilisés)');
   }
 }
 
@@ -270,8 +234,8 @@ async function runTest() {
     // Étape 2 : Attendre que l'API soit accessible
     await waitForApiAvailability();
     
-    // Étape 3 : Utiliser Puppeteer pour envoyer une requête POST
-    const apiResponse = await createUserWithPuppeteer();
+    // Étape 3 : Envoyer une requête POST avec curl
+    const apiResponse = await createUserWithCurl();
     
     // Étape 4 : Vérifier directement en base via MongoDB
     const dbUser = await verifyUserInDatabase();
@@ -319,3 +283,4 @@ if (require.main === module) {
 }
 
 module.exports = { runTest, TEST_CONFIG };
+

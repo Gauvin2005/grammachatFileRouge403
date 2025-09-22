@@ -128,3 +128,4 @@ Le test produit des logs détaillés pour chaque étape :
 ✅ **Contrainte 4** : Commentaires clairs et séparation stricte  
 
 Le test vérifie que toutes les contraintes sont respectées et que l'application fonctionne correctement en mode production avec Docker.
+

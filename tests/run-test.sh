@@ -16,8 +16,8 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-# Vérifier que Docker Compose est installé
-if ! command -v docker-compose &> /dev/null; then
+# Vérifier que Docker Compose est installé (nouvelle syntaxe)
+if ! docker compose version &> /dev/null; then
     echo "❌ Docker Compose n'est pas installé. Veuillez installer Docker Compose d'abord."
     exit 1
 fi
@@ -58,3 +58,4 @@ else
 fi
 
 exit $TEST_EXIT_CODE
+
