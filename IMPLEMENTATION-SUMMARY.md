@@ -1,36 +1,36 @@
 # Résumé de l'Implémentation - Bouton d'Inscription Fonctionnel
 
-## 🎯 Objectif Atteint
+## Objectif Atteint
 
 Remplacement du `<Text>"Créer un compte"</Text>` par un vrai bouton fonctionnel avec formulaire complet, backend Dockerisé et test automatisé.
 
-## 📋 Contraintes Respectées
+## Contraintes Respectées
 
-### ✅ Contrainte 1 : Bouton + Formulaire
+### Contrainte 1 : Bouton + Formulaire
 - **Bouton cliquable** : Remplacé le Text par un Button React Native Paper
 - **Formulaire modal** : Dialog avec 3 champs (nom, email, mot de passe)
 - **Requête POST** : Envoi vers `/api/users` avec validation complète
 - **Rôle forcé** : Backend force automatiquement `role="user"`
 
-### ✅ Contrainte 2 : Backend + Base Docker
+### Contrainte 2 : Backend + Base Docker
 - **Docker Compose** : Configuration existante optimisée
 - **MongoDB** : Volume persistant configuré
 - **Backend** : Accessible sur port 3000 depuis le frontend
 - **Health checks** : Surveillance automatique des services
 
-### ✅ Contrainte 3 : Test Automatisé
+### Contrainte 3 : Test Automatisé
 - **Fichier** : `tests/createUser.test.js`
 - **Docker** : Simule `docker-compose up` dans le test
-- **Puppeteer** : Requête POST automatisée
+- **Curl** : Requête POST automatisée
 - **MongoDB** : Vérification directe en base
 - **Contrôle rôle** : Vérification `role="user"`
 - **Logs** : "Compte créé et vérifié" ou erreur détaillée
 
-### ✅ Contrainte 4 : Commentaires + Séparation
+### Contrainte 4 : Commentaires + Séparation
 - **Commentaires clairs** : Chaque étape documentée
 - **Séparation stricte** : Frontend, Backend, Tests, Docker
 
-## 🔧 Modifications Apportées
+## Modifications Apportées
 
 ### Frontend (`frontend/src/screens/LoginScreen.tsx`)
 
@@ -109,22 +109,22 @@ export const createUser = async (req, res) => {
 
 #### Création complète :
 - **Configuration** : URLs, timeouts, données de test
-- **Docker** : Lancement automatique des services
-- **Puppeteer** : Requête POST automatisée
+- **Docker** : Vérification des services existants
+- **Curl** : Requête POST automatisée
 - **MongoDB** : Vérification directe en base
-- **Nettoyage** : Arrêt propre des services
+- **Nettoyage** : Fermeture propre des connexions
 
 #### Scripts :
-- **`package.json`** : Dépendances Puppeteer + MongoDB
+- **`package.json`** : Dépendances curl + MongoDB
 - **`run-test.sh`** : Script de lancement automatique
 - **`README.md`** : Documentation complète
 
-## 🚀 Utilisation
+## Utilisation
 
 ### 1. Démarrage des Services
 ```bash
 # Dans le répertoire racine
-docker-compose up --build
+docker compose up --build
 ```
 
 ### 2. Test de l'Interface
@@ -140,41 +140,41 @@ cd tests
 ./run-test.sh
 ```
 
-## 🔍 Vérifications
+## Vérifications
 
 ### Frontend
-- ✅ Bouton "Créer un compte" cliquable
-- ✅ Modal s'ouvre au clic
-- ✅ Formulaire avec 4 champs
-- ✅ Validation en temps réel
-- ✅ Envoi POST vers `/api/users`
-- ✅ Gestion des erreurs
-- ✅ Message de succès
+- Bouton "Créer un compte" cliquable
+- Modal s'ouvre au clic
+- Formulaire avec 4 champs
+- Validation en temps réel
+- Envoi POST vers `/api/users`
+- Gestion des erreurs
+- Message de succès
 
 ### Backend
-- ✅ Endpoint POST `/api/users` fonctionnel
-- ✅ Validation des données
-- ✅ Vérification unicité email/username
-- ✅ Hash sécurisé du mot de passe
-- ✅ Rôle forcé à "user"
-- ✅ Génération JWT
-- ✅ Réponse structurée
+- Endpoint POST `/api/users` fonctionnel
+- Validation des données
+- Vérification unicité email/username
+- Hash sécurisé du mot de passe
+- Rôle forcé à "user"
+- Génération JWT
+- Réponse structurée
 
 ### Base de Données
-- ✅ Utilisateur créé en MongoDB
-- ✅ Rôle = "user" vérifié
-- ✅ XP = 0, Level = 1 par défaut
-- ✅ Timestamps automatiques
+- Utilisateur créé en MongoDB
+- Rôle = "user" vérifié
+- XP = 0, Level = 1 par défaut
+- Timestamps automatiques
 
 ### Test Automatisé
-- ✅ Lancement Docker automatique
-- ✅ Requête POST avec Puppeteer
-- ✅ Vérification MongoDB directe
-- ✅ Contrôle du rôle "user"
-- ✅ Logs détaillés
-- ✅ Nettoyage des ressources
+- Vérification Docker automatique
+- Requête POST avec curl
+- Vérification MongoDB directe
+- Contrôle du rôle "user"
+- Logs détaillés
+- Nettoyage des ressources
 
-## 📊 Résultat Final
+## Résultat Final
 
 Le système est maintenant entièrement fonctionnel avec :
 
@@ -185,4 +185,3 @@ Le système est maintenant entièrement fonctionnel avec :
 5. **Documentation** : Commentaires clairs et guides d'utilisation
 
 Toutes les contraintes ont été respectées et le système est prêt pour la production.
-

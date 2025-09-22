@@ -74,27 +74,27 @@ const LoginScreen: React.FC = () => {
     }
   };
 
-  // 🎭 NOUVELLE FONCTION : Mode démo
+  // Mode démo
   const onDemoMode = async () => {
     try {
-      console.log('🎭 Activation du mode démo');
+      console.log('Activation du mode démo');
       const demoData: LoginFormData = {
         email: 'demo@grammachat.com',
         password: 'demo123'
       };
       const result = await dispatch(loginUser(demoData)).unwrap();
-      console.log('✅ Mode démo activé:', result);
+      console.log('Mode démo activé:', result);
     } catch (error: any) {
-      console.log('❌ Erreur mode démo:', error);
+      console.log('Erreur mode démo:', error);
       Alert.alert('Erreur mode démo', 'Impossible d\'activer le mode démo');
     }
   };
 
-  // 📝 NOUVELLE FONCTION : Inscription utilisateur
+  // Inscription utilisateur
   const onRegister = async (data: RegisterFormData) => {
     try {
       setIsRegistering(true);
-      console.log('🚀 Début de l\'inscription avec:', data.email, data.username);
+      console.log('Début de l\'inscription avec:', data.email, data.username);
       
       // Préparer les données pour l'API (rôle forcé à 'user')
       const registerData = {
@@ -106,7 +106,7 @@ const LoginScreen: React.FC = () => {
       
       // Envoyer la requête POST vers /api/users
       const result = await apiService.register(registerData);
-      console.log('✅ Inscription réussie:', result);
+      console.log('Inscription réussie:', result);
       
       // Fermer le modal et réinitialiser le formulaire
       setShowRegisterModal(false);
@@ -119,7 +119,7 @@ const LoginScreen: React.FC = () => {
       );
       
     } catch (error: any) {
-      console.log('❌ Erreur inscription:', error);
+      console.log('Erreur inscription:', error);
       const errorMessage = typeof error === 'string' ? error : 
                           error?.response?.data?.message || 
                           error?.message || 
@@ -237,7 +237,7 @@ const LoginScreen: React.FC = () => {
               {isLoading ? 'Connexion...' : 'Se connecter'}
             </Button>
 
-            {/* 🎭 NOUVEAU BOUTON MODE DÉMO */}
+            {/* Bouton Mode Démo */}
             <Button
               mode="outlined"
               onPress={onDemoMode}
@@ -247,7 +247,7 @@ const LoginScreen: React.FC = () => {
               textColor={colors.phoenix}
               icon="play-circle"
             >
-              🎭 Mode Démo (Test)
+              Mode Démo (Test)
             </Button>
           </Card.Content>
         </Card>
@@ -268,7 +268,7 @@ const LoginScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* 📝 MODAL D'INSCRIPTION */}
+      {/* Modal d'inscription */}
       <Portal>
         <Dialog 
           visible={showRegisterModal} 
@@ -411,7 +411,7 @@ const LoginScreen: React.FC = () => {
 
             {/* Note sur le rôle */}
             <Text style={styles.roleNote}>
-              ℹ️ Votre compte sera créé avec le rôle "utilisateur" par défaut
+              Votre compte sera créé avec le rôle "utilisateur" par défaut
             </Text>
           </Dialog.Content>
 

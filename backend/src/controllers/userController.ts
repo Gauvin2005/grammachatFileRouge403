@@ -10,7 +10,7 @@ import { ApiResponse, PaginationParams, PaginatedResponse } from '../types';
  */
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('🚀 Création d\'un nouvel utilisateur:', req.body);
+    console.log('Création d\'un nouvel utilisateur:', req.body);
 
     const { email, password, username } = req.body;
 
@@ -58,7 +58,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     });
 
     await newUser.save();
-    console.log('✅ Utilisateur créé avec succès:', newUser._id);
+    console.log('Utilisateur créé avec succès:', newUser._id);
 
     // Générer un token JWT
     const token = jwt.sign(
@@ -94,7 +94,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 
     res.status(201).json(response);
   } catch (error) {
-    console.error('❌ Erreur lors de la création de l\'utilisateur:', error);
+    console.error('Erreur lors de la création de l\'utilisateur:', error);
     res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la création de l\'utilisateur'
