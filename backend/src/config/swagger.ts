@@ -259,6 +259,24 @@ const options: swaggerJsdoc.Options = {
 const specs = swaggerJsdoc(options);
 
 export const setupSwagger = (app: Express): void => {
+  // Routes de redirection vers /api-docs pour les URLs communes de Swagger
+  const swaggerRedirects = [
+    '/',
+    '/swagger',
+    '/swagger-ui',
+    '/swagger-ui.html',
+    '/docs',
+    '/documentation',
+    '/api/docs',
+    '/api/documentation'
+  ];
+
+  swaggerRedirects.forEach(route => {
+    app.get(route, (req, res) => {
+      res.redirect(301, '/api-docs');
+    });
+  });
+
   // Route pour la documentation Swagger UI
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
     explorer: true,
@@ -280,6 +298,7 @@ export const setupSwagger = (app: Express): void => {
   });
 
   console.log('Documentation Swagger disponible sur: http://localhost:3000/api-docs');
+  console.log('Redirections configurées pour: /, /swagger, /swagger-ui, /docs, /documentation, /api/docs');
 };
 
 export default specs;
