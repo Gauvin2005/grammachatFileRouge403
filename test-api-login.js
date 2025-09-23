@@ -75,43 +75,43 @@ async function testApiLogin() {
   try {
     // Connexion à MongoDB
     await mongoose.connect('mongodb://mongodb:27017/grammachat');
-    console.log('✅ Connecté à MongoDB');
+    console.log('Connecté à MongoDB');
 
     // Tester la connexion avec user1
-    console.log('🔐 Test de connexion API avec user1@grammachat.com...');
+    console.log('Test de connexion API avec user1@grammachat.com...');
     
     const user = await User.findOne({ email: 'user1@grammachat.com' }).select('+password');
     if (!user) {
-      console.log('❌ Utilisateur user1 non trouvé');
+      console.log('Utilisateur user1 non trouvé');
       return;
     }
     
-    console.log('👤 Utilisateur trouvé:', user.username);
-    console.log('🔐 Hash du mot de passe:', user.password.substring(0, 20) + '...');
+    console.log('Utilisateur trouvé:', user.username);
+    console.log('Hash du mot de passe:', user.password.substring(0, 20) + '...');
     
     const isValid = await user.comparePassword('password123');
-    console.log('✅ Mot de passe valide:', isValid);
+    console.log('Mot de passe valide:', isValid);
     
     if (isValid) {
       console.log('Connexion API devrait fonctionner !');
     } else {
-      console.log('❌ Problème avec le mot de passe - connexion API échouera');
+      console.log('Problème avec le mot de passe - connexion API échouera');
       
       // Debug : tester avec différents mots de passe
-      console.log('🔍 Test avec différents mots de passe:');
+      console.log(' Test avec différents mots de passe:');
       const passwords = ['password123', 'Password123', 'PASSWORD123', 'password', 'admin123'];
       
       for (const pwd of passwords) {
         const testResult = await user.comparePassword(pwd);
-        console.log(`  "${pwd}": ${testResult ? '✅' : '❌'}`);
+        console.log(`  "${pwd}": ${testResult ? 'Success' : 'Error'}`);
       }
     }
 
   } catch (error) {
-    console.error('❌ Erreur lors du test:', error);
+    console.error('Erreur lors du test:', error);
   } finally {
     await mongoose.connection.close();
-    console.log('🔌 Connexion MongoDB fermée');
+    console.log('Connexion MongoDB fermée');
     process.exit(0);
   }
 }

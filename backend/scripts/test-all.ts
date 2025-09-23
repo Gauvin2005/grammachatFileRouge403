@@ -66,7 +66,7 @@ class AllTestsRunner {
       console.log('Tous les tests sont passés avec succès !');
       console.log('Ton API Grammachat est parfaitement fonctionnelle.');
     } else if (successRate >= 75) {
-      console.log('\n✅ EXCELLENT !');
+      console.log('\nEXCELLENT !');
       console.log('La plupart des tests sont passés.');
       console.log('Ton API fonctionne bien avec quelques ajustements mineurs.');
     } else if (successRate >= 50) {
@@ -74,7 +74,7 @@ class AllTestsRunner {
       console.log('Plusieurs tests ont échoué.');
       console.log('Vérifie la configuration et les erreurs signalées.');
     } else {
-      console.log('\n❌ PROBLÈMES DÉTECTÉS');
+      console.log('\nPROBLÈMES DÉTECTÉS');
       console.log('La majorité des tests ont échoué.');
       console.log('Vérifie que l\'API est correctement démarrée et configurée.');
     }
@@ -96,8 +96,8 @@ class AllTestsRunner {
 
     if (successRate === 100) {
       console.log('   - Ton API est prête pour la production !');
-      console.log('   - 📚 La documentation Swagger est complète');
-      console.log('   - 🧪 Les tests automatisés fonctionnent parfaitement');
+      console.log('   - La documentation Swagger est complète');
+      console.log('   - Les tests automatisés fonctionnent parfaitement');
     }
 
     // Liens utiles

@@ -221,7 +221,7 @@ class BasicSwaggerTester {
       console.log('INFO: Tu peux maintenant lancer les tests plus avancés :');
       console.log('   npm run test:swagger:routes');
     } else if (successCount >= 2) {
-      console.log('✅ Tests basiques majoritairement réussis');
+      console.log('Tests basiques majoritairement réussis');
       console.log('INFO: Swagger est fonctionnel, vérifie les erreurs restantes');
     } else {
       console.log('ATTENTION: Problèmes détectés avec Swagger');

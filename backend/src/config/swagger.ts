@@ -279,7 +279,7 @@ export const setupSwagger = (app: Express): void => {
     res.send(specs);
   });
 
-  console.log('📚 Documentation Swagger disponible sur: http://localhost:3000/api-docs');
+  console.log('Documentation Swagger disponible sur: http://localhost:3000/api-docs');
 };
 
 export default specs;

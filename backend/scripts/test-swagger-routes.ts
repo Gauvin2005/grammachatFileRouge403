@@ -264,7 +264,7 @@ class RouteTester {
     const totalCount = results.length;
     const successRate = (passedCount / totalCount) * 100;
 
-    console.log(`📈 Score global: ${passedCount}/${totalCount} (${successRate.toFixed(1)}%)`);
+    console.log(`Score global: ${passedCount}/${totalCount} (${successRate.toFixed(1)}%)`);
     console.log(`Tests réussis: ${passedCount}`);
     console.log(`Tests échoués: ${totalCount - passedCount}\n`);
 
@@ -283,7 +283,7 @@ class RouteTester {
 
     // Statistiques par méthode HTTP
     const methods = [...new Set(results.map(r => r.route.split(' ')[0]))];
-    console.log('📈 Statistiques par méthode HTTP:');
+    console.log('Statistiques par méthode HTTP:');
     methods.forEach(method => {
       const methodResults = results.filter(r => r.route.startsWith(method));
       const methodPassed = methodResults.filter(r => r.passed).length;

@@ -115,7 +115,7 @@ class APIRouteTester {
         error: error.message || String(error)
       };
 
-      console.log(`❌ ${method} ${endpoint} - Erreur: ${result.error}`);
+      console.log(`${method} ${endpoint} - Erreur: ${result.error}`);
       return result;
     }
   }
@@ -167,7 +167,7 @@ class APIRouteTester {
   }
 
   async testErrorCases(): Promise<void> {
-    console.log('\n🔍 Tests des cas d\'erreur...');
+    console.log('\n Tests des cas d\'erreur...');
 
     // Test avec token invalide
     const invalidTokenResult = await this.testRoute('/api/auth/profile', 'GET', undefined, {

@@ -253,7 +253,7 @@ MONGODB_URI=mongodb://admin:motdepasse@mongodb:27017/grammachat?authSource=admin
 REDIS_PASSWORD=motdepasse-redis-complexe
 ```
 
-## 📚 Ressources Supplémentaires
+## Ressources Supplémentaires
 
 - [Documentation Docker Compose](https://docs.docker.com/compose/)
 - [Documentation MongoDB Docker](https://hub.docker.com/_/mongo)

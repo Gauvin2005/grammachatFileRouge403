@@ -61,7 +61,7 @@ async function createTestUsers() {
   try {
     // Connexion à MongoDB
     await mongoose.connect('mongodb://mongodb:27017/grammachat');
-    console.log('✅ Connecté à MongoDB');
+    console.log('Connecté à MongoDB');
 
     // Supprimer tous les utilisateurs existants
     await User.deleteMany({});
@@ -92,21 +92,21 @@ async function createTestUsers() {
       }
     ];
 
-    console.log('🔄 Création des utilisateurs de test...');
+    console.log('Création des utilisateurs de test...');
 
     for (const userData of users) {
       const user = new User(userData);
       await user.save();
-      console.log(`✅ Utilisateur créé: ${userData.username} (${userData.role})`);
+      console.log(`Utilisateur créé: ${userData.username} (${userData.role})`);
       
       // Tester immédiatement le mot de passe
       const testUser = await User.findOne({ email: userData.email }).select('+password');
       const isValid = await testUser.comparePassword(userData.password);
-      console.log(`🔐 Test mot de passe pour ${userData.username}: ${isValid ? '✅ VALIDE' : '❌ INVALIDE'}`);
+      console.log(`Test mot de passe pour ${userData.username}: ${isValid ? 'VALIDE' : 'INVALIDE'}`);
     }
 
     console.log('\nUtilisateurs de test créés avec succès !');
-    console.log('\n📋 Identifiants de connexion :');
+    console.log('\nIdentifiants de connexion :');
     console.log('┌─────────────┬─────────────────────────┬─────────────┬─────────┐');
     console.log('│ Username    │ Email                   │ Password    │ Role    │');
     console.log('├─────────────┼─────────────────────────┼─────────────┼─────────┤');
@@ -116,10 +116,10 @@ async function createTestUsers() {
     console.log('└─────────────┴─────────────────────────┴─────────────┴─────────┘');
 
   } catch (error) {
-    console.error('❌ Erreur lors de la création des utilisateurs:', error);
+    console.error('Erreur lors de la création des utilisateurs:', error);
   } finally {
     await mongoose.connection.close();
-    console.log('🔌 Connexion MongoDB fermée');
+    console.log('Connexion MongoDB fermée');
     process.exit(0);
   }
 }

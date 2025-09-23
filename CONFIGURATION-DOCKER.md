@@ -84,7 +84,7 @@ nano .env
 docker-compose up -d
 ```
 
-## 📋 Exemple de Configuration Complète
+## Exemple de Configuration Complète
 
 ```bash
 # .env personnalisé

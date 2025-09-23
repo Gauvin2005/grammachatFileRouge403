@@ -7,7 +7,7 @@ async function resetDatabase() {
   try {
     // Connexion à MongoDB
     await mongoose.connect(MONGODB_URI);
-    console.log('✅ Connecté à MongoDB');
+    console.log('Connecté à MongoDB');
 
     // Supprimer toutes les collections
     const db = mongoose.connection.db;
@@ -23,11 +23,11 @@ async function resetDatabase() {
     console.log('SUCCÈS: Base de données réinitialisée avec succès !');
 
   } catch (error) {
-    console.error('❌ Erreur:', error);
+    console.error('Erreur:', error);
   } finally {
     // Fermer la connexion
     await mongoose.connection.close();
-    console.log('🔌 Connexion MongoDB fermée');
+    console.log('Connexion MongoDB fermée');
     process.exit(0);
   }
 }

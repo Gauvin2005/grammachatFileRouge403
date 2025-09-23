@@ -112,21 +112,21 @@ et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
   - Surveillance des erreurs
 
 #### Fonctionnalités MVP
-- ✅ Authentification utilisateur (inscription/connexion)
-- ✅ Envoi de messages texte
-- ✅ Vérification orthographique avec LanguageTool
-- ✅ Système de gamification (XP, niveaux)
-- ✅ Profil utilisateur avec statistiques
-- ✅ Classement des utilisateurs
-- ✅ Rôles utilisateur (Standard/Admin)
-- ✅ Interface mobile native (iOS/Android)
-- ✅ API RESTful complète
-- ✅ Base de données NoSQL (MongoDB)
-- ✅ Cache et sessions (Redis)
-- ✅ Containerisation Docker
-- ✅ Tests automatisés
-- ✅ CI/CD pipeline
-- ✅ Documentation exhaustive
+-  Authentification utilisateur (inscription/connexion)
+-  Envoi de messages texte
+-  Vérification orthographique avec LanguageTool
+-  Système de gamification (XP, niveaux)
+-  Profil utilisateur avec statistiques
+-  Classement des utilisateurs
+-  Rôles utilisateur (Standard/Admin)
+-  Interface mobile native (iOS/Android)
+-  API RESTful complète
+-  Base de données NoSQL (MongoDB)
+-  Cache et sessions (Redis)
+-  Containerisation Docker
+-  Tests automatisés
+-  CI/CD pipeline
+-  Documentation exhaustive
 
 #### Technologies utilisées
 - **Frontend** : React Native, Expo, TypeScript, Redux Toolkit

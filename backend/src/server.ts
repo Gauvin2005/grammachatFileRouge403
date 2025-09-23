@@ -134,9 +134,9 @@ const connectDB = async (): Promise<void> => {
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat';
     
     await mongoose.connect(mongoURI);
-    console.log('✅ Connexion à MongoDB réussie');
+    console.log('Connexion à MongoDB réussie');
   } catch (error) {
-    console.error('❌ Erreur de connexion à MongoDB:', error);
+    console.error('Erreur de connexion à MongoDB:', error);
     process.exit(1);
   }
 };
@@ -159,25 +159,25 @@ const startServer = async (): Promise<void> => {
 
 // Gestion des signaux de fermeture
 process.on('SIGTERM', async () => {
-  console.log('🛑 Signal SIGTERM reçu, fermeture du serveur...');
+  console.log('Signal SIGTERM reçu, fermeture du serveur...');
   try {
     await mongoose.connection.close();
-    console.log('✅ Connexion MongoDB fermée');
+    console.log('Connexion MongoDB fermée');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Erreur lors de la fermeture MongoDB:', error);
+    console.error('Erreur lors de la fermeture MongoDB:', error);
     process.exit(1);
   }
 });
 
 process.on('SIGINT', async () => {
-  console.log('🛑 Signal SIGINT reçu, fermeture du serveur...');
+  console.log('Signal SIGINT reçu, fermeture du serveur...');
   try {
     await mongoose.connection.close();
-    console.log('✅ Connexion MongoDB fermée');
+    console.log('Connexion MongoDB fermée');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Erreur lors de la fermeture MongoDB:', error);
+    console.error('Erreur lors de la fermeture MongoDB:', error);
     process.exit(1);
   }
 });

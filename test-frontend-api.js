@@ -16,18 +16,18 @@ async function testFrontendApi() {
     // Intercepter les requêtes réseau
     page.on('request', request => {
       if (request.url().includes('/api/')) {
-        console.log('📤 Requête API:', request.method(), request.url());
+        console.log('Requête API:', request.method(), request.url());
       }
     });
     
     page.on('response', response => {
       if (response.url().includes('/api/')) {
-        console.log('📥 Réponse API:', response.status(), response.url());
+        console.log('Réponse API:', response.status(), response.url());
         if (response.url().includes('/auth/login')) {
           response.text().then(text => {
             console.log('📄 Contenu de la réponse:', text);
           }).catch(err => {
-            console.log('❌ Erreur lecture réponse:', err.message);
+            console.log('Erreur lecture réponse:', err.message);
           });
         }
       }
@@ -35,12 +35,12 @@ async function testFrontendApi() {
     
     // Intercepter les erreurs JavaScript
     page.on('pageerror', error => {
-      console.log('❌ Erreur JavaScript:', error.message);
+      console.log('Erreur JavaScript:', error.message);
     });
     
     page.on('console', msg => {
       if (msg.type() === 'error') {
-        console.log('❌ Console error:', msg.text());
+        console.log('Console error:', msg.text());
       }
     });
     
@@ -52,7 +52,7 @@ async function testFrontendApi() {
     await new Promise(resolve => setTimeout(resolve, 3000));
     
     // Remplir le formulaire avec des événements React
-    console.log('🔐 Remplissage du formulaire...');
+    console.log('Remplissage du formulaire...');
     
     // Trouver les inputs
     const emailInput = await page.$('input[type="email"], input[name="email"], [data-testid="email-input"]');
@@ -90,7 +90,7 @@ async function testFrontendApi() {
         el.dispatchEvent(new Event('blur', { bubbles: true }));
       });
       
-      console.log('✅ Formulaire rempli caractère par caractère');
+      console.log(' Formulaire rempli caractère par caractère');
       
       // Vérifier les valeurs après remplissage
       const valuesAfter = await page.evaluate(() => {
@@ -100,10 +100,10 @@ async function testFrontendApi() {
           value: input.value
         }));
       });
-      console.log('🔍 Valeurs après remplissage:', valuesAfter);
+      console.log(' Valeurs après remplissage:', valuesAfter);
       
     } else {
-      console.log('❌ Inputs non trouvés');
+      console.log('Inputs non trouvés');
     }
     
     // Essayer de soumettre le formulaire directement
@@ -118,9 +118,9 @@ async function testFrontendApi() {
           forms[0].submit();
         }
       });
-      console.log('✅ Formulaire soumis directement');
+      console.log(' Formulaire soumis directement');
     } catch (error) {
-      console.log('❌ Erreur soumission directe:', error.message);
+      console.log('Erreur soumission directe:', error.message);
     }
     
     // Méthode 2: Cliquer sur le bouton
@@ -136,7 +136,7 @@ async function testFrontendApi() {
       }));
     });
     
-    console.log('🔍 Boutons trouvés:', buttons);
+    console.log(' Boutons trouvés:', buttons);
     
     let loginButton = null;
     for (const btn of buttons) {
@@ -151,7 +151,7 @@ async function testFrontendApi() {
     }
     
     if (loginButton) {
-      console.log('✅ Bouton de connexion trouvé:', loginButton.text);
+      console.log(' Bouton de connexion trouvé:', loginButton.text);
       
       // Vérifier l'état du bouton
       const buttonState = await page.evaluate((btnText) => {
@@ -169,7 +169,7 @@ async function testFrontendApi() {
         return null;
       }, loginButton.text);
       
-      console.log('🔍 État du bouton:', buttonState);
+      console.log(' État du bouton:', buttonState);
       
       if (buttonState && !buttonState.disabled) {
         await page.evaluate((btnText) => {
@@ -193,17 +193,17 @@ async function testFrontendApi() {
             value: input.value
           }));
         });
-        console.log('🔍 Valeurs juste après le clic:', valuesAfterClick);
+        console.log(' Valeurs juste après le clic:', valuesAfterClick);
         
       } else {
-        console.log('❌ Bouton désactivé ou problème d\'état');
+        console.log('Bouton désactivé ou problème d\'état');
       }
     } else {
-      console.log('❌ Aucun bouton de connexion trouvé');
+      console.log('Aucun bouton de connexion trouvé');
     }
     
     // Vérifier les erreurs de validation
-    console.log('🔍 Vérification des erreurs de validation...');
+    console.log(' Vérification des erreurs de validation...');
     const validationErrors = await page.evaluate(() => {
       const errorElements = document.querySelectorAll('[class*="error"], .error, .text-red, .text-error');
       const errors = [];
@@ -216,9 +216,9 @@ async function testFrontendApi() {
     });
     
     if (validationErrors.length > 0) {
-      console.log('❌ Erreurs de validation trouvées:', validationErrors);
+      console.log('Erreurs de validation trouvées:', validationErrors);
     } else {
-      console.log('✅ Aucune erreur de validation visible');
+      console.log(' Aucune erreur de validation visible');
     }
     
     // Vérifier l'état des inputs
@@ -233,7 +233,7 @@ async function testFrontendApi() {
       }));
     });
     
-    console.log('🔍 État des inputs:', inputStates);
+    console.log(' État des inputs:', inputStates);
     
     // Tester l'API directement depuis le navigateur
     console.log('Test de l\'API depuis le navigateur...');
@@ -264,16 +264,16 @@ async function testFrontendApi() {
       }
     });
     
-    console.log('🔍 Test API navigateur:', apiTest);
+    console.log('Test API navigateur:', apiTest);
     
     // Attendre les requêtes réseau
-    console.log('⏳ Attente des requêtes réseau...');
+    console.log('Attente des requêtes réseau...');
     await new Promise(resolve => setTimeout(resolve, 5000));
     
-    console.log('✅ Test terminé !');
+    console.log('Test terminé !');
     
   } catch (error) {
-    console.error('❌ Erreur lors du test:', error);
+    console.error('Erreur lors du test:', error);
   } finally {
     if (browser) {
       await browser.close();

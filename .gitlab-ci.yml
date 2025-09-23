@@ -56,9 +56,9 @@ lint_backend:
     - cd backend
     - npm ci
   script:
-    - echo "🔍 Vérification du code Backend (ESLint)"
+    - echo " Vérification du code Backend (ESLint)"
     - npm run lint
-    - echo "✅ Linting Backend terminé"
+    - echo " Linting Backend terminé"
   artifacts:
     reports:
       junit: backend/lint-results.xml
@@ -75,9 +75,9 @@ lint_frontend:
     - cd frontend
     - npm ci
   script:
-    - echo "🔍 Vérification du code Frontend (ESLint)"
+    - echo " Vérification du code Frontend (ESLint)"
     - npm run lint
-    - echo "✅ Linting Frontend terminé"
+    - echo " Linting Frontend terminé"
   artifacts:
     reports:
       junit: frontend/lint-results.xml
@@ -95,7 +95,7 @@ format_check:
     - echo "Vérification du formatage du code"
     - cd backend && npm ci && npm run format -- --check
     - cd ../frontend && npm ci && npm run format -- --check
-    - echo "✅ Formatage vérifié"
+    - echo " Formatage vérifié"
   only:
     - main
     - develop
@@ -118,9 +118,9 @@ test_backend:
     - cd backend
     - npm ci
   script:
-    - echo "🧪 Exécution des tests Backend"
+    - echo "Exécution des tests Backend"
     - npm run test:coverage
-    - echo "✅ Tests Backend terminés"
+    - echo " Tests Backend terminés"
   artifacts:
     reports:
       junit: backend/coverage/junit.xml
@@ -141,9 +141,9 @@ test_frontend:
     - cd frontend
     - npm ci
   script:
-    - echo "🧪 Exécution des tests Frontend"
+    - echo "Exécution des tests Frontend"
     - npm run test:coverage
-    - echo "✅ Tests Frontend terminés"
+    - echo " Tests Frontend terminés"
   artifacts:
     reports:
       junit: frontend/coverage/junit.xml
@@ -175,9 +175,9 @@ test_integration:
     - cd tests/automation
     - npm ci
   script:
-    - echo "🔗 Exécution des tests d'intégration"
+    - echo "Exécution des tests d'intégration"
     - node run-tests.js
-    - echo "✅ Tests d'intégration terminés"
+    - echo " Tests d'intégration terminés"
   artifacts:
     reports:
       junit: tests/integration-results.xml
@@ -199,12 +199,12 @@ build_docker:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - echo "🐳 Construction des images Docker"
+    - echo " Construction des images Docker"
     - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA ./backend
     - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA ./frontend
     - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
     - docker push $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA
-    - echo "✅ Images Docker construites et poussées"
+    - echo " Images Docker construites et poussées"
   only:
     - main
     - develop
@@ -219,7 +219,7 @@ security_scan:
     - echo "Analyse de sécurité"
     - cd backend && npm audit --audit-level moderate
     - cd ../frontend && npm audit --audit-level moderate
-    - echo "✅ Analyse de sécurité terminée"
+    - echo " Analyse de sécurité terminée"
   allow_failure: true
   only:
     - main
@@ -235,7 +235,7 @@ deploy_dev:
   script:
     - echo "Déploiement en environnement de développement"
     - curl -X POST "$DEV_DEPLOY_WEBHOOK" -H "Content-Type: application/json" -d '{"ref":"'$CI_COMMIT_SHA'","environment":"development"}'
-    - echo "✅ Déploiement en dev terminé"
+    - echo " Déploiement en dev terminé"
   environment:
     name: development
     url: https://dev.grammachat.com
@@ -251,7 +251,7 @@ deploy_prod:
   script:
     - echo "Déploiement en production"
     - curl -X POST "$PROD_DEPLOY_WEBHOOK" -H "Content-Type: application/json" -d '{"ref":"'$CI_COMMIT_SHA'","environment":"production"}'
-    - echo "✅ Déploiement en production terminé"
+    - echo " Déploiement en production terminé"
   environment:
     name: production
     url: https://grammachat.com
@@ -266,11 +266,11 @@ notify:
   before_script:
     - apk add --no-cache curl
   script:
-    - echo "📢 Envoi des notifications"
+    - echo "Envoi des notifications"
     - |
       if [ "$CI_PIPELINE_STATUS" = "success" ]; then
         curl -X POST "$SLACK_WEBHOOK" -H "Content-Type: application/json" -d '{
-          "text": "✅ Pipeline réussi pour Grammachat",
+          "text": " Pipeline réussi pour Grammachat",
           "attachments": [{
             "color": "good",
             "fields": [{
@@ -290,7 +290,7 @@ notify:
         }'
       else
         curl -X POST "$SLACK_WEBHOOK" -H "Content-Type: application/json" -d '{
-          "text": "❌ Pipeline échoué pour Grammachat",
+          "text": "Pipeline échoué pour Grammachat",
           "attachments": [{
             "color": "danger",
             "fields": [{
@@ -305,7 +305,7 @@ notify:
           }]
         }'
       fi
-    - echo "✅ Notifications envoyées"
+    - echo " Notifications envoyées"
   when: always
   only:
     - main
@@ -316,8 +316,8 @@ cleanup:
   stage: deploy
   image: alpine:latest
   script:
-    - echo "🧹 Nettoyage des ressources temporaires"
-    - echo "✅ Nettoyage terminé"
+    - echo " Nettoyage des ressources temporaires"
+    - echo " Nettoyage terminé"
   when: always
   only:
     - main

@@ -20,7 +20,7 @@ async function testFormValidation() {
     
     // Intercepter les erreurs JavaScript
     page.on('pageerror', error => {
-      console.log('❌ Erreur JavaScript:', error.message);
+      console.log('Erreur JavaScript:', error.message);
     });
     
     // Aller sur l'application
@@ -31,7 +31,7 @@ async function testFormValidation() {
     await new Promise(resolve => setTimeout(resolve, 3000));
     
     // Vérifier l'état initial du formulaire
-    console.log('🔍 Vérification de l\'état initial du formulaire...');
+    console.log(' Vérification de l\'état initial du formulaire...');
     const initialFormState = await page.evaluate(() => {
       const inputs = document.querySelectorAll('input');
       return Array.from(inputs).map(input => ({
@@ -44,10 +44,10 @@ async function testFormValidation() {
         id: input.id
       }));
     });
-    console.log('📋 État initial des inputs:', initialFormState);
+    console.log('État initial des inputs:', initialFormState);
     
     // Remplir le formulaire avec des événements React appropriés
-    console.log('🔐 Remplissage du formulaire...');
+    console.log('Remplissage du formulaire...');
     const emailInput = await page.$('input[type="email"]');
     const passwordInput = await page.$('input[type="password"]');
     
@@ -81,11 +81,11 @@ async function testFormValidation() {
         el.dispatchEvent(event);
       }, password);
       
-      console.log('✅ Formulaire rempli');
+      console.log('Formulaire rempli');
     }
     
     // Vérifier l'état après remplissage
-    console.log('🔍 Vérification de l\'état après remplissage...');
+    console.log(' Vérification de l\'état après remplissage...');
     const filledFormState = await page.evaluate(() => {
       const inputs = document.querySelectorAll('input');
       return Array.from(inputs).map(input => ({
@@ -96,7 +96,7 @@ async function testFormValidation() {
         validationMessage: input.validationMessage
       }));
     });
-    console.log('📋 État après remplissage:', filledFormState);
+    console.log('État après remplissage:', filledFormState);
     
     // Vérifier les erreurs de validation
     const validationErrors = await page.evaluate(() => {
@@ -111,13 +111,13 @@ async function testFormValidation() {
     });
     
     if (validationErrors.length > 0) {
-      console.log('❌ Erreurs de validation trouvées:', validationErrors);
+      console.log('Erreurs de validation trouvées:', validationErrors);
     } else {
-      console.log('✅ Aucune erreur de validation visible');
+      console.log('Aucune erreur de validation visible');
     }
     
     // Vérifier l'état du bouton
-    console.log('🔍 Vérification de l\'état du bouton...');
+    console.log(' Vérification de l\'état du bouton...');
     const buttonState = await page.evaluate(() => {
       const buttons = document.querySelectorAll('button');
       const loginButton = Array.from(buttons).find(btn => 
@@ -135,7 +135,7 @@ async function testFormValidation() {
       return null;
     });
     
-    console.log('🔘 État du bouton:', buttonState);
+    console.log('État du bouton:', buttonState);
     
     // Essayer de déclencher la soumission du formulaire manuellement
     console.log('Tentative de soumission manuelle du formulaire...');
@@ -165,12 +165,12 @@ async function testFormValidation() {
         value: input.value
       }));
     });
-    console.log('📋 État final des inputs:', finalFormState);
+    console.log('État final des inputs:', finalFormState);
     
-    console.log('✅ Test terminé !');
+    console.log('Test terminé !');
     
   } catch (error) {
-    console.error('❌ Erreur lors du test:', error);
+    console.error('Erreur lors du test:', error);
   } finally {
     if (browser) {
       await browser.close();

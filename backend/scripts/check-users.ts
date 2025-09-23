@@ -26,7 +26,7 @@ async function checkUsers() {
     console.log(`\nTotal: ${users.length} utilisateurs`);
 
   } catch (error) {
-    console.error('❌ Erreur:', error);
+    console.error('Erreur:', error);
   } finally {
     // Fermer la connexion
     await mongoose.connection.close();

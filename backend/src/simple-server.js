@@ -14,9 +14,9 @@ mongoose.connect('mongodb://localhost:27017/grammachat', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => {
-  console.log('✅ Connexion à MongoDB réussie');
+  console.log('Connexion à MongoDB réussie');
 }).catch(err => {
-  console.error('❌ Erreur de connexion à MongoDB:', err);
+  console.error('Erreur de connexion à MongoDB:', err);
 });
 
 // Modèle User simplifié

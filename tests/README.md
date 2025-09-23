@@ -71,9 +71,9 @@ En cas de succès, le test affiche :
 ```
 COMPTE CRÉÉ ET VÉRIFIÉ
 Résumé du test:
-  - API Response: ✅ Succès
-  - Database Check: ✅ Utilisateur trouvé
-  - Role Check: ✅ Rôle correct
+  - API Response: Succès
+  - Database Check: Utilisateur trouvé
+  - Role Check: Rôle correct
   - User ID: [ObjectId]
   - Email: test-{timestamp}@example.com
   - Username: testuser{timestamp}
@@ -110,22 +110,22 @@ tests/
 ### Logs Détaillés
 
 Le test produit des logs détaillés pour chaque étape :
-- `🐳` Démarrage Docker
-- `⏳` Attente API
-- `🤖` Lancement Puppeteer
-- `📤` Envoi requête POST
-- `📥` Réception réponse
-- `🔍` Connexion MongoDB
-- `✅` Vérifications réussies
-- `❌` Erreurs détectées
-- `🧹` Nettoyage ressources
+- Démarrage Docker
+- Attente API
+- Lancement Puppeteer
+- Envoi requête POST
+- Réception réponse
+- Connexion MongoDB
+- Vérifications réussies
+- Erreurs détectées
+- Nettoyage ressources
 
 ### Contraintes Respectées
 
-✅ **Contrainte 1** : Bouton + formulaire fonctionnel  
-✅ **Contrainte 2** : Backend + base en Docker  
-✅ **Contrainte 3** : Test automatisé avec Puppeteer + MongoDB  
-✅ **Contrainte 4** : Commentaires clairs et séparation stricte  
+**Contrainte 1** : Bouton + formulaire fonctionnel  
+**Contrainte 2** : Backend + base en Docker  
+**Contrainte 3** : Test automatisé avec Puppeteer + MongoDB  
+**Contrainte 4** : Commentaires clairs et séparation stricte  
 
 Le test vérifie que toutes les contraintes sont respectées et que l'application fonctionne correctement en mode production avec Docker.
 
