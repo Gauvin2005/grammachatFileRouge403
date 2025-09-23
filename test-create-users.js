@@ -65,7 +65,7 @@ async function createTestUsers() {
 
     // Supprimer tous les utilisateurs existants
     await User.deleteMany({});
-    console.log('🗑️ Anciens utilisateurs supprimés');
+    console.log('Anciens utilisateurs supprimés');
 
     // Créer les utilisateurs de test
     const users = [
@@ -105,7 +105,7 @@ async function createTestUsers() {
       console.log(`🔐 Test mot de passe pour ${userData.username}: ${isValid ? '✅ VALIDE' : '❌ INVALIDE'}`);
     }
 
-    console.log('\n🎉 Utilisateurs de test créés avec succès !');
+    console.log('\nUtilisateurs de test créés avec succès !');
     console.log('\n📋 Identifiants de connexion :');
     console.log('┌─────────────┬─────────────────────────┬─────────────┬─────────┐');
     console.log('│ Username    │ Email                   │ Password    │ Role    │');

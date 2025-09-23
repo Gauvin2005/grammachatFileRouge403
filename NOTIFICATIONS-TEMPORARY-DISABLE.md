@@ -129,7 +129,7 @@ grep -r "expo-notifications" frontend/
 
 ---
 
-## ⚡ RÉACTIVATION RAPIDE
+## RÉACTIVATION RAPIDE
 
 **Commande pour réactiver rapidement :**
 

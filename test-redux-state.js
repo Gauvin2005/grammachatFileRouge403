@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 async function testReduxState() {
   let browser;
   try {
-    console.log('🚀 Test de l\'état Redux...');
+    console.log('Test de l\'état Redux...');
     
     browser = await puppeteer.launch({
       headless: false,
@@ -15,23 +15,23 @@ async function testReduxState() {
     
     // Intercepter tous les logs de console
     page.on('console', msg => {
-      console.log(`📱 Console [${msg.type()}]:`, msg.text());
+      console.log(`Console [${msg.type()}]:`, msg.text());
     });
     
     // Intercepter les erreurs JavaScript
     page.on('pageerror', error => {
-      console.log('❌ Erreur JavaScript:', error.message);
+      console.log('Erreur JavaScript:', error.message);
     });
     
     // Aller sur l'application
-    console.log('📱 Ouverture de http://localhost:8082...');
+    console.log('Ouverture de http://localhost:8082...');
     await page.goto('http://localhost:8082', { waitUntil: 'networkidle0' });
     
     // Attendre que l'application se charge
     await new Promise(resolve => setTimeout(resolve, 3000));
     
     // Remplir le formulaire
-    console.log('🔐 Remplissage du formulaire...');
+    console.log('Remplissage du formulaire...');
     const emailInput = await page.$('input[type="email"]');
     const passwordInput = await page.$('input[type="password"]');
     
@@ -56,11 +56,11 @@ async function testReduxState() {
         await new Promise(resolve => setTimeout(resolve, 50));
       }
       
-      console.log('✅ Formulaire rempli');
+      console.log('Formulaire rempli');
     }
     
     // Cliquer sur le bouton de connexion
-    console.log('🖱️ Clic sur le bouton de connexion...');
+    console.log('Clic sur le bouton de connexion...');
     const buttons = await page.evaluate(() => {
       const allButtons = document.querySelectorAll('button');
       return Array.from(allButtons).map(btn => ({
@@ -70,7 +70,7 @@ async function testReduxState() {
       }));
     });
     
-    console.log('🔍 Boutons trouvés:', buttons);
+    console.log('Boutons trouvés:', buttons);
     
     let loginButton = null;
     for (const btn of buttons) {
@@ -83,7 +83,7 @@ async function testReduxState() {
     }
     
     if (loginButton) {
-      console.log('✅ Bouton de connexion trouvé:', loginButton.text);
+      console.log('Bouton de connexion trouvé:', loginButton.text);
       await page.evaluate((btnText) => {
         const buttons = document.querySelectorAll('button');
         for (let btn of buttons) {
@@ -94,10 +94,10 @@ async function testReduxState() {
         }
       }, loginButton.text);
       
-      console.log('🖱️ Bouton cliqué');
+      console.log('Bouton cliqué');
       
       // Attendre et vérifier l'état Redux
-      console.log('⏳ Attente de la réponse...');
+      console.log('Attente de la réponse...');
       await new Promise(resolve => setTimeout(resolve, 3000));
       
       // Vérifier l'état Redux directement
@@ -142,26 +142,26 @@ async function testReduxState() {
         return 'Aucun état Redux accessible';
       });
       
-      console.log('🔍 État Redux:', reduxState);
+      console.log('État Redux:', reduxState);
       
       // Vérifier l'URL et le contenu de la page
       const currentUrl = await page.url();
       const pageTitle = await page.title();
       const hasLoginForm = await page.$('input[type="email"]') !== null;
       
-      console.log('🔍 État de la page:');
+      console.log('État de la page:');
       console.log('  URL:', currentUrl);
       console.log('  Titre:', pageTitle);
       console.log('  Formulaire de connexion présent:', hasLoginForm);
       
     } else {
-      console.log('❌ Bouton de connexion non trouvé');
+      console.log('Bouton de connexion non trouvé');
     }
     
-    console.log('✅ Test terminé !');
+    console.log('Test terminé !');
     
   } catch (error) {
-    console.error('❌ Erreur lors du test:', error);
+    console.error('Erreur lors du test:', error);
   } finally {
     if (browser) {
       await browser.close();

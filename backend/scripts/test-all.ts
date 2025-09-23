@@ -12,30 +12,30 @@ class AllTestsRunner {
   constructor(private baseUrl: string = 'http://localhost:3000') {}
 
   async runAllTests(): Promise<void> {
-    console.log('🎯 TESTS COMPLETS DE L\'API GRAMMACHAT');
+    console.log('TESTS COMPLETS DE L\'API GRAMMACHAT');
     console.log('=====================================\n');
 
     // Test API directs
-    console.log('\n🧪 Tests API directs');
+    console.log('\nTests API directs');
     console.log('='.repeat(50));
     try {
       const apiTester = new APIRouteTester({ baseUrl: this.baseUrl, timeout: 10000 });
       await apiTester.testAllRoutes();
       this.results['API directs'] = true;
     } catch (error) {
-      console.error('❌ Erreur dans les tests API:', error);
+      console.error('Erreur dans les tests API:', error);
       this.results['API directs'] = false;
     }
 
     // Test Swagger basiques
-    console.log('\n🧪 Tests Swagger basiques');
+    console.log('\nTests Swagger basiques');
     console.log('='.repeat(50));
     try {
       const swaggerTester = new BasicSwaggerTester(this.baseUrl);
       await swaggerTester.runBasicTests();
       this.results['Swagger basiques'] = true;
     } catch (error) {
-      console.error('❌ Erreur dans les tests Swagger:', error);
+      console.error('Erreur dans les tests Swagger:', error);
       this.results['Swagger basiques'] = false;
     }
 
@@ -44,7 +44,7 @@ class AllTestsRunner {
   }
 
   private printFinalResults(): void {
-    console.log('\n🏆 RÉSULTATS FINAUX');
+    console.log('\nRÉSULTATS FINAUX');
     console.log('===================\n');
 
     const testNames = Object.keys(this.results);
@@ -52,17 +52,17 @@ class AllTestsRunner {
     const totalTests = testNames.length;
 
     testNames.forEach(testName => {
-      const status = this.results[testName] ? '✅' : '❌';
+      const status = this.results[testName] ? 'SUCCÈS:' : 'ERREUR:';
       console.log(`${status} ${testName}`);
     });
 
-    console.log(`\n📈 Score global: ${successCount}/${totalTests} suites de tests réussies`);
+    console.log(`Score global: ${successCount}/${totalTests} suites de tests réussies`);
     
     const successRate = (successCount / totalTests) * 100;
-    console.log(`📊 Taux de réussite: ${successRate.toFixed(1)}%`);
+    console.log(`Taux de réussite: ${successRate.toFixed(1)}%`);
 
     if (successRate === 100) {
-      console.log('\n🎉 FÉLICITATIONS !');
+      console.log('\nFÉLICITATIONS !');
       console.log('Tous les tests sont passés avec succès !');
       console.log('Ton API Grammachat est parfaitement fonctionnelle.');
     } else if (successRate >= 75) {
@@ -70,7 +70,7 @@ class AllTestsRunner {
       console.log('La plupart des tests sont passés.');
       console.log('Ton API fonctionne bien avec quelques ajustements mineurs.');
     } else if (successRate >= 50) {
-      console.log('\n⚠️ ATTENTION');
+      console.log('\nATTENTION');
       console.log('Plusieurs tests ont échoué.');
       console.log('Vérifie la configuration et les erreurs signalées.');
     } else {
@@ -80,7 +80,7 @@ class AllTestsRunner {
     }
 
     // Recommandations spécifiques
-    console.log('\n💡 RECOMMANDATIONS:');
+    console.log('\nRECOMMANDATIONS:');
     
     if (!this.results['API directs']) {
       console.log('   - Vérifie que l\'API est démarrée: docker-compose up -d');
@@ -95,13 +95,13 @@ class AllTestsRunner {
     }
 
     if (successRate === 100) {
-      console.log('   - 🚀 Ton API est prête pour la production !');
+      console.log('   - Ton API est prête pour la production !');
       console.log('   - 📚 La documentation Swagger est complète');
       console.log('   - 🧪 Les tests automatisés fonctionnent parfaitement');
     }
 
     // Liens utiles
-    console.log('\n🔗 LIENS UTILES:');
+    console.log('\nLIENS UTILES:');
     console.log(`   - Swagger UI: ${this.baseUrl}/api-docs`);
     console.log(`   - Spec JSON: ${this.baseUrl}/api-docs.json`);
     console.log(`   - Health Check: ${this.baseUrl}/api/health`);
@@ -117,14 +117,14 @@ async function main(): Promise<void> {
   try {
     await runner.runAllTests();
   } catch (error) {
-    console.error('💥 Erreur fatale:', error);
+    console.error('Erreur fatale:', error);
     process.exit(1);
   }
 }
 
 // Gestion des signaux
 process.on('SIGINT', () => {
-  console.log('\n🛑 Arrêt des tests...');
+  console.log('\nArrêt des tests...');
   process.exit(0);
 });
 

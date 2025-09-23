@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 async function testWebLogin() {
   let browser;
   try {
-    console.log('🚀 Démarrage des tests web...');
+    console.log('Démarrage des tests web...');
     
     // Lancer le navigateur
     browser = await puppeteer.launch({
@@ -15,7 +15,7 @@ async function testWebLogin() {
     const page = await browser.newPage();
     
     // Aller sur l'application
-    console.log('📱 Ouverture de http://localhost:8082...');
+    console.log('Ouverture de http://localhost:8082...');
     await page.goto('http://localhost:8082', { waitUntil: 'networkidle0' });
     
     // Attendre que l'application se charge
@@ -23,23 +23,23 @@ async function testWebLogin() {
     
     // Prendre une capture d'écran de la page d'accueil
     await page.screenshot({ path: 'test-homepage.png' });
-    console.log('📸 Capture d\'écran de la page d\'accueil sauvegardée');
+    console.log('Capture d\'écran de la page d\'accueil sauvegardée');
     
     // Chercher le formulaire de connexion
-    console.log('🔍 Recherche du formulaire de connexion...');
+    console.log('Recherche du formulaire de connexion...');
     
     // Attendre que les éléments de connexion apparaissent
     try {
       await page.waitForSelector('input[type="email"], input[name="email"], [data-testid="email-input"]', { timeout: 10000 });
-      console.log('✅ Formulaire de connexion trouvé');
+      console.log('Formulaire de connexion trouvé');
     } catch (error) {
-      console.log('❌ Formulaire de connexion non trouvé');
-      console.log('📄 Contenu de la page:', await page.content());
+      console.log('Formulaire de connexion non trouvé');
+      console.log('Contenu de la page:', await page.content());
       return;
     }
     
     // Tester la connexion avec user1
-    console.log('🔐 Test de connexion avec user1@grammachat.com...');
+    console.log('Test de connexion avec user1@grammachat.com...');
     
     // Remplir le formulaire
     await page.type('input[type="email"], input[name="email"], [data-testid="email-input"]', 'user1@grammachat.com');
@@ -47,7 +47,7 @@ async function testWebLogin() {
     
     // Prendre une capture avant la soumission
     await page.screenshot({ path: 'test-login-form.png' });
-    console.log('📸 Formulaire rempli, capture d\'écran sauvegardée');
+    console.log('Formulaire rempli, capture d\'écran sauvegardée');
     
     // Inspecter les boutons disponibles
     const buttons = await page.evaluate(() => {
@@ -60,7 +60,7 @@ async function testWebLogin() {
         'data-testid': btn.getAttribute('data-testid')
       }));
     });
-    console.log('🔍 Boutons trouvés:', buttons);
+    console.log('Boutons trouvés:', buttons);
     
     // Essayer de trouver le bon bouton
     let loginButton = null;
@@ -76,7 +76,7 @@ async function testWebLogin() {
     }
     
     if (loginButton) {
-      console.log('✅ Bouton de connexion trouvé:', loginButton);
+      console.log('Bouton de connexion trouvé:', loginButton);
       // Cliquer sur le bouton trouvé
       await page.evaluate((btnText) => {
         const buttons = document.querySelectorAll('button');
@@ -88,7 +88,7 @@ async function testWebLogin() {
         }
       }, loginButton.text);
     } else {
-      console.log('❌ Aucun bouton de connexion trouvé');
+      console.log('Aucun bouton de connexion trouvé');
       return;
     }
     
@@ -97,11 +97,11 @@ async function testWebLogin() {
     
     // Prendre une capture après la tentative de connexion
     await page.screenshot({ path: 'test-after-login.png' });
-    console.log('📸 Capture d\'écran après connexion sauvegardée');
+    console.log('Capture d\'écran après connexion sauvegardée');
     
     // Vérifier si la connexion a réussi
     const currentUrl = page.url();
-    console.log('🌐 URL actuelle:', currentUrl);
+    console.log('URL actuelle:', currentUrl);
     
     // Chercher des messages d'erreur
     const errorMessages = await page.evaluate(() => {
@@ -125,9 +125,9 @@ async function testWebLogin() {
     });
     
     if (errorMessages.length > 0) {
-      console.log('❌ Erreurs détectées:', errorMessages);
+      console.log('Erreurs détectées:', errorMessages);
     } else {
-      console.log('✅ Aucune erreur visible détectée');
+      console.log('Aucune erreur visible détectée');
     }
     
     // Vérifier si on est connecté (chercher des éléments qui n'apparaissent que quand connecté)
@@ -196,7 +196,7 @@ async function testWebLogin() {
       };
     });
     
-    console.log('🔍 Debug après connexion:');
+    console.log('Debug après connexion:');
     console.log('  URL:', debugInfo.url);
     console.log('  Titre:', debugInfo.title);
     console.log('  Formulaire de connexion présent:', debugInfo.hasLoginForm);
@@ -206,13 +206,13 @@ async function testWebLogin() {
     console.log('  Échantillon de textes:', debugInfo.sampleTexts.slice(0, 10));
     
     if (isLoggedIn) {
-      console.log('🎉 Connexion réussie !');
+      console.log('Connexion réussie !');
     } else {
-      console.log('❌ Connexion échouée ou page non chargée');
+      console.log('Connexion échouée ou page non chargée');
     }
     
     // Tester avec un autre compte
-    console.log('🔐 Test avec admin@grammachat.com...');
+    console.log('Test avec admin@grammachat.com...');
     
     // Effacer et remplir avec admin
     await page.evaluate(() => {
@@ -264,19 +264,19 @@ async function testWebLogin() {
     await new Promise(resolve => setTimeout(resolve, 5000));
     
     await page.screenshot({ path: 'test-admin-login.png' });
-    console.log('📸 Test admin terminé, capture d\'écran sauvegardée');
+    console.log('Test admin terminé, capture d\'écran sauvegardée');
     
-    console.log('✅ Tests terminés !');
+    console.log('Tests terminés !');
     
   } catch (error) {
-    console.error('❌ Erreur lors des tests:', error);
+    console.error('Erreur lors des tests:', error);
   } finally {
     if (browser) {
       await browser.close();
     }
     
     // Nettoyer les captures d'écran
-    console.log('🧹 Nettoyage des captures d\'écran...');
+    console.log('Nettoyage des captures d\'écran...');
     const fs = require('fs');
     const screenshots = [
       'test-homepage.png',
@@ -289,10 +289,10 @@ async function testWebLogin() {
       try {
         if (fs.existsSync(file)) {
           fs.unlinkSync(file);
-          console.log(`🗑️ Supprimé: ${file}`);
+          console.log(`Supprimé: ${file}`);
         }
       } catch (error) {
-        console.log(`⚠️ Impossible de supprimer ${file}:`, error.message);
+        console.log(`ATTENTION: Impossible de supprimer ${file}:`, error.message);
       }
     });
   }

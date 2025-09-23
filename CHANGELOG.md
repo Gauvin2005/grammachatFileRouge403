@@ -7,7 +7,7 @@ et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
 ## [1.0.0] - 2024-01-01
 
-### 🎉 Version Initiale - MVP
+### Version Initiale - MVP
 
 #### Ajouté
 - **Authentification complète**

@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 async function testFrontendApi() {
   let browser;
   try {
-    console.log('🚀 Test de communication frontend-API...');
+    console.log('Test de communication frontend-API...');
     
     browser = await puppeteer.launch({
       headless: false,
@@ -45,7 +45,7 @@ async function testFrontendApi() {
     });
     
     // Aller sur l'application
-    console.log('📱 Ouverture de http://localhost:8082...');
+    console.log('Ouverture de http://localhost:8082...');
     await page.goto('http://localhost:8082', { waitUntil: 'networkidle0' });
     
     // Attendre que l'application se charge
@@ -107,7 +107,7 @@ async function testFrontendApi() {
     }
     
     // Essayer de soumettre le formulaire directement
-    console.log('🖱️ Tentative de soumission du formulaire...');
+    console.log('Tentative de soumission du formulaire...');
     
     // Méthode 1: Soumettre le formulaire directement
     try {
@@ -124,7 +124,7 @@ async function testFrontendApi() {
     }
     
     // Méthode 2: Cliquer sur le bouton
-    console.log('🖱️ Clic sur le bouton de connexion...');
+    console.log('Clic sur le bouton de connexion...');
     const buttons = await page.evaluate(() => {
       const allButtons = document.querySelectorAll('button');
       return Array.from(allButtons).map(btn => ({
@@ -181,7 +181,7 @@ async function testFrontendApi() {
             }
           }
         }, loginButton.text);
-        console.log('🖱️ Bouton cliqué');
+        console.log('Bouton cliqué');
         
         // Attendre un peu et vérifier les valeurs juste après le clic
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -236,7 +236,7 @@ async function testFrontendApi() {
     console.log('🔍 État des inputs:', inputStates);
     
     // Tester l'API directement depuis le navigateur
-    console.log('🌐 Test de l\'API depuis le navigateur...');
+    console.log('Test de l\'API depuis le navigateur...');
     const apiTest = await page.evaluate(async () => {
       try {
         const response = await fetch('http://localhost:3000/api/auth/login', {

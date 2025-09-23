@@ -21,7 +21,7 @@ npm run test:api           # Plus rapide
 npm run test:all           # Complet
 ```
 
-## 🔧 Variables d'environnement
+## Variables d'environnement
 
 ```bash
 API_URL=http://localhost:3000  # URL API

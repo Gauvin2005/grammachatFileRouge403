@@ -12,26 +12,26 @@ class SimpleSwaggerTester {
   constructor(private baseUrl: string = 'http://localhost:3000') {}
 
   async initialize(): Promise<void> {
-    console.log('🚀 Initialisation de Puppeteer...');
+    console.log('Initialisation de Puppeteer...');
     this.browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     this.page = await this.browser.newPage();
     await this.page.setViewport({ width: 1280, height: 720 });
-    console.log('✅ Puppeteer initialisé');
+    console.log('Puppeteer initialisé');
   }
 
   async cleanup(): Promise<void> {
     if (this.browser) {
       await this.browser.close();
-      console.log('🧹 Puppeteer fermé');
+      console.log('Puppeteer fermé');
     }
   }
 
   async testSwaggerUI(): Promise<boolean> {
     try {
-      console.log('📖 Test de l\'accès à Swagger UI...');
+      console.log('Test de l\'accès à Swagger UI...');
       
       // Naviguer vers Swagger UI
       await this.page!.goto(`${this.baseUrl}/api-docs/`, { 
@@ -41,14 +41,14 @@ class SimpleSwaggerTester {
 
       // Vérifier que Swagger UI est chargé
       await this.page!.waitForSelector('.swagger-ui', { timeout: 5000 });
-      console.log('✅ Swagger UI accessible');
+      console.log('Swagger UI accessible');
 
       // Vérifier la présence des sections principales
       const sections = await this.page!.$$eval('.opblock-tag', elements => 
         elements.map(el => el.textContent?.trim())
       );
       
-      console.log('📋 Sections trouvées:', sections);
+      console.log('Sections trouvées:', sections);
       
       // Vérifier qu'on a les sections attendues
       const expectedSections = ['Authentication', 'Messages', 'Users', 'System'];
@@ -56,19 +56,19 @@ class SimpleSwaggerTester {
         sections.some(s => s?.includes(section))
       );
       
-      console.log(`✅ Sections trouvées: ${foundSections.length}/${expectedSections.length}`);
+      console.log(`Sections trouvées: ${foundSections.length}/${expectedSections.length}`);
       
       return foundSections.length >= 3; // Au moins 3 sections sur 4
       
     } catch (error) {
-      console.error('❌ Erreur lors du test Swagger UI:', error);
+      console.error('Erreur lors du test Swagger UI:', error);
       return false;
     }
   }
 
   async testAuthenticationFlow(): Promise<boolean> {
     try {
-      console.log('🔐 Test du flux d\'authentification...');
+      console.log('Test du flux d\'authentification...');
       
       // Naviguer vers Swagger UI si pas déjà fait
       if (!this.page!.url().includes('/api-docs')) {
@@ -108,7 +108,7 @@ class SimpleSwaggerTester {
       const statusElement = await this.page!.$('.response-col_status');
       const statusCode = await statusElement!.evaluate(el => el.textContent?.trim());
       
-      console.log(`✅ Inscription testée - Status: ${statusCode}`);
+      console.log(`Inscription testée - Status: ${statusCode}`);
       
       // Maintenant tester la connexion
       const loginSelector = '.opblock.opblock-post[data-path="/api/auth/login"]';
@@ -133,19 +133,19 @@ class SimpleSwaggerTester {
       const loginStatusElement = await this.page!.$('.response-col_status');
       const loginStatusCode = await loginStatusElement!.evaluate(el => el.textContent?.trim());
       
-      console.log(`✅ Connexion testée - Status: ${loginStatusCode}`);
+      console.log(`Connexion testée - Status: ${loginStatusCode}`);
       
       return statusCode === '201' && loginStatusCode === '200';
       
     } catch (error) {
-      console.error('❌ Erreur lors du test d\'authentification:', error);
+      console.error('Erreur lors du test d\'authentification:', error);
       return false;
     }
   }
 
   async testProtectedRoute(): Promise<boolean> {
     try {
-      console.log('🔒 Test d\'une route protégée...');
+      console.log('Test d\'une route protégée...');
       
       // Trouver et cliquer sur l'endpoint GET /api/auth/profile
       const profileSelector = '.opblock.opblock-get[data-path="/api/auth/profile"]';
@@ -163,18 +163,18 @@ class SimpleSwaggerTester {
       const statusElement = await this.page!.$('.response-col_status');
       const statusCode = await statusElement!.evaluate(el => el.textContent?.trim());
       
-      console.log(`✅ Route protégée testée - Status: ${statusCode} (attendu: 401)`);
+      console.log(`Route protégée testée - Status: ${statusCode} (attendu: 401)`);
       
       return statusCode === '401'; // Doit retourner 401 sans token
       
     } catch (error) {
-      console.error('❌ Erreur lors du test de route protégée:', error);
+      console.error('Erreur lors du test de route protégée:', error);
       return false;
     }
   }
 
   async runQuickTests(): Promise<void> {
-    console.log('🎯 Tests rapides de Swagger UI\n');
+    console.log('Tests rapides de Swagger UI\n');
 
     const results = {
       swaggerUI: false,
@@ -190,13 +190,13 @@ class SimpleSwaggerTester {
       results.protectedRoute = await this.testProtectedRoute();
 
     } catch (error) {
-      console.error('💥 Erreur fatale:', error);
+      console.error('Erreur fatale:', error);
     } finally {
       await this.cleanup();
     }
 
     // Résultats
-    console.log('\n📊 RÉSULTATS DES TESTS RAPIDES');
+    console.log('\nRÉSULTATS DES TESTS RAPIDES');
     console.log('==================================\n');
     
     const tests = [
@@ -206,19 +206,19 @@ class SimpleSwaggerTester {
     ];
 
     tests.forEach(test => {
-      const status = test.result ? '✅' : '❌';
+      const status = test.result ? 'SUCCÈS:' : 'ERREUR:';
       console.log(`${status} ${test.name}`);
     });
 
     const successCount = Object.values(results).filter(Boolean).length;
     const totalTests = Object.keys(results).length;
     
-    console.log(`\n📈 Score: ${successCount}/${totalTests} tests réussis`);
+    console.log(`\nScore: ${successCount}/${totalTests} tests réussis`);
     
     if (successCount === totalTests) {
-      console.log('🎉 Tous les tests sont passés !');
+      console.log('SUCCÈS: Tous les tests sont passés !');
     } else {
-      console.log('⚠️ Certains tests ont échoué, vérifiez la configuration.');
+      console.log('ATTENTION: Certains tests ont échoué, vérifiez la configuration.');
     }
   }
 }
@@ -232,7 +232,7 @@ async function main(): Promise<void> {
 
 // Gestion des signaux
 process.on('SIGINT', () => {
-  console.log('\n🛑 Arrêt des tests...');
+  console.log('\nArrêt des tests...');
   process.exit(0);
 });
 

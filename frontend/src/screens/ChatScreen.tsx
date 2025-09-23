@@ -65,7 +65,7 @@ const ChatScreen: React.FC = () => {
         const xpCalc = result.xpCalculation as any;
         if (xpCalc.levelUp) {
           Alert.alert(
-            '🎉 Félicitations !',
+            'Félicitations !',
             `Vous avez gagné ${xpCalc.totalXP} XP et êtes passé au niveau ${xpCalc.newLevel} !`
           );
         }

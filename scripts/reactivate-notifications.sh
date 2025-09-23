@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# 🔔 Script de réactivation rapide des notifications
+# Script de réactivation rapide des notifications
 # Usage: ./scripts/reactivate-notifications.sh
 
-echo "🔔 Réactivation des notifications..."
+echo "Réactivation des notifications..."
 
 # Décommenter l'import dans App.tsx
 sed -i 's|// import notificationService|import notificationService|g' frontend/App.tsx
@@ -23,8 +23,8 @@ sed -i 's|{/\* Voir NOTIFICATIONS-TEMPORARY-DISABLE.md pour plus d'informations 
 sed -i 's|{/\*||g' frontend/src/screens/ProfileScreen.tsx
 sed -i 's|\*/}||g' frontend/src/screens/ProfileScreen.tsx
 
-echo "✅ Notifications réactivées !"
-echo "📝 N'oublie pas de :"
+echo "Notifications réactivées !"
+echo "N'oublie pas de :"
 echo "   1. Tester sur un appareil physique"
 echo "   2. Vérifier les permissions"
 echo "   3. Configurer les canaux Android si nécessaire"

@@ -22,25 +22,25 @@ class RouteTester {
   constructor(private baseUrl: string = 'http://localhost:3000') {}
 
   async initialize(): Promise<void> {
-    console.log('🚀 Initialisation de Puppeteer...');
+    console.log('Initialisation de Puppeteer...');
     this.browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     this.page = await this.browser.newPage();
     await this.page.setViewport({ width: 1280, height: 720 });
-    console.log('✅ Puppeteer initialisé');
+    console.log('Puppeteer initialisé');
   }
 
   async cleanup(): Promise<void> {
     if (this.browser) {
       await this.browser.close();
-      console.log('🧹 Puppeteer fermé');
+      console.log('Puppeteer fermé');
     }
   }
 
   async authenticate(): Promise<string> {
-    console.log('🔐 Authentification...');
+    console.log('Authentification...');
     
     const testUser = {
       email: `test-${Date.now()}@example.com`,
@@ -59,7 +59,7 @@ class RouteTester {
 
     if (loginResult.success && loginResult.data?.token) {
       this.jwtToken = loginResult.data.token;
-      console.log('✅ Authentification réussie');
+      console.log('Authentification réussie');
       return this.jwtToken;
     } else {
       throw new Error('Échec de l\'authentification');
@@ -123,7 +123,7 @@ class RouteTester {
       };
 
     } catch (error) {
-      console.error(`❌ Erreur lors de l'exécution de ${method} ${endpoint}:`, error);
+      console.error(`Erreur lors de l'exécution de ${method} ${endpoint}:`, error);
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error)
@@ -164,12 +164,12 @@ class RouteTester {
       await closeButton!.click();
 
     } catch (error) {
-      console.warn('⚠️ Impossible d\'ajouter le token JWT:', error);
+      console.warn('ATTENTION: Impossible d\'ajouter le token JWT:', error);
     }
   }
 
   async testAllRoutes(): Promise<void> {
-    console.log('🎯 Test de toutes les routes via Swagger UI\n');
+    console.log('Test de toutes les routes via Swagger UI\n');
 
     // Authentification
     await this.authenticate();
@@ -225,7 +225,7 @@ class RouteTester {
 
     // Tester chaque route
     for (const route of routes) {
-      console.log(`🧪 Test: ${route.description}`);
+      console.log(`Test: ${route.description}`);
       
       const result = await this.executeRequest(route.endpoint, route.method, route.body);
       
@@ -241,7 +241,7 @@ class RouteTester {
 
       results.push(testResult);
 
-      const status = testResult.passed ? '✅' : '❌';
+      const status = testResult.passed ? 'SUCCÈS:' : 'ERREUR:';
       console.log(`${status} ${route.method} ${route.endpoint} - ${result.statusCode} (attendu: ${route.expectedStatus})`);
       
       if (result.error) {
@@ -257,7 +257,7 @@ class RouteTester {
   }
 
   private printResults(results: any[]): void {
-    console.log('\n📊 RÉSULTATS DES TESTS DE ROUTES');
+    console.log('\nRÉSULTATS DES TESTS DE ROUTES');
     console.log('===================================\n');
 
     const passedCount = results.filter(r => r.passed).length;
@@ -265,12 +265,12 @@ class RouteTester {
     const successRate = (passedCount / totalCount) * 100;
 
     console.log(`📈 Score global: ${passedCount}/${totalCount} (${successRate.toFixed(1)}%)`);
-    console.log(`✅ Tests réussis: ${passedCount}`);
-    console.log(`❌ Tests échoués: ${totalCount - passedCount}\n`);
+    console.log(`Tests réussis: ${passedCount}`);
+    console.log(`Tests échoués: ${totalCount - passedCount}\n`);
 
     // Détail des résultats
     results.forEach((result, index) => {
-      const status = result.passed ? '✅' : '❌';
+      const status = result.passed ? 'SUCCÈS:' : 'ERREUR:';
       console.log(`${index + 1}. ${status} ${result.route}`);
       console.log(`   ${result.description}`);
       console.log(`   Status: ${result.statusCode} (attendu: ${result.expectedStatus})`);
@@ -293,9 +293,9 @@ class RouteTester {
     });
 
     // Recommandations
-    console.log('\n💡 Recommandations:');
+    console.log('\nRecommandations:');
     if (passedCount === totalCount) {
-      console.log('   🎉 Toutes les routes fonctionnent correctement !');
+      console.log('   Toutes les routes fonctionnent correctement !');
     } else {
       console.log('   - Vérifier les routes qui ont échoué');
       console.log('   - Contrôler la configuration Swagger');
@@ -313,7 +313,7 @@ async function main(): Promise<void> {
     await tester.initialize();
     await tester.testAllRoutes();
   } catch (error) {
-    console.error('💥 Erreur fatale:', error);
+    console.error('Erreur fatale:', error);
     process.exit(1);
   } finally {
     await tester.cleanup();
@@ -322,7 +322,7 @@ async function main(): Promise<void> {
 
 // Gestion des signaux
 process.on('SIGINT', () => {
-  console.log('\n🛑 Arrêt des tests...');
+  console.log('\nArrêt des tests...');
   process.exit(0);
 });
 

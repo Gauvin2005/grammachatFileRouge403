@@ -15,22 +15,22 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials: AuthRequest, { rejectWithValue }) => {
     try {
-      console.log('🔐 Tentative de connexion avec:', credentials.email);
+      console.log('Tentative de connexion avec:', credentials.email);
       const response = await apiService.login(credentials);
-      console.log('📥 Réponse API:', response);
+      console.log('Réponse API:', response);
       
       if (response.success && response.data) {
         await apiService.setAuthToken(response.data.token);
         await apiService.setUserData(response.data.user);
-        console.log('✅ Connexion réussie');
+        console.log('Connexion réussie');
         return response.data;
       } else {
-        console.log('❌ Échec de connexion:', response.message);
+        console.log('Échec de connexion:', response.message);
         return rejectWithValue(response.message || 'Erreur de connexion');
       }
     } catch (error: any) {
-      console.log('❌ Erreur lors de la connexion:', error);
-      console.log('❌ Détails erreur:', {
+      console.log('Erreur lors de la connexion:', error);
+      console.log('Détails erreur:', {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status
@@ -100,41 +100,41 @@ export const initializeAuth = createAsyncThunk(
   'auth/initialize',
   async (_, { rejectWithValue }) => {
     try {
-      console.log('🔄 Initialisation de l\'authentification...');
+      console.log('Initialisation de l\'authentification...');
       
       // Test de connectivité d'abord
       try {
         await apiService.checkHealth();
-        console.log('✅ Serveur accessible');
+        console.log('Serveur accessible');
       } catch (error) {
-        console.log('❌ Serveur inaccessible, initialisation sans token');
+        console.log('Serveur inaccessible, initialisation sans token');
         return null;
       }
       
       const token = await apiService.getAuthToken();
       const userData = await apiService.getUserData();
       
-      console.log('🔍 Token trouvé:', !!token);
-      console.log('🔍 Données utilisateur trouvées:', !!userData);
+      console.log('Token trouvé:', !!token);
+      console.log('Données utilisateur trouvées:', !!userData);
       
       if (token && userData) {
         // Vérifier si le token est encore valide
         try {
           await apiService.getProfile();
-          console.log('✅ Token valide, utilisateur connecté');
+          console.log('Token valide, utilisateur connecté');
           return { token, user: userData };
         } catch (error) {
-          console.log('❌ Token expiré, nettoyage des données');
+          console.log('Token expiré, nettoyage des données');
           // Token expiré, nettoyer les données
           await apiService.logout();
           return null;
         }
       }
       
-      console.log('ℹ️ Aucune session active');
+      console.log('Aucune session active');
       return null;
     } catch (error: any) {
-      console.log('❌ Erreur d\'initialisation:', error);
+      console.log('Erreur d\'initialisation:', error);
       return rejectWithValue('Erreur d\'initialisation');
     }
   }

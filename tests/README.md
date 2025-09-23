@@ -6,7 +6,7 @@ Ce dossier contient les tests automatisés pour vérifier le bon fonctionnement 
 
 Le fichier `createUser.test.js` implémente un test automatisé complet qui :
 
-### 🎯 Objectifs du Test
+### Objectifs du Test
 
 1. **Lance le serveur backend avec Docker** (simule `docker-compose up`)
 2. **Utilise Puppeteer** pour envoyer une requête POST vers `/api/users`
@@ -14,13 +14,13 @@ Le fichier `createUser.test.js` implémente un test automatisé complet qui :
 4. **Contrôle que le document inséré** a bien `role="user"`
 5. **Loggue "Compte créé et vérifié"** si succès, sinon l'erreur
 
-### 🔧 Prérequis
+### Prérequis
 
 - Docker et Docker Compose installés
 - Node.js installé
 - Accès aux ports 3000 (API) et 27017 (MongoDB)
 
-### 🚀 Lancement du Test
+### Lancement du Test
 
 #### Méthode 1 : Script automatique (recommandé)
 ```bash
@@ -35,7 +35,7 @@ npm install
 npm test
 ```
 
-### 📋 Ce que fait le test
+### Ce que fait le test
 
 #### Étape 1 : Démarrage Docker
 - Lance `docker-compose up --build`
@@ -65,12 +65,12 @@ npm test
 - Ferme la connexion MongoDB
 - Arrête les services Docker
 
-### 📊 Résultat Attendu
+### Résultat Attendu
 
 En cas de succès, le test affiche :
 ```
-🎉 COMPTE CRÉÉ ET VÉRIFIÉ
-📊 Résumé du test:
+COMPTE CRÉÉ ET VÉRIFIÉ
+Résumé du test:
   - API Response: ✅ Succès
   - Database Check: ✅ Utilisateur trouvé
   - Role Check: ✅ Rôle correct
@@ -82,7 +82,7 @@ En cas de succès, le test affiche :
   - Level: 1
 ```
 
-### 🐛 Dépannage
+### Dépannage
 
 #### Erreur : "Services Docker n'ont pas démarré"
 - Vérifiez que Docker est en cours d'exécution
@@ -97,7 +97,7 @@ En cas de succès, le test affiche :
 - Vérifiez la connexion MongoDB
 - Vérifiez que l'endpoint `/api/users` fonctionne correctement
 
-### 📁 Structure des Fichiers
+### Structure des Fichiers
 
 ```
 tests/
@@ -107,7 +107,7 @@ tests/
 └── README.md            # Cette documentation
 ```
 
-### 🔍 Logs Détaillés
+### Logs Détaillés
 
 Le test produit des logs détaillés pour chaque étape :
 - `🐳` Démarrage Docker
@@ -120,7 +120,7 @@ Le test produit des logs détaillés pour chaque étape :
 - `❌` Erreurs détectées
 - `🧹` Nettoyage ressources
 
-### 🎯 Contraintes Respectées
+### Contraintes Respectées
 
 ✅ **Contrainte 1** : Bouton + formulaire fonctionnel  
 ✅ **Contrainte 2** : Backend + base en Docker  

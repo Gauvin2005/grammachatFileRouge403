@@ -57,7 +57,7 @@ CORS_ORIGIN=http://localhost:3000,http://localhost:19006,https://domaine.com
 EXPO_PUSH_TOKEN=token-expo-push
 ```
 
-## 🛠️ Scripts Disponibles
+## Scripts Disponibles
 
 ### 1. Configuration Automatique
 ```bash

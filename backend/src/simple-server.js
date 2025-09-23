@@ -224,7 +224,7 @@ app.get('/api/users/leaderboard', async (req, res) => {
 
 // Démarrage du serveur
 app.listen(PORT, () => {
-  console.log(`🚀 Serveur Grammachat démarré sur le port ${PORT}`);
-  console.log(`📱 API disponible sur: http://localhost:${PORT}/api`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`Serveur Grammachat démarré sur le port ${PORT}`);
+  console.log(`API disponible sur: http://localhost:${PORT}/api`);
+  console.log(`Health check: http://localhost:${PORT}/api/health`);
 });

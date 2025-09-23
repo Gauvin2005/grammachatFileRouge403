@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 async function testFormValidation() {
   let browser;
   try {
-    console.log('🚀 Test de validation du formulaire...');
+    console.log('Test de validation du formulaire...');
     
     browser = await puppeteer.launch({
       headless: false,
@@ -15,7 +15,7 @@ async function testFormValidation() {
     
     // Intercepter tous les logs de console
     page.on('console', msg => {
-      console.log(`📱 Console [${msg.type()}]:`, msg.text());
+      console.log(`Console [${msg.type()}]:`, msg.text());
     });
     
     // Intercepter les erreurs JavaScript
@@ -24,7 +24,7 @@ async function testFormValidation() {
     });
     
     // Aller sur l'application
-    console.log('📱 Ouverture de http://localhost:8082...');
+    console.log('Ouverture de http://localhost:8082...');
     await page.goto('http://localhost:8082', { waitUntil: 'networkidle0' });
     
     // Attendre que l'application se charge
@@ -138,7 +138,7 @@ async function testFormValidation() {
     console.log('🔘 État du bouton:', buttonState);
     
     // Essayer de déclencher la soumission du formulaire manuellement
-    console.log('🖱️ Tentative de soumission manuelle du formulaire...');
+    console.log('Tentative de soumission manuelle du formulaire...');
     
     // Méthode 1: Cliquer sur le bouton
     if (buttonState && !buttonState.disabled) {
@@ -151,7 +151,7 @@ async function testFormValidation() {
           loginButton.click();
         }
       });
-      console.log('🖱️ Bouton cliqué');
+        console.log('Bouton cliqué');
     }
     
     // Attendre un peu pour voir si quelque chose se passe

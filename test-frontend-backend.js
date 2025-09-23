@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 async function testFrontendBackend() {
   let browser;
   try {
-    console.log('🚀 Test de communication frontend-backend...');
+    console.log('Test de communication frontend-backend...');
     
     browser = await puppeteer.launch({
       headless: false,
@@ -24,7 +24,7 @@ async function testFrontendBackend() {
           url: request.url(),
           headers: request.headers()
         });
-        console.log('📤 Requête API:', request.method(), request.url());
+        console.log('Requête API:', request.method(), request.url());
       }
     });
     
@@ -35,13 +35,13 @@ async function testFrontendBackend() {
           url: response.url(),
           headers: response.headers()
         });
-        console.log('📥 Réponse API:', response.status(), response.url());
+        console.log('Réponse API:', response.status(), response.url());
         
         if (response.url().includes('/auth/login')) {
           response.text().then(text => {
-            console.log('📄 Contenu réponse login:', text);
+            console.log('Contenu réponse login:', text);
           }).catch(err => {
-            console.log('❌ Erreur lecture réponse:', err.message);
+            console.log('Erreur lecture réponse:', err.message);
           });
         }
       }
@@ -49,18 +49,18 @@ async function testFrontendBackend() {
     
     // Intercepter les erreurs JavaScript
     page.on('pageerror', error => {
-      console.log('❌ Erreur JavaScript:', error.message);
+      console.log('Erreur JavaScript:', error.message);
     });
     
     // Aller sur l'application
-    console.log('📱 Ouverture de http://localhost:8082...');
+    console.log('Ouverture de http://localhost:8082...');
     await page.goto('http://localhost:8082', { waitUntil: 'networkidle0' });
     
     // Attendre que l'application se charge
     await new Promise(resolve => setTimeout(resolve, 3000));
     
     // Remplir le formulaire
-    console.log('🔐 Remplissage du formulaire...');
+    console.log('Remplissage du formulaire...');
     const emailInput = await page.$('input[type="email"]');
     const passwordInput = await page.$('input[type="password"]');
     
@@ -85,11 +85,11 @@ async function testFrontendBackend() {
         await new Promise(resolve => setTimeout(resolve, 50));
       }
       
-      console.log('✅ Formulaire rempli');
+      console.log('Formulaire rempli');
     }
     
     // Cliquer sur le bouton de connexion
-    console.log('🖱️ Clic sur le bouton de connexion...');
+    console.log('Clic sur le bouton de connexion...');
     const buttons = await page.evaluate(() => {
       const allButtons = document.querySelectorAll('button');
       return Array.from(allButtons).map(btn => ({
@@ -109,7 +109,7 @@ async function testFrontendBackend() {
     }
     
     if (loginButton) {
-      console.log('✅ Bouton de connexion trouvé:', loginButton.text);
+      console.log('Bouton de connexion trouvé:', loginButton.text);
       await page.evaluate((btnText) => {
         const buttons = document.querySelectorAll('button');
         for (let btn of buttons) {
@@ -120,31 +120,31 @@ async function testFrontendBackend() {
         }
       }, loginButton.text);
       
-      console.log('🖱️ Bouton cliqué');
+      console.log('Bouton cliqué');
       
       // Attendre les requêtes réseau
-      console.log('⏳ Attente des requêtes réseau...');
+      console.log('Attente des requêtes réseau...');
       await new Promise(resolve => setTimeout(resolve, 5000));
       
       // Résumé des requêtes
-      console.log('\n📊 RÉSUMÉ DES REQUÊTES:');
+      console.log('\nRÉSUMÉ DES REQUÊTES:');
       console.log('Requêtes API:', requests.length);
       console.log('Réponses API:', responses.length);
       
       if (requests.length === 0) {
-        console.log('❌ PROBLÈME: Aucune requête API envoyée !');
+        console.log('PROBLÈME: Aucune requête API envoyée !');
       } else {
-        console.log('✅ Des requêtes API ont été envoyées');
+        console.log('Des requêtes API ont été envoyées');
       }
       
     } else {
-      console.log('❌ Bouton de connexion non trouvé');
+      console.log('Bouton de connexion non trouvé');
     }
     
-    console.log('✅ Test terminé !');
+    console.log('Test terminé !');
     
   } catch (error) {
-    console.error('❌ Erreur lors du test:', error);
+    console.error('Erreur lors du test:', error);
   } finally {
     if (browser) {
       await browser.close();

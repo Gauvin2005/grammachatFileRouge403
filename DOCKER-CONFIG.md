@@ -262,5 +262,5 @@ REDIS_PASSWORD=motdepasse-redis-complexe
 
 ---
 
-**🎉 Votre configuration Docker est prête !**  
+**Votre configuration Docker est prête !**  
 Utilisez `./scripts/docker-setup.sh` pour une configuration automatique ou suivez le guide manuel ci-dessus.

@@ -62,11 +62,11 @@ const LoginScreen: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      console.log('🚀 Début de la connexion avec:', data.email);
+      console.log('Début de la connexion avec:', data.email);
       const result = await dispatch(loginUser(data)).unwrap();
-      console.log('✅ Connexion réussie:', result);
+      console.log('Connexion réussie:', result);
     } catch (error: any) {
-      console.log('❌ Erreur de connexion dans onSubmit:', error);
+      console.log('Erreur de connexion dans onSubmit:', error);
       const errorMessage = typeof error === 'string' ? error : 
                           error?.message || 
                           'Échec de la connexion';

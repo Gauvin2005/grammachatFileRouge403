@@ -8,9 +8,9 @@ const MONGODB_URI = 'mongodb://localhost:27017/grammachat';
 
 async function debugAuth() {
   try {
-    console.log('🔌 Connexion à MongoDB...');
+    console.log('Connexion à MongoDB...');
     await mongoose.connect(MONGODB_URI);
-    console.log('✅ Connexion MongoDB réussie');
+    console.log('Connexion MongoDB réussie');
 
     // Importer le modèle User
     const UserSchema = new mongoose.Schema({
@@ -58,7 +58,7 @@ async function debugAuth() {
     const User = mongoose.model('User', UserSchema);
 
     // Tester la création d'un utilisateur
-    console.log('🧪 Test création utilisateur...');
+    console.log('Test création utilisateur...');
     
     const testUser = new User({
       email: 'debug@example.com',
@@ -70,37 +70,37 @@ async function debugAuth() {
     });
 
     await testUser.save();
-    console.log('✅ Utilisateur créé:', testUser._id);
+    console.log('Utilisateur créé:', testUser._id);
 
     // Tester la recherche
-    console.log('🔍 Test recherche utilisateur...');
+    console.log('Test recherche utilisateur...');
     const foundUser = await User.findOne({ email: 'debug@example.com' });
-    console.log('✅ Utilisateur trouvé:', foundUser ? foundUser.username : 'Non trouvé');
+    console.log('Utilisateur trouvé:', foundUser ? foundUser.username : 'Non trouvé');
 
     // Tester JWT
-    console.log('🔐 Test JWT...');
+    console.log('Test JWT...');
     const jwt = require('jsonwebtoken');
     const jwtSecret = process.env.JWT_SECRET;
     console.log('JWT_SECRET défini:', !!jwtSecret);
     
     if (jwtSecret) {
       const token = jwt.sign({ userId: testUser._id.toString() }, jwtSecret, { expiresIn: '7d' });
-      console.log('✅ Token généré:', token.substring(0, 50) + '...');
+      console.log('Token généré:', token.substring(0, 50) + '...');
       
       const decoded = jwt.verify(token, jwtSecret);
-      console.log('✅ Token décodé:', decoded);
+      console.log('Token décodé:', decoded);
     }
 
     // Nettoyer
     await User.deleteOne({ _id: testUser._id });
-    console.log('🧹 Utilisateur de test supprimé');
+    console.log('Utilisateur de test supprimé');
 
   } catch (error) {
-    console.error('❌ Erreur:', error.message);
+    console.error('Erreur:', error.message);
     console.error('Stack:', error.stack);
   } finally {
     await mongoose.disconnect();
-    console.log('🔌 Déconnexion MongoDB');
+    console.log('Déconnexion MongoDB');
   }
 }
 

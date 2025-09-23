@@ -14,14 +14,14 @@ import {
 class ApiService {
   private api: AxiosInstance;
   private baseURL: string;
-  private DEMO_MODE = true; // 🔧 MODE DÉMO TEMPORAIRE
+  private DEMO_MODE = true; // MODE DÉMO TEMPORAIRE
 
   constructor() {
     this.baseURL = __DEV__ 
       ? 'http://localhost:3000/api'  // IP de l'ordinateur pour mobile physique
       : 'https://your-production-api.com/api';
     
-    console.log('🔧 Configuration API:', {
+    console.log('Configuration API:', {
       baseURL: this.baseURL,
       isDev: __DEV__,
       demoMode: this.DEMO_MODE
@@ -74,7 +74,7 @@ class ApiService {
   // Méthodes d'authentification
   async login(credentials: AuthRequest): Promise<ApiResponse<{ user: User; token: string }>> {
     if (this.DEMO_MODE) {
-      console.log('🎭 MODE DÉMO - Connexion simulée');
+      console.log('MODE DÉMO - Connexion simulée');
       
       // Simuler un délai réseau
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -108,16 +108,16 @@ class ApiService {
     }
 
     try {
-      console.log('🌐 Envoi requête login vers:', `${this.baseURL}/auth/login`);
-      console.log('📤 Données envoyées:', { email: credentials.email, password: '[HIDDEN]' });
+      console.log('Envoi requête login vers:', `${this.baseURL}/auth/login`);
+      console.log('Données envoyées:', { email: credentials.email, password: '[HIDDEN]' });
       
       const response = await this.api.post('/auth/login', credentials);
-      console.log('📥 Réponse reçue:', response.status, response.data);
+      console.log('Réponse reçue:', response.status, response.data);
       
       return response.data;
     } catch (error: any) {
-      console.log('❌ Erreur API login:', error);
-      console.log('❌ Détails erreur:', {
+      console.log('Erreur API login:', error);
+      console.log('Détails erreur:', {
         message: error.message,
         status: error.response?.status,
         data: error.response?.data,
@@ -129,7 +129,7 @@ class ApiService {
 
   async register(userData: RegisterRequest): Promise<ApiResponse<{ user: User; token: string }>> {
     if (this.DEMO_MODE) {
-      console.log('🎭 MODE DÉMO - Inscription simulée');
+      console.log('MODE DÉMO - Inscription simulée');
       
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -165,7 +165,7 @@ class ApiService {
 
   async getProfile(): Promise<ApiResponse<{ user: User }>> {
     if (this.DEMO_MODE) {
-      console.log('🎭 MODE DÉMO - Profil simulé');
+      console.log('MODE DÉMO - Profil simulé');
       const userData = await this.getUserData();
       return {
         success: true,
@@ -181,7 +181,7 @@ class ApiService {
   // Méthodes pour les messages
   async sendMessage(messageData: MessageRequest): Promise<ApiResponse<{ message: Message & { xpCalculation: any } }>> {
     if (this.DEMO_MODE) {
-      console.log('🎭 MODE DÉMO - Message simulé');
+      console.log('MODE DÉMO - Message simulé');
       
       await new Promise(resolve => setTimeout(resolve, 1500));
       
@@ -221,7 +221,7 @@ class ApiService {
 
   async getMessages(params?: PaginationParams): Promise<ApiResponse<{ data: Message[]; pagination: any }>> {
     if (this.DEMO_MODE) {
-      console.log('🎭 MODE DÉMO - Messages simulés');
+      console.log('MODE DÉMO - Messages simulés');
       
       // Simuler des messages avec différents expéditeurs
       const demoMessages = [
@@ -288,7 +288,7 @@ class ApiService {
 
   async updateProfile(userId: string, userData: Partial<User>): Promise<ApiResponse<{ user: User }>> {
     if (this.DEMO_MODE) {
-      console.log('🎭 MODE DÉMO - Mise à jour profil simulée');
+      console.log('MODE DÉMO - Mise à jour profil simulée');
       
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -316,7 +316,7 @@ class ApiService {
 
   async getLeaderboard(limit?: number): Promise<ApiResponse<{ leaderboard: LeaderboardEntry[] }>> {
     if (this.DEMO_MODE) {
-      console.log('🎭 MODE DÉMO - Leaderboard simulé');
+      console.log('MODE DÉMO - Leaderboard simulé');
       
       // Simuler un leaderboard
       const demoLeaderboard = [
@@ -343,7 +343,7 @@ class ApiService {
   // Méthodes utilitaires
   async checkHealth(): Promise<ApiResponse> {
     if (this.DEMO_MODE) {
-      console.log('🎭 MODE DÉMO - Health check simulé');
+      console.log('MODE DÉMO - Health check simulé');
       return {
         success: true,
         data: { status: 'ok', mode: 'demo' },
@@ -352,12 +352,12 @@ class ApiService {
     }
 
     try {
-      console.log('🏥 Test de connectivité vers:', `${this.baseURL}/health`);
+      console.log('Test de connectivité vers:', `${this.baseURL}/health`);
       const response = await this.api.get('/health');
-      console.log('✅ Serveur accessible:', response.status);
+      console.log('Serveur accessible:', response.status);
       return response.data;
     } catch (error: any) {
-      console.log('❌ Serveur inaccessible:', error.message);
+      console.log('Serveur inaccessible:', error.message);
       throw error;
     }
   }

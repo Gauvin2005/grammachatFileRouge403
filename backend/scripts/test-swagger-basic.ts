@@ -12,26 +12,26 @@ class BasicSwaggerTester {
   constructor(private baseUrl: string = 'http://localhost:3000') {}
 
   async initialize(): Promise<void> {
-    console.log('🚀 Initialisation de Puppeteer...');
+    console.log('Initialisation de Puppeteer...');
     this.browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     this.page = await this.browser.newPage();
     await this.page.setViewport({ width: 1280, height: 720 });
-    console.log('✅ Puppeteer initialisé');
+    console.log('Puppeteer initialisé');
   }
 
   async cleanup(): Promise<void> {
     if (this.browser) {
       await this.browser.close();
-      console.log('🧹 Puppeteer fermé');
+      console.log('Puppeteer fermé');
     }
   }
 
   async testSwaggerAccess(): Promise<boolean> {
     try {
-      console.log('📖 Test de l\'accès à Swagger UI...');
+      console.log('Test de l\'accès à Swagger UI...');
       
       // Naviguer vers Swagger UI
       await this.page!.goto(`${this.baseUrl}/api-docs/`, { 
@@ -41,14 +41,14 @@ class BasicSwaggerTester {
 
       // Vérifier que Swagger UI est chargé
       await this.page!.waitForSelector('.swagger-ui', { timeout: 10000 });
-      console.log('✅ Swagger UI accessible');
+      console.log('Swagger UI accessible');
 
       // Vérifier la présence des sections principales
       const sections = await this.page!.$$eval('.opblock-tag', elements => 
         elements.map(el => el.textContent?.trim())
       );
       
-      console.log('📋 Sections trouvées:', sections);
+      console.log('Sections trouvées:', sections);
       
       // Vérifier qu'on a les sections attendues
       const expectedSections = ['Authentication', 'Messages', 'Users', 'System'];
@@ -56,19 +56,19 @@ class BasicSwaggerTester {
         sections.some(s => s?.includes(section))
       );
       
-      console.log(`✅ Sections trouvées: ${foundSections.length}/${expectedSections.length}`);
+      console.log(`Sections trouvées: ${foundSections.length}/${expectedSections.length}`);
       
       return foundSections.length >= 2; // Au moins 2 sections sur 4
       
     } catch (error) {
-      console.error('❌ Erreur lors du test d\'accès Swagger:', error);
+      console.error('Erreur lors du test d\'accès Swagger:', error);
       return false;
     }
   }
 
   async testEndpointVisibility(): Promise<boolean> {
     try {
-      console.log('🔍 Test de la visibilité des endpoints...');
+      console.log('Test de la visibilité des endpoints...');
       
       // Vérifier la présence d'endpoints
       const endpoints = await this.page!.$$eval('.opblock', elements => 
@@ -79,7 +79,7 @@ class BasicSwaggerTester {
         }).filter(e => e.method && e.path)
       );
       
-      console.log(`📋 Endpoints trouvés: ${endpoints.length}`);
+      console.log(`Endpoints trouvés: ${endpoints.length}`);
       
       // Afficher quelques endpoints
       endpoints.slice(0, 5).forEach(endpoint => {
@@ -89,14 +89,14 @@ class BasicSwaggerTester {
       return endpoints.length >= 5; // Au moins 5 endpoints
       
     } catch (error) {
-      console.error('❌ Erreur lors du test de visibilité:', error);
+      console.error('Erreur lors du test de visibilité:', error);
       return false;
     }
   }
 
   async testSwaggerJSON(): Promise<boolean> {
     try {
-      console.log('📄 Test de l\'accès à la spec JSON...');
+      console.log('Test de l\'accès à la spec JSON...');
       
       // Naviguer vers la spec JSON
       await this.page!.goto(`${this.baseUrl}/api-docs.json`, { 
@@ -111,28 +111,28 @@ class BasicSwaggerTester {
       if (jsonMatch) {
         try {
           const spec = JSON.parse(jsonMatch[0]);
-          console.log(`✅ Spec JSON valide - Version: ${spec.info?.version}`);
+          console.log(`Spec JSON valide - Version: ${spec.info?.version}`);
           console.log(`   Titre: ${spec.info?.title}`);
           console.log(`   Endpoints: ${Object.keys(spec.paths || {}).length}`);
           return true;
         } catch (parseError) {
-          console.error('❌ JSON invalide:', parseError);
+          console.error('JSON invalide:', parseError);
           return false;
         }
       } else {
-        console.error('❌ Aucun JSON trouvé dans la réponse');
+        console.error('Aucun JSON trouvé dans la réponse');
         return false;
       }
       
     } catch (error) {
-      console.error('❌ Erreur lors du test JSON:', error);
+      console.error('Erreur lors du test JSON:', error);
       return false;
     }
   }
 
   async testHealthEndpoint(): Promise<boolean> {
     try {
-      console.log('🏥 Test de l\'endpoint health...');
+      console.log('Test de l\'endpoint health...');
       
       // Naviguer vers l'endpoint health directement
       await this.page!.goto(`${this.baseUrl}/api/health`, { 
@@ -147,28 +147,28 @@ class BasicSwaggerTester {
       if (jsonMatch) {
         try {
           const health = JSON.parse(jsonMatch[0]);
-          console.log(`✅ Health endpoint accessible`);
+          console.log(`Health endpoint accessible`);
           console.log(`   Status: ${health.success ? 'OK' : 'ERROR'}`);
           console.log(`   Message: ${health.message}`);
           console.log(`   Environment: ${health.environment}`);
           return health.success === true;
         } catch (parseError) {
-          console.error('❌ JSON invalide:', parseError);
+          console.error('JSON invalide:', parseError);
           return false;
         }
       } else {
-        console.error('❌ Aucun JSON trouvé dans la réponse health');
+        console.error('Aucun JSON trouvé dans la réponse health');
         return false;
       }
       
     } catch (error) {
-      console.error('❌ Erreur lors du test health:', error);
+      console.error('Erreur lors du test health:', error);
       return false;
     }
   }
 
   async runBasicTests(): Promise<void> {
-    console.log('🎯 Tests basiques de Swagger\n');
+    console.log('Tests basiques de Swagger\n');
 
     const results = {
       swaggerAccess: false,
@@ -190,13 +190,13 @@ class BasicSwaggerTester {
       results.healthEndpoint = await this.testHealthEndpoint();
 
     } catch (error) {
-      console.error('💥 Erreur fatale:', error);
+      console.error('Erreur fatale:', error);
     } finally {
       await this.cleanup();
     }
 
     // Résultats
-    console.log('\n📊 RÉSULTATS DES TESTS BASIQUES');
+    console.log('\nRÉSULTATS DES TESTS BASIQUES');
     console.log('==================================\n');
     
     const tests = [
@@ -207,25 +207,25 @@ class BasicSwaggerTester {
     ];
 
     tests.forEach(test => {
-      const status = test.result ? '✅' : '❌';
+      const status = test.result ? 'SUCCÈS:' : 'ERREUR:';
       console.log(`${status} ${test.name}`);
     });
 
     const successCount = Object.values(results).filter(Boolean).length;
     const totalTests = Object.keys(results).length;
     
-    console.log(`\n📈 Score: ${successCount}/${totalTests} tests réussis`);
+    console.log(`\nScore: ${successCount}/${totalTests} tests réussis`);
     
     if (successCount === totalTests) {
-      console.log('🎉 Tous les tests basiques sont passés !');
-      console.log('💡 Tu peux maintenant lancer les tests plus avancés :');
+      console.log('SUCCÈS: Tous les tests basiques sont passés !');
+      console.log('INFO: Tu peux maintenant lancer les tests plus avancés :');
       console.log('   npm run test:swagger:routes');
     } else if (successCount >= 2) {
       console.log('✅ Tests basiques majoritairement réussis');
-      console.log('💡 Swagger est fonctionnel, vérifie les erreurs restantes');
+      console.log('INFO: Swagger est fonctionnel, vérifie les erreurs restantes');
     } else {
-      console.log('⚠️ Problèmes détectés avec Swagger');
-      console.log('💡 Vérifie que l\'API est démarrée et accessible');
+      console.log('ATTENTION: Problèmes détectés avec Swagger');
+      console.log('INFO: Vérifie que l\'API est démarrée et accessible');
     }
   }
 }
@@ -239,7 +239,7 @@ async function main(): Promise<void> {
 
 // Gestion des signaux
 process.on('SIGINT', () => {
-  console.log('\n🛑 Arrêt des tests...');
+  console.log('\nArrêt des tests...');
   process.exit(0);
 });
 

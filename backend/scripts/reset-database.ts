@@ -16,11 +16,11 @@ async function resetDatabase() {
       
       for (const collection of collections) {
         await db.collection(collection.name).drop();
-        console.log(`🗑️  Collection ${collection.name} supprimée`);
+        console.log(`Collection ${collection.name} supprimée`);
       }
     }
 
-    console.log('🎉 Base de données réinitialisée avec succès !');
+    console.log('SUCCÈS: Base de données réinitialisée avec succès !');
 
   } catch (error) {
     console.error('❌ Erreur:', error);

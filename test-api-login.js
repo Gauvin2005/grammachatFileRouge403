@@ -93,7 +93,7 @@ async function testApiLogin() {
     console.log('✅ Mot de passe valide:', isValid);
     
     if (isValid) {
-      console.log('🎉 Connexion API devrait fonctionner !');
+      console.log('Connexion API devrait fonctionner !');
     } else {
       console.log('❌ Problème avec le mot de passe - connexion API échouera');
       

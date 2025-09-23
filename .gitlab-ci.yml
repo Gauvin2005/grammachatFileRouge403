@@ -39,10 +39,10 @@ setup:
   stage: setup
   image: node:18-alpine
   script:
-    - echo "🔧 Configuration de l'environnement de développement"
+    - echo "Configuration de l'environnement de développement"
     - node --version
     - npm --version
-    - echo "✅ Environnement configuré"
+    - echo "Environnement configuré"
   only:
     - main
     - develop
@@ -92,7 +92,7 @@ format_check:
   stage: lint
   image: node:18-alpine
   script:
-    - echo "🎨 Vérification du formatage du code"
+    - echo "Vérification du formatage du code"
     - cd backend && npm ci && npm run format -- --check
     - cd ../frontend && npm ci && npm run format -- --check
     - echo "✅ Formatage vérifié"
@@ -216,7 +216,7 @@ security_scan:
   before_script:
     - npm install -g npm-audit
   script:
-    - echo "🔒 Analyse de sécurité"
+    - echo "Analyse de sécurité"
     - cd backend && npm audit --audit-level moderate
     - cd ../frontend && npm audit --audit-level moderate
     - echo "✅ Analyse de sécurité terminée"
@@ -233,7 +233,7 @@ deploy_dev:
   before_script:
     - apk add --no-cache curl
   script:
-    - echo "🚀 Déploiement en environnement de développement"
+    - echo "Déploiement en environnement de développement"
     - curl -X POST "$DEV_DEPLOY_WEBHOOK" -H "Content-Type: application/json" -d '{"ref":"'$CI_COMMIT_SHA'","environment":"development"}'
     - echo "✅ Déploiement en dev terminé"
   environment:
@@ -249,7 +249,7 @@ deploy_prod:
   before_script:
     - apk add --no-cache curl
   script:
-    - echo "🚀 Déploiement en production"
+    - echo "Déploiement en production"
     - curl -X POST "$PROD_DEPLOY_WEBHOOK" -H "Content-Type: application/json" -d '{"ref":"'$CI_COMMIT_SHA'","environment":"production"}'
     - echo "✅ Déploiement en production terminé"
   environment:

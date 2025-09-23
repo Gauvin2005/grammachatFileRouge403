@@ -8,12 +8,12 @@ async function checkUsers() {
   try {
     // Connexion à MongoDB
     await mongoose.connect(MONGODB_URI);
-    console.log('✅ Connecté à MongoDB');
+    console.log('Connecté à MongoDB');
 
     // Récupérer tous les utilisateurs
     const users = await User.find({}).select('username email role');
     
-    console.log('\n📋 Utilisateurs dans la base de données :');
+    console.log('\nUtilisateurs dans la base de données :');
     console.log('┌─────────────┬─────────────────────────┬─────────┐');
     console.log('│ Username    │ Email                   │ Role    │');
     console.log('├─────────────┼─────────────────────────┼─────────┤');
@@ -30,7 +30,7 @@ async function checkUsers() {
   } finally {
     // Fermer la connexion
     await mongoose.connection.close();
-    console.log('🔌 Connexion MongoDB fermée');
+    console.log('Connexion MongoDB fermée');
     process.exit(0);
   }
 }

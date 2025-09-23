@@ -147,12 +147,12 @@ const startServer = async (): Promise<void> => {
     await connectDB();
     
     app.listen(PORT, () => {
-      console.log(`🚀 Serveur Grammachat démarré sur le port ${PORT}`);
-      console.log(`📱 Environnement: ${process.env.NODE_ENV}`);
-      console.log(`🔗 API disponible sur: http://localhost:${PORT}/api`);
+      console.log(`Serveur Grammachat démarré sur le port ${PORT}`);
+      console.log(`Environnement: ${process.env.NODE_ENV}`);
+      console.log(`API disponible sur: http://localhost:${PORT}/api`);
     });
   } catch (error) {
-    console.error('❌ Erreur lors du démarrage du serveur:', error);
+    console.error('Erreur lors du démarrage du serveur:', error);
     process.exit(1);
   }
 };

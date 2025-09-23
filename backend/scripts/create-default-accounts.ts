@@ -9,12 +9,12 @@ async function createDefaultAccounts() {
   try {
     // Connexion à MongoDB
     await mongoose.connect(MONGODB_URI);
-    console.log('✅ Connecté à MongoDB');
+    console.log('Connecté à MongoDB');
 
     // Vérifier si des comptes existent déjà
     const existingUsers = await User.countDocuments();
     if (existingUsers > 0) {
-      console.log('⚠️  Des comptes existent déjà. Suppression des anciens comptes...');
+      console.log('ATTENTION: Des comptes existent déjà. Suppression des anciens comptes...');
       await User.deleteMany({});
     }
 
@@ -43,7 +43,7 @@ async function createDefaultAccounts() {
       }
     ];
 
-    console.log('🔄 Création des comptes par défaut...');
+    console.log('Création des comptes par défaut...');
 
     for (const account of defaultAccounts) {
       // Créer l'utilisateur (le mot de passe sera hashé automatiquement par le middleware)
@@ -56,11 +56,11 @@ async function createDefaultAccounts() {
       });
 
       await user.save();
-      console.log(`✅ Compte créé: ${account.username} (${account.role})`);
+      console.log(`Compte créé: ${account.username} (${account.role})`);
     }
 
-    console.log('\n🎉 Comptes par défaut créés avec succès !');
-    console.log('\n📋 Identifiants de connexion :');
+    console.log('\nSUCCÈS: Comptes par défaut créés avec succès !');
+    console.log('\nIdentifiants de connexion :');
     console.log('┌─────────────┬─────────────────────────┬─────────────┬─────────┐');
     console.log('│ Username    │ Email                   │ Password    │ Role    │');
     console.log('├─────────────┼─────────────────────────┼─────────────┼─────────┤');
@@ -70,11 +70,11 @@ async function createDefaultAccounts() {
     console.log('└─────────────┴─────────────────────────┴─────────────┴─────────┘');
 
   } catch (error) {
-    console.error('❌ Erreur lors de la création des comptes:', error);
+    console.error('Erreur lors de la création des comptes:', error);
   } finally {
     // Fermer la connexion
     await mongoose.connection.close();
-    console.log('🔌 Connexion MongoDB fermée');
+    console.log('Connexion MongoDB fermée');
     process.exit(0);
   }
 }

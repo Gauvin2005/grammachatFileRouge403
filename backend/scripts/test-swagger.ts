@@ -32,7 +32,7 @@ class SwaggerTester {
   constructor(private config: TestConfig) {}
 
   async initialize(): Promise<void> {
-    console.log('🚀 Initialisation de Puppeteer...');
+    console.log('Initialisation de Puppeteer...');
     this.browser = await puppeteer.launch({
       headless: this.config.headless,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -43,18 +43,18 @@ class SwaggerTester {
     await this.page.setViewport({ width: 1280, height: 720 });
     await this.page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36');
     
-    console.log('✅ Puppeteer initialisé');
+    console.log('Puppeteer initialisé');
   }
 
   async cleanup(): Promise<void> {
     if (this.browser) {
       await this.browser.close();
-      console.log('🧹 Puppeteer fermé');
+      console.log('Puppeteer fermé');
     }
   }
 
   async navigateToSwagger(): Promise<void> {
-    console.log(`📖 Navigation vers Swagger UI: ${this.config.swaggerUrl}`);
+    console.log(`Navigation vers Swagger UI: ${this.config.swaggerUrl}`);
     await this.page!.goto(this.config.swaggerUrl, { 
       waitUntil: 'networkidle2',
       timeout: this.config.timeout 
@@ -62,11 +62,11 @@ class SwaggerTester {
     
     // Attendre que Swagger UI soit chargé
     await this.page!.waitForSelector('.swagger-ui', { timeout: 10000 });
-    console.log('✅ Swagger UI chargé');
+    console.log('Swagger UI chargé');
   }
 
   async authenticate(): Promise<void> {
-    console.log('🔐 Test de l\'authentification...');
+    console.log('Test de l\'authentification...');
     
     try {
       // Test d'inscription
@@ -84,12 +84,12 @@ class SwaggerTester {
 
       if (loginResult.status === 'success' && loginResult.response?.token) {
         this.jwtToken = loginResult.response.token;
-        console.log('✅ Authentification réussie, token JWT obtenu');
+        console.log('Authentification réussie, token JWT obtenu');
       } else {
         throw new Error('Échec de l\'authentification');
       }
     } catch (error) {
-      console.error('❌ Erreur d\'authentification:', error);
+      console.error('Erreur d\'authentification:', error);
       throw error;
     }
   }
@@ -98,7 +98,7 @@ class SwaggerTester {
     const startTime = performance.now();
     const route = `${this.config.baseUrl}${endpoint}`;
     
-    console.log(`🧪 Test ${method} ${endpoint}`);
+    console.log(`Test ${method} ${endpoint}`);
     
     try {
       // Naviguer vers Swagger UI si nécessaire
@@ -160,7 +160,7 @@ class SwaggerTester {
         response
       };
 
-      console.log(`✅ ${method} ${endpoint} - ${statusCode} (${responseTime.toFixed(2)}ms)`);
+      console.log(`SUCCÈS: ${method} ${endpoint} - ${statusCode} (${responseTime.toFixed(2)}ms)`);
       return result;
 
     } catch (error) {
@@ -175,7 +175,7 @@ class SwaggerTester {
         error: error instanceof Error ? error.message : String(error)
       };
 
-      console.log(`❌ ${method} ${endpoint} - Erreur: ${result.error}`);
+      console.log(`ERREUR: ${method} ${endpoint} - Erreur: ${result.error}`);
       return result;
     }
   }
@@ -219,14 +219,14 @@ class SwaggerTester {
       const closeButton = await this.page!.waitForSelector('.auth-btn-wrapper .btn-done', { timeout: 5000 });
       await closeButton!.click();
 
-      console.log('🔑 Token JWT ajouté à Swagger UI');
+      console.log('Token JWT ajouté à Swagger UI');
     } catch (error) {
-      console.warn('⚠️ Impossible d\'ajouter le token JWT:', error);
+      console.warn('ATTENTION: Impossible d\'ajouter le token JWT:', error);
     }
   }
 
   async runAllTests(): Promise<void> {
-    console.log('🎯 Démarrage des tests Swagger...\n');
+    console.log('Démarrage des tests Swagger...\n');
 
     // Tests d'authentification
     await this.authenticate();
@@ -263,7 +263,7 @@ class SwaggerTester {
   }
 
   async testErrorCases(): Promise<void> {
-    console.log('\n🔍 Tests des cas d\'erreur...');
+    console.log('Tests des cas d\'erreur...');
 
     // Test avec token invalide
     const originalToken = this.jwtToken;
@@ -290,21 +290,21 @@ class SwaggerTester {
   }
 
   private printResults(): void {
-    console.log('\n📊 RÉSULTATS DES TESTS SWAGGER');
+    console.log('\nRÉSULTATS DES TESTS SWAGGER');
     console.log('=====================================\n');
 
     const successCount = this.results.filter(r => r.status === 'success').length;
     const errorCount = this.results.filter(r => r.status === 'error').length;
     const totalTime = this.results.reduce((sum, r) => sum + r.responseTime, 0);
 
-    console.log(`✅ Tests réussis: ${successCount}`);
-    console.log(`❌ Tests échoués: ${errorCount}`);
-    console.log(`⏱️ Temps total: ${totalTime.toFixed(2)}ms`);
-    console.log(`📈 Temps moyen: ${(totalTime / this.results.length).toFixed(2)}ms\n`);
+    console.log(`Tests réussis: ${successCount}`);
+    console.log(`Tests échoués: ${errorCount}`);
+    console.log(`Temps total: ${totalTime.toFixed(2)}ms`);
+    console.log(`Temps moyen: ${(totalTime / this.results.length).toFixed(2)}ms\n`);
 
     // Détail des résultats
     this.results.forEach((result, index) => {
-      const status = result.status === 'success' ? '✅' : '❌';
+      const status = result.status === 'success' ? 'SUCCÈS:' : 'ERREUR:';
       const statusCode = result.statusCode ? ` (${result.statusCode})` : '';
       console.log(`${index + 1}. ${status} ${result.method} ${result.route}${statusCode} - ${result.responseTime.toFixed(2)}ms`);
       
@@ -315,7 +315,7 @@ class SwaggerTester {
 
     // Statistiques par méthode HTTP
     const methods = [...new Set(this.results.map(r => r.method))];
-    console.log('\n📈 Statistiques par méthode HTTP:');
+    console.log('\nStatistiques par méthode HTTP:');
     methods.forEach(method => {
       const methodResults = this.results.filter(r => r.method === method);
       const successRate = (methodResults.filter(r => r.status === 'success').length / methodResults.length) * 100;
@@ -325,7 +325,7 @@ class SwaggerTester {
     });
 
     // Recommandations
-    console.log('\n💡 Recommandations:');
+    console.log('\nRecommandations:');
     if (errorCount > 0) {
       console.log('   - Vérifier les routes qui ont échoué');
       console.log('   - Contrôler la configuration Swagger');
@@ -334,7 +334,7 @@ class SwaggerTester {
       console.log('   - Les tests sont lents, considérer l\'optimisation');
     }
     if (successCount === this.results.length) {
-      console.log('   - 🎉 Tous les tests sont passés avec succès !');
+      console.log('   - Tous les tests sont passés avec succès !');
     }
   }
 }
@@ -355,7 +355,7 @@ async function main(): Promise<void> {
     await tester.initialize();
     await tester.runAllTests();
   } catch (error) {
-    console.error('💥 Erreur fatale:', error);
+    console.error('Erreur fatale:', error);
     process.exit(1);
   } finally {
     await tester.cleanup();
@@ -364,12 +364,12 @@ async function main(): Promise<void> {
 
 // Gestion des signaux
 process.on('SIGINT', async () => {
-  console.log('\n🛑 Arrêt des tests...');
+  console.log('\nArrêt des tests...');
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  console.log('\n🛑 Arrêt des tests...');
+  console.log('\nArrêt des tests...');
   process.exit(0);
 });
 

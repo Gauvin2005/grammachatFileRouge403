@@ -7,7 +7,7 @@ const API_BASE = 'http://localhost:3000/api';
 const FRONTEND_URL = 'http://localhost:19006'; // URL Expo web
 
 async function testFrontendRegistration() {
-  console.log('🌐 Test de l\'inscription frontend avec Puppeteer...\n');
+  console.log('Test de l\'inscription frontend avec Puppeteer...\n');
 
   let browser;
   try {
@@ -20,7 +20,7 @@ async function testFrontendRegistration() {
     const page = await browser.newPage();
     
     // Aller sur la page d'inscription
-    console.log('📱 Navigation vers la page d\'inscription...');
+    console.log('Navigation vers la page d\'inscription...');
     await page.goto(`${FRONTEND_URL}/register`, { 
       waitUntil: 'networkidle2',
       timeout: 10000 
@@ -31,10 +31,10 @@ async function testFrontendRegistration() {
 
     // Prendre une capture d'écran
     await page.screenshot({ path: 'registration-page.png' });
-    console.log('📸 Capture d\'écran sauvegardée: registration-page.png');
+    console.log('Capture d\'écran sauvegardée: registration-page.png');
 
     // Chercher les éléments du formulaire
-    console.log('🔍 Recherche des éléments du formulaire...');
+    console.log('Recherche des éléments du formulaire...');
     
     const emailInput = await page.$('input[type="email"], input[name="email"], input[placeholder*="email" i]');
     const usernameInput = await page.$('input[name="username"], input[placeholder*="username" i]');
@@ -42,7 +42,7 @@ async function testFrontendRegistration() {
     const submitButton = await page.$('button[type="submit"], button:contains("Inscription"), button:contains("Register")');
 
     if (!emailInput || !usernameInput || !passwordInput || !submitButton) {
-      console.log('❌ Éléments du formulaire non trouvés');
+      console.log('Éléments du formulaire non trouvés');
       console.log('   Email input:', !!emailInput);
       console.log('   Username input:', !!usernameInput);
       console.log('   Password input:', !!passwordInput);
@@ -57,7 +57,7 @@ async function testFrontendRegistration() {
           id: input.id
         }))
       );
-      console.log('📋 Inputs disponibles:', allInputs);
+      console.log('Inputs disponibles:', allInputs);
       
       const allButtons = await page.$$eval('button', buttons => 
         buttons.map(button => ({
@@ -66,12 +66,12 @@ async function testFrontendRegistration() {
           className: button.className
         }))
       );
-      console.log('🔘 Boutons disponibles:', allButtons);
+      console.log('Boutons disponibles:', allButtons);
       
       return;
     }
 
-    console.log('✅ Éléments du formulaire trouvés');
+    console.log('Éléments du formulaire trouvés');
 
     // Remplir le formulaire
     const testUser = {
@@ -80,7 +80,7 @@ async function testFrontendRegistration() {
       password: 'password123'
     };
 
-    console.log(`📝 Remplissage du formulaire avec: ${testUser.username} (${testUser.email})`);
+    console.log(`Remplissage du formulaire avec: ${testUser.username} (${testUser.email})`);
 
     await emailInput.type(testUser.email);
     await usernameInput.type(testUser.username);
@@ -88,10 +88,10 @@ async function testFrontendRegistration() {
 
     // Prendre une capture avant soumission
     await page.screenshot({ path: 'form-filled.png' });
-    console.log('📸 Formulaire rempli sauvegardé: form-filled.png');
+    console.log('Formulaire rempli sauvegardé: form-filled.png');
 
     // Soumettre le formulaire
-    console.log('🚀 Soumission du formulaire...');
+    console.log('Soumission du formulaire...');
     await submitButton.click();
 
     // Attendre la réponse
@@ -99,7 +99,7 @@ async function testFrontendRegistration() {
 
     // Prendre une capture après soumission
     await page.screenshot({ path: 'after-submit.png' });
-    console.log('📸 Après soumission sauvegardé: after-submit.png');
+    console.log('Après soumission sauvegardé: after-submit.png');
 
     // Vérifier si l'inscription a réussi
     const currentUrl = page.url();
@@ -110,11 +110,11 @@ async function testFrontendRegistration() {
     const errorMessage = await page.$('text/erreur, text/error, text/échec');
 
     if (successMessage) {
-      console.log('✅ Message de succès détecté');
+      console.log('Message de succès détecté');
     } else if (errorMessage) {
-      console.log('❌ Message d\'erreur détecté');
+      console.log('Message d\'erreur détecté');
     } else {
-      console.log('⚠️ Aucun message de succès/erreur détecté');
+      console.log('Aucun message de succès/erreur détecté');
     }
 
     // Vérifier via l'API si l'utilisateur a été créé
@@ -123,15 +123,15 @@ async function testFrontendRegistration() {
         email: testUser.email,
         password: testUser.password
       });
-      console.log('✅ Utilisateur créé avec succès (vérifié via API)');
+      console.log('Utilisateur créé avec succès (vérifié via API)');
       console.log(`   Token: ${response.data.token ? 'Généré' : 'Non généré'}`);
     } catch (error) {
-      console.log('❌ Utilisateur non créé (vérifié via API)');
+      console.log('Utilisateur non créé (vérifié via API)');
       console.log(`   Erreur: ${error.response?.data?.message || error.message}`);
     }
 
   } catch (error) {
-    console.error('❌ Erreur lors du test frontend:', error.message);
+    console.error('Erreur lors du test frontend:', error.message);
   } finally {
     if (browser) {
       await browser.close();
@@ -141,7 +141,7 @@ async function testFrontendRegistration() {
 
 // Test de validation frontend
 async function testFrontendValidation() {
-  console.log('\n🔍 Test de validation frontend...\n');
+  console.log('\nTest de validation frontend...\n');
 
   let browser;
   try {
@@ -155,7 +155,7 @@ async function testFrontendValidation() {
     await page.waitForTimeout(2000);
 
     // Test avec email invalide
-    console.log('🚫 Test avec email invalide...');
+    console.log('Test avec email invalide...');
     const emailInput = await page.$('input[type="email"], input[name="email"]');
     const usernameInput = await page.$('input[name="username"]');
     const passwordInput = await page.$('input[type="password"]');
@@ -172,16 +172,16 @@ async function testFrontendValidation() {
       // Vérifier si une erreur de validation apparaît
       const validationError = await page.$('text/email invalide, text/invalid email');
       if (validationError) {
-        console.log('✅ Validation email détectée');
+        console.log('Validation email détectée');
       } else {
-        console.log('❌ Validation email non détectée');
+        console.log('Validation email non détectée');
       }
       
       await page.screenshot({ path: 'validation-test.png' });
     }
 
   } catch (error) {
-    console.error('❌ Erreur validation frontend:', error.message);
+    console.error('Erreur validation frontend:', error.message);
   } finally {
     if (browser) {
       await browser.close();
@@ -192,7 +192,7 @@ async function testFrontendValidation() {
 async function runFrontendTests() {
   await testFrontendRegistration();
   await testFrontendValidation();
-  console.log('\n🎉 Tests frontend terminés !');
+  console.log('\nTests frontend terminés !');
 }
 
 runFrontendTests().catch(console.error);

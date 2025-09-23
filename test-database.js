@@ -15,7 +15,7 @@ async function testDatabase() {
     // Vérifier les collections
     const db = mongoose.connection.db;
     const collections = await db.listCollections().toArray();
-    console.log('\n📊 Collections existantes:');
+    console.log('\nCollections existantes:');
     collections.forEach(col => {
       console.log(`  - ${col.name}`);
     });
