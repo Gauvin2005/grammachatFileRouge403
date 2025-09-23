@@ -14,6 +14,7 @@
     "test:swagger:simple": "ts-node -r tsconfig-paths/register scripts/test-swagger-simple.ts",
     "test:swagger:routes": "ts-node -r tsconfig-paths/register scripts/test-swagger-routes.ts",
     "test:swagger:basic": "ts-node -r tsconfig-paths/register scripts/test-swagger-basic.ts",
+    "export:swagger": "node scripts/export-swagger-for-confluence.js",
     "test:api": "ts-node -r tsconfig-paths/register scripts/test-api-routes.ts",
     "test:all": "ts-node -r tsconfig-paths/register scripts/test-all.ts",
     "lint": "eslint src/**/*.ts",
