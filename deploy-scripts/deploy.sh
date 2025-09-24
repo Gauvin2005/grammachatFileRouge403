@@ -40,7 +40,8 @@ log "Début du déploiement Grammachat"
 if [ -d "$APP_DIR/backend" ]; then
     log "Sauvegarde de l'ancienne version..."
     BACKUP_NAME="backup-$(date +%Y%m%d-%H%M%S)"
-    cp -r "$APP_DIR" "$BACKUP_DIR/$BACKUP_NAME"
+    # Exclure le dossier backups de la sauvegarde pour éviter la récursion
+    rsync -av --exclude='backups' "$APP_DIR/" "$BACKUP_DIR/$BACKUP_NAME/"
     log "Sauvegarde créée: $BACKUP_NAME"
 fi
 
