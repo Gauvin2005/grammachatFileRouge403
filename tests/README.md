@@ -1,131 +1,162 @@
-# Tests Automatisés Grammachat
+# Tests Grammachat
 
-Ce dossier contient les tests automatisés pour vérifier le bon fonctionnement de l'application Grammachat.
+Suite de tests organisée et structurée pour l'application Grammachat.
 
-## Test de Création d'Utilisateur
-
-Le fichier `createUser.test.js` implémente un test automatisé complet qui :
-
-### Objectifs du Test
-
-1. **Lance le serveur backend avec Docker** (simule `docker-compose up`)
-2. **Utilise Puppeteer** pour envoyer une requête POST vers `/api/users`
-3. **Vérifie directement en base** via le driver officiel MongoDB
-4. **Contrôle que le document inséré** a bien `role="user"`
-5. **Loggue "Compte créé et vérifié"** si succès, sinon l'erreur
-
-### Prérequis
-
-- Docker et Docker Compose installés
-- Node.js installé
-- Accès aux ports 3000 (API) et 27017 (MongoDB)
-
-### Lancement du Test
-
-#### Méthode 1 : Script automatique (recommandé)
-```bash
-cd tests
-./run-test.sh
-```
-
-#### Méthode 2 : Lancement manuel
-```bash
-cd tests
-npm install
-npm test
-```
-
-### Ce que fait le test
-
-#### Étape 1 : Démarrage Docker
-- Lance `docker-compose up --build`
-- Attend que l'API soit accessible sur le port 3000
-- Surveille les logs pour détecter le démarrage complet
-
-#### Étape 2 : Test API avec Puppeteer
-- Lance un navigateur headless avec Puppeteer
-- Envoie une requête POST vers `/api/users` avec :
-  ```json
-  {
-    "email": "test-{timestamp}@example.com",
-    "password": "testpassword123",
-    "username": "testuser{timestamp}"
-  }
-  ```
-- Vérifie que la réponse est un succès (status 201)
-
-#### Étape 3 : Vérification Base de Données
-- Se connecte directement à MongoDB via le driver officiel
-- Recherche l'utilisateur créé par email
-- Vérifie que le rôle est bien `"user"` (forcé côté backend)
-- Contrôle les autres champs (xp: 0, level: 1)
-
-#### Étape 4 : Nettoyage
-- Ferme le navigateur Puppeteer
-- Ferme la connexion MongoDB
-- Arrête les services Docker
-
-### Résultat Attendu
-
-En cas de succès, le test affiche :
-```
-COMPTE CRÉÉ ET VÉRIFIÉ
-Résumé du test:
-  - API Response: Succès
-  - Database Check: Utilisateur trouvé
-  - Role Check: Rôle correct
-  - User ID: [ObjectId]
-  - Email: test-{timestamp}@example.com
-  - Username: testuser{timestamp}
-  - Role: user
-  - XP: 0
-  - Level: 1
-```
-
-### Dépannage
-
-#### Erreur : "Services Docker n'ont pas démarré"
-- Vérifiez que Docker est en cours d'exécution
-- Vérifiez que les ports 3000 et 27017 sont libres
-- Vérifiez le fichier `.env` dans le répertoire racine
-
-#### Erreur : "API non accessible"
-- Attendez plus longtemps le démarrage des services
-- Vérifiez les logs Docker avec `docker-compose logs`
-
-#### Erreur : "Utilisateur non trouvé en base"
-- Vérifiez la connexion MongoDB
-- Vérifiez que l'endpoint `/api/users` fonctionne correctement
-
-### Structure des Fichiers
+## Dossier Structure
 
 ```
 tests/
-├── createUser.test.js    # Test principal
-├── package.json          # Dépendances de test
-├── run-test.sh          # Script de lancement
-└── README.md            # Cette documentation
+├── api/                    # Tests API
+│   ├── auth.test.js        # Tests d'authentification
+│   └── messages.test.js     # Tests de messages
+├── database/               # Tests de base de données
+│   └── connection.test.js  # Tests de connexion et CRUD
+├── frontend/               # Tests frontend
+│   └── ui.test.js          # Tests d'interface utilisateur
+├── integration/            # Tests d'intégration
+├── utils/                  # Utilitaires partagés
+│   └── testUtils.js        # Classe utilitaire principale
+├── run-tests.js            # Script principal
+├── package.json           # Dépendances des tests
+└── README.md              # Ce fichier
 ```
 
-### Logs Détaillés
+## Démarrage Utilisation
 
-Le test produit des logs détaillés pour chaque étape :
-- Démarrage Docker
-- Attente API
-- Lancement Puppeteer
-- Envoi requête POST
-- Réception réponse
-- Connexion MongoDB
-- Vérifications réussies
-- Erreurs détectées
-- Nettoyage ressources
+### Installation des dépendances
+```bash
+cd tests
+npm install
+```
 
-### Contraintes Respectées
+### Exécution des tests
 
-**Contrainte 1** : Bouton + formulaire fonctionnel  
-**Contrainte 2** : Backend + base en Docker  
-**Contrainte 3** : Test automatisé avec Puppeteer + MongoDB  
-**Contrainte 4** : Commentaires clairs et séparation stricte  
+**Tous les tests :**
+```bash
+npm test
+# ou
+node run-tests.js
+```
 
-Le test vérifie que toutes les contraintes sont respectées et que l'application fonctionne correctement en mode production avec Docker.
+**Tests par catégorie :**
+```bash
+npm run test:api          # Tests API seulement
+npm run test:database     # Tests database seulement
+npm run test:frontend     # Tests frontend seulement
+npm run test:integration  # Tests d'intégration seulement
+```
 
+**Options avancées :**
+```bash
+node run-tests.js --category api        # Catégorie spécifique
+node run-tests.js --no-frontend        # Ignorer les tests frontend
+node run-tests.js --verbose            # Mode verbeux
+node run-tests.js --help               # Aide
+```
+
+## Test Types de tests
+
+### Tests API (`tests/api/`)
+- **auth.test.js** : Authentification, inscription, validation
+- **messages.test.js** : Création, récupération, calcul XP
+
+### Tests Database (`tests/database/`)
+- **connection.test.js** : Connexion MongoDB, CRUD, contraintes
+
+### Tests Frontend (`tests/frontend/`)
+- **ui.test.js** : Interface utilisateur avec Puppeteer
+
+### Tests d'Intégration (`tests/integration/`)
+- Tests end-to-end complets
+
+## Configuration Configuration
+
+### Variables d'environnement
+Les tests utilisent les variables suivantes (avec valeurs par défaut) :
+
+```env
+MONGODB_URI=mongodb://localhost:27017/grammachat
+API_BASE_URL=http://localhost:3000
+```
+
+### Prérequis
+- MongoDB accessible
+- API Grammachat en cours d'exécution
+- Puppeteer installé (pour les tests frontend)
+
+## Résultats Résultats
+
+Le script affiche :
+- [SUCCESS] Tests réussis
+- [ERROR] Tests échoués  
+- [INFO] Total des tests
+- [INFO] Taux de réussite
+- [INFO] Durée d'exécution
+- Dossier Résultats par catégorie
+
+## Outils Développement
+
+### Ajouter un nouveau test
+
+1. Créer un fichier `.test.js` dans la catégorie appropriée
+2. Importer `TestUtils` depuis `../utils/testUtils`
+3. Créer une classe avec méthode `runAllTests()`
+4. Utiliser `this.utils` pour les opérations communes
+
+Exemple :
+```javascript
+const { TestUtils } = require('../utils/testUtils');
+
+class MonTest {
+  constructor() {
+    this.utils = new TestUtils();
+    this.testResults = { passed: 0, failed: 0, total: 0 };
+  }
+
+  async runAllTests() {
+    // Vos tests ici
+  }
+}
+
+module.exports = MonTest;
+```
+
+### Utilitaires disponibles
+
+La classe `TestUtils` fournit :
+- `connectDB()` / `disconnectDB()` : Gestion MongoDB
+- `createTestUser()` / `deleteTestUser()` : Gestion utilisateurs
+- `makeRequest()` : Requêtes HTTP
+- `authenticateUser()` : Authentification
+- `cleanDatabase()` : Nettoyage DB
+- `generateTestData()` : Données de test
+- `log()` : Logging coloré
+
+## Dépannage Dépannage
+
+### MongoDB non accessible
+```bash
+# Vérifier que MongoDB tourne
+sudo systemctl status mongod
+# ou
+docker ps | grep mongo
+```
+
+### API non accessible
+```bash
+# Vérifier que l'API tourne
+curl http://localhost:3000/api/health
+```
+
+### Puppeteer échoue
+```bash
+# Installer les dépendances système
+sudo apt-get install -y libnss3-dev libatk-bridge2.0-dev libdrm2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libxss1 libasound2
+```
+
+## Notes Notes
+
+- Les tests nettoient automatiquement les données de test
+- Les tests frontend nécessitent un navigateur (mode headless disponible)
+- Les tests API nécessitent l'API en cours d'exécution
+- Les tests database nécessitent MongoDB accessible

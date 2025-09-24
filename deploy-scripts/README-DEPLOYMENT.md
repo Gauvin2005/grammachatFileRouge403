@@ -9,7 +9,7 @@ Ce guide vous explique comment déployer votre application Grammachat sur un ser
 - Connexion Internet
 - Domaine ou IP statique (recommandé) -> 10.6.0.7
 
-## 🛠️ Installation Initiale
+## Outils Installation Initiale
 
 ### 1. Préparation du Serveur
 

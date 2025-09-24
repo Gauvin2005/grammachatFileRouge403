@@ -61,7 +61,14 @@ check_prerequisites() {
     if ! docker ps &> /dev/null; then
         log_error "Docker n'est pas accessible. Vérifiez que vous êtes dans le groupe 'docker' ou utilisez sudo."
         log_info "Solution: sudo usermod -aG docker $USER (puis redémarrez la session)"
-        exit 1
+        log_warning "Tentative avec sudo..."
+        if ! sudo docker ps &> /dev/null; then
+            log_error "Docker n'est pas accessible même avec sudo. Vérifiez l'installation Docker."
+            exit 1
+        else
+            log_warning "Docker accessible avec sudo uniquement. Le script utilisera sudo pour Docker."
+            export USE_SUDO_DOCKER=true
+        fi
     fi
     
     # Vérifier Docker Compose
@@ -148,13 +155,28 @@ start_docker_services() {
     log_info "Lancement des services Docker (MongoDB, Redis, API)..."
     
     # Arrêter les services existants s'ils tournent
-    if docker compose version &> /dev/null; then
-        docker compose down 2>/dev/null || true
-        docker compose up -d
-    else
-        docker compose down 2>/dev/null || true
-        docker compose up -d
+    log_info "Nettoyage des conteneurs existants..."
+    
+    # Déterminer la commande Docker à utiliser
+    DOCKER_CMD="docker compose"
+    if [ "$USE_SUDO_DOCKER" = "true" ]; then
+        DOCKER_CMD="sudo docker compose"
     fi
+    
+    # Essayer d'arrêter normalement, puis avec sudo si ça échoue
+    log_info "Tentative d'arrêt des conteneurs existants..."
+    if ! $DOCKER_CMD down 2>/dev/null; then
+        log_warning "Arrêt normal échoué, tentative avec sudo..."
+        sudo docker compose down 2>/dev/null || true
+    fi
+    
+    # Supprimer les conteneurs orphelins
+    log_info "Suppression des conteneurs orphelins..."
+    $DOCKER_CMD rm -f 2>/dev/null || sudo docker compose rm -f 2>/dev/null || true
+    
+    # Lancer les services
+    log_info "Lancement des nouveaux services..."
+    $DOCKER_CMD up -d
     
     # Attendre que les services soient prêts
     log_info "Attente que les services soient prêts..."
@@ -162,11 +184,7 @@ start_docker_services() {
     
     # Vérifier le statut des services
     log_info "Vérification du statut des services..."
-    if docker compose version &> /dev/null; then
-        docker compose ps
-    else
-        docker compose ps
-    fi
+    $DOCKER_CMD ps
     
     log_success "Services Docker lancés avec succès!"
 }
@@ -265,11 +283,14 @@ main() {
 # Gestion des signaux pour un arrêt propre
 cleanup() {
     log_info "Arrêt des services..."
-    if docker compose version &> /dev/null; then
-        docker compose down
-    else
-        docker compose down
+    
+    # Déterminer la commande Docker à utiliser
+    DOCKER_CMD="docker compose"
+    if [ "$USE_SUDO_DOCKER" = "true" ]; then
+        DOCKER_CMD="sudo docker compose"
     fi
+    
+    $DOCKER_CMD down
     log_success "Services arrêtés proprement"
     exit 0
 }
