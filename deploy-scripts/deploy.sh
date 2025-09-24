@@ -61,7 +61,7 @@ git reset --hard origin/main
 # 4. Installation des dépendances Backend
 log "Installation des dépendances Backend..."
 cd "$APP_DIR/backend"
-npm ci --production
+npm ci
 
 # 5. Build du Backend
 log "Build du Backend..."
