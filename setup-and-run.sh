@@ -72,19 +72,9 @@ check_prerequisites() {
     
     # Vérifier Expo CLI
     if ! command -v expo &> /dev/null; then
-        log_warning "Expo CLI n'est pas installé. Installation..."
-        # Essayer avec sudo si nécessaire
-        if npm install -g @expo/cli 2>/dev/null; then
-            log_success "Expo CLI installé avec succès!"
-        else
-            log_warning "Installation globale échouée, tentative avec sudo..."
-            if sudo npm install -g @expo/cli 2>/dev/null; then
-                log_success "Expo CLI installé avec sudo!"
-            else
-                log_warning "Installation globale impossible, utilisation de npx..."
-                # On utilisera npx expo au lieu de expo directement
-            fi
-        fi
+        log_warning "Expo CLI n'est pas installé. Installation avec sudo..."
+        sudo npm install -g @expo/cli
+        log_success "Expo CLI installé avec sudo!"
     fi
     
     log_success "Tous les prérequis sont satisfaits!"
@@ -208,16 +198,50 @@ main() {
     clone_project
     create_env_file
     
+    # Configuration des variables importantes
+    echo ""
+    log_info "Configuration des variables d'environnement importantes :"
+    
+    # JWT Secret
+    current_jwt=$(grep "JWT_SECRET=" .env | cut -d'=' -f2)
+    if [ "$current_jwt" = "quelque_chose_est_ici_haha" ]; then
+        log_warning "JWT_SECRET utilise la valeur par défaut"
+        read -p "Voulez-vous générer un nouveau JWT_SECRET sécurisé ? (y/N) : " generate_jwt
+        if [[ $generate_jwt =~ ^[Yy]$ ]]; then
+            new_jwt=$(openssl rand -base64 32 2>/dev/null || head -c 32 /dev/urandom | base64)
+            sed -i "s/JWT_SECRET=.*/JWT_SECRET=$new_jwt/" .env
+            log_success "JWT_SECRET généré automatiquement"
+        fi
+    fi
+    
+    # Docker Credentials
+    echo ""
+    log_info "Configuration Docker (optionnel) :"
+    read -p "Entrez votre Docker Hub username (optionnel) : " docker_username
+    if [ ! -z "$docker_username" ]; then
+        sed -i "s/DOCKER_USERNAME=.*/DOCKER_USERNAME=$docker_username/" .env
+        read -p "Entrez votre Docker Hub password/token : " docker_password
+        if [ ! -z "$docker_password" ]; then
+            sed -i "s/DOCKER_PASSWORD=.*/DOCKER_PASSWORD=$docker_password/" .env
+            log_success "Credentials Docker configurés"
+        fi
+    fi
+    
+    # Snyk Token
+    echo ""
+    log_info "Configuration Snyk (optionnel) :"
+    echo "  - Token pour l'analyse de sécurité des dépendances"
+    echo "  - Obtenez votre token sur : https://app.snyk.io/account"
+    read -p "Entrez votre Snyk token (optionnel) : " snyk_token
+    if [ ! -z "$snyk_token" ]; then
+        sed -i "s/SNYK_TOKEN=.*/SNYK_TOKEN=$snyk_token/" .env
+        log_success "Snyk token configuré"
+    fi
+    
     # Proposer la configuration avancée
     echo ""
-    log_info "Voulez-vous configurer les variables d'environnement maintenant ?"
-    log_info "Cela vous permettra de définir JWT_SECRET, API keys, etc."
-    read -p "Configurer maintenant ? (y/N) : " configure_now
-    if [[ $configure_now =~ ^[Yy]$ ]]; then
-        ./configure-env.sh
-    else
-        log_warning "Configuration ignorée. Vous pourrez la faire plus tard avec : ./configure-env.sh"
-    fi
+    log_info "Configuration terminée !"
+    log_info "Pour une configuration complète, utilisez : ./configure-env.sh"
     
     install_dependencies
     build_backend
