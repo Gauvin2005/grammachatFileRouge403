@@ -10,6 +10,9 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+deploy-scripts/.env.production
+deploy-scripts/env.production
 
 # Build outputs
 dist/
