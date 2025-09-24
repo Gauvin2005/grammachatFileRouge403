@@ -115,35 +115,11 @@ clone_project() {
 
 # Créer le fichier .env
 create_env_file() {
-    log_info "Configuration du fichier .env..."
+    log_info "Création du fichier .env..."
     
     if [ ! -f ".env" ]; then
         cp env.example .env
         log_success "Fichier .env créé à partir de env.example"
-        
-        # Demander les valeurs importantes
-        echo ""
-        log_info "Configuration des variables d'environnement importantes :"
-        
-        # JWT Secret
-        read -p "Entrez un JWT_SECRET (ou appuyez sur Entrée pour utiliser la valeur par défaut) : " jwt_secret
-        if [ ! -z "$jwt_secret" ]; then
-            sed -i "s/JWT_SECRET=.*/JWT_SECRET=$jwt_secret/" .env
-        fi
-        
-        # LanguageTool API Key
-        read -p "Entrez votre LanguageTool API Key (optionnel, appuyez sur Entrée pour ignorer) : " lt_key
-        if [ ! -z "$lt_key" ]; then
-            sed -i "s/LANGUAGETOOL_API_KEY=.*/LANGUAGETOOL_API_KEY=$lt_key/" .env
-        fi
-        
-        # Expo Push Token
-        read -p "Entrez votre Expo Push Token (optionnel, appuyez sur Entrée pour ignorer) : " expo_token
-        if [ ! -z "$expo_token" ]; then
-            sed -i "s/EXPO_PUSH_TOKEN=.*/EXPO_PUSH_TOKEN=$expo_token/" .env
-        fi
-        
-        log_success "Configuration .env terminée!"
     else
         log_warning "Le fichier .env existe déjà"
     fi

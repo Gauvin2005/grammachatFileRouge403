@@ -78,13 +78,50 @@ configure_env() {
     echo ""
     log_info "Configuration CORS (optionnel) :"
     echo "  - URLs autorisées pour les requêtes CORS"
-    echo "  - Valeur par défaut : localhost et IPs locales"
-    read -p "Ajouter des URLs supplémentaires (séparées par des virgules) : " cors_extra
-    if [ ! -z "$cors_extra" ]; then
-        current_cors=$(grep "CORS_ORIGIN=" .env | cut -d'=' -f2)
-        new_cors="$current_cors,$cors_extra"
-        sed -i "s|CORS_ORIGIN=.*|CORS_ORIGIN=$new_cors|" .env
-        log_success "URLs CORS supplémentaires ajoutées"
+    echo "  - Valeur par défaut : * (toutes les URLs)"
+    read -p "Modifier CORS_ORIGIN (ou appuyez sur Entrée pour garder *) : " cors_origin
+    if [ ! -z "$cors_origin" ]; then
+        sed -i "s|CORS_ORIGIN=.*|CORS_ORIGIN=$cors_origin|" .env
+        log_success "CORS_ORIGIN configuré"
+    fi
+    
+    # Docker Credentials
+    echo ""
+    log_info "Configuration Docker (optionnel) :"
+    echo "  - Credentials pour Docker Hub (pour push/pull d'images)"
+    read -p "Entrez votre Docker Hub username (optionnel) : " docker_username
+    if [ ! -z "$docker_username" ]; then
+        sed -i "s/DOCKER_USERNAME=.*/DOCKER_USERNAME=$docker_username/" .env
+        read -p "Entrez votre Docker Hub password/token : " docker_password
+        if [ ! -z "$docker_password" ]; then
+            sed -i "s/DOCKER_PASSWORD=.*/DOCKER_PASSWORD=$docker_password/" .env
+            log_success "Credentials Docker configurés"
+        fi
+    fi
+    
+    # Snyk Token
+    echo ""
+    log_info "Configuration Snyk (optionnel) :"
+    echo "  - Token pour l'analyse de sécurité des dépendances"
+    echo "  - Obtenez votre token sur : https://app.snyk.io/account"
+    read -p "Entrez votre Snyk token (optionnel) : " snyk_token
+    if [ ! -z "$snyk_token" ]; then
+        sed -i "s/SNYK_TOKEN=.*/SNYK_TOKEN=$snyk_token/" .env
+        log_success "Snyk token configuré"
+    fi
+    
+    # Webhook Configuration
+    echo ""
+    log_info "Configuration Webhook (optionnel) :"
+    echo "  - URLs pour les webhooks de déploiement"
+    read -p "Entrez l'URL du webhook de dev (ou appuyez sur Entrée pour garder la valeur par défaut) : " dev_webhook
+    if [ ! -z "$dev_webhook" ]; then
+        sed -i "s|DEV_DEPLOY_WEBHOOK =.*|DEV_DEPLOY_WEBHOOK = $dev_webhook|" .env
+    fi
+    
+    read -p "Entrez l'URL du webhook de prod (ou appuyez sur Entrée pour garder la valeur par défaut) : " prod_webhook
+    if [ ! -z "$prod_webhook" ]; then
+        sed -i "s|PROD_DEPLOY_WEBHOOK =.*|PROD_DEPLOY_WEBHOOK = $prod_webhook|" .env
     fi
     
     echo ""
@@ -100,6 +137,11 @@ show_config() {
     echo "LANGUAGETOOL_API_KEY: $(grep "LANGUAGETOOL_API_KEY=" .env | cut -d'=' -f2 | cut -c1-10)..."
     echo "EXPO_PUSH_TOKEN: $(grep "EXPO_PUSH_TOKEN=" .env | cut -d'=' -f2 | cut -c1-10)..."
     echo "CORS_ORIGIN: $(grep "CORS_ORIGIN=" .env | cut -d'=' -f2)"
+    echo "DOCKER_USERNAME: $(grep "DOCKER_USERNAME=" .env | cut -d'=' -f2)"
+    echo "DOCKER_PASSWORD: $(grep "DOCKER_PASSWORD=" .env | cut -d'=' -f2 | cut -c1-10)..."
+    echo "SNYK_TOKEN: $(grep "SNYK_TOKEN=" .env | cut -d'=' -f2 | cut -c1-10)..."
+    echo "DEV_DEPLOY_WEBHOOK: $(grep "DEV_DEPLOY_WEBHOOK" .env | cut -d'=' -f2)"
+    echo "PROD_DEPLOY_WEBHOOK: $(grep "PROD_DEPLOY_WEBHOOK" .env | cut -d'=' -f2)"
 }
 
 # Fonction principale
