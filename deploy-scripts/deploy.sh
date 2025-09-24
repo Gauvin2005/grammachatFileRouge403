@@ -47,34 +47,34 @@ fi
 
 # 2. Arrêt des services
 log "Arrêt des services..."
-sudo systemctl stop grammachat-api || true
-sudo systemctl stop grammachat-frontend || true
+systemctl --user stop grammachat-api || true
+systemctl --user stop grammachat-frontend || true
 pm2 stop grammachat-api || true
 pm2 stop grammachat-frontend || true
 
 # 3. Mise à jour du code depuis GitHub
 log "Récupération du code depuis GitHub..."
 cd "$APP_DIR"
-sudo -u "$USER" git fetch origin
-sudo -u "$USER" git reset --hard origin/main
+git fetch origin
+git reset --hard origin/main
 
 # 4. Installation des dépendances Backend
 log "Installation des dépendances Backend..."
 cd "$APP_DIR/backend"
-sudo -u "$USER" npm ci --production
+npm ci --production
 
 # 5. Build du Backend
 log "Build du Backend..."
-sudo -u "$USER" npm run build
+npm run build
 
 # 6. Installation des dépendances Frontend
 log "Installation des dépendances Frontend..."
 cd "$APP_DIR/frontend"
-sudo -u "$USER" npm ci
+npm ci
 
 # 7. Build du Frontend (Expo)
 log "Build du Frontend..."
-sudo -u "$USER" npx expo export --platform web
+npx expo export --platform web
 
 # 8. Démarrage des services avec PM2
 log "Démarrage des services..."
@@ -130,8 +130,8 @@ pm2 startup
 # 9. Redémarrage des services Docker
 log "Redémarrage des services Docker..."
 cd "$APP_DIR"
-sudo -u "$USER" docker-compose down
-sudo -u "$USER" docker-compose up -d
+docker-compose down
+docker-compose up -d
 
 # 10. Attendre que les services soient prêts
 log "Attente du démarrage des services..."
