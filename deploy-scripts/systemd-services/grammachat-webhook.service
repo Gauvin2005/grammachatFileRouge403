@@ -1,0 +1,33 @@
+[Unit]
+Description=Grammachat Webhook Server
+Documentation=https://github.com/your-username/grammachat
+After=network.target
+
+[Service]
+Type=simple
+User=grammachat
+Group=grammachat
+WorkingDirectory=/opt/grammachat
+ExecStart=/usr/bin/node /opt/grammachat/deploy-scripts/webhook-server.js
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=grammachat-webhook
+
+# Variables d'environnement
+Environment=NODE_ENV=production
+Environment=WEBHOOK_PORT=9000
+Environment=GITHUB_WEBHOOK_SECRET=your-webhook-secret-change-this
+
+# Sécurité
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/grammachat
+ReadWritePaths=/var/log/grammachat
+
+[Install]
+WantedBy=multi-user.target
