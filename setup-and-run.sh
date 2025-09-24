@@ -57,8 +57,15 @@ check_prerequisites() {
         exit 1
     fi
     
+    # Vérifier les permissions Docker
+    if ! docker ps &> /dev/null; then
+        log_error "Docker n'est pas accessible. Vérifiez que vous êtes dans le groupe 'docker' ou utilisez sudo."
+        log_info "Solution: sudo usermod -aG docker $USER (puis redémarrez la session)"
+        exit 1
+    fi
+    
     # Vérifier Docker Compose
-    if ! command -v docker compose &> /dev/null && ! docker compose version &> /dev/null; then
+    if ! docker compose version &> /dev/null && ! command -v docker compose &> /dev/null; then
         log_error "Docker Compose n'est pas installé. Veuillez installer Docker Compose d'abord."
         exit 1
     fi
@@ -66,7 +73,18 @@ check_prerequisites() {
     # Vérifier Expo CLI
     if ! command -v expo &> /dev/null; then
         log_warning "Expo CLI n'est pas installé. Installation..."
-        npm install -g @expo/cli
+        # Essayer avec sudo si nécessaire
+        if npm install -g @expo/cli 2>/dev/null; then
+            log_success "Expo CLI installé avec succès!"
+        else
+            log_warning "Installation globale échouée, tentative avec sudo..."
+            if sudo npm install -g @expo/cli 2>/dev/null; then
+                log_success "Expo CLI installé avec sudo!"
+            else
+                log_warning "Installation globale impossible, utilisation de npx..."
+                # On utilisera npx expo au lieu de expo directement
+            fi
+        fi
     fi
     
     log_success "Tous les prérequis sont satisfaits!"
@@ -84,7 +102,12 @@ clone_project() {
         rm -rf "$PROJECT_DIR"
     fi
     
-    git clone "$REPO_URL" "$PROJECT_DIR"
+    # Essayer SSH d'abord, puis HTTPS si ça échoue
+    if ! git clone "$REPO_URL" "$PROJECT_DIR" 2>/dev/null; then
+        log_warning "Échec du clonage SSH, tentative avec HTTPS..."
+        REPO_URL="https://github.com/Gauvin2005/grammachatFileRouge403.git"
+        git clone "$REPO_URL" "$PROJECT_DIR"
+    fi
     cd "$PROJECT_DIR"
     
     log_success "Projet cloné avec succès!"
@@ -92,11 +115,35 @@ clone_project() {
 
 # Créer le fichier .env
 create_env_file() {
-    log_info "Création du fichier .env..."
+    log_info "Configuration du fichier .env..."
     
     if [ ! -f ".env" ]; then
         cp env.example .env
         log_success "Fichier .env créé à partir de env.example"
+        
+        # Demander les valeurs importantes
+        echo ""
+        log_info "Configuration des variables d'environnement importantes :"
+        
+        # JWT Secret
+        read -p "Entrez un JWT_SECRET (ou appuyez sur Entrée pour utiliser la valeur par défaut) : " jwt_secret
+        if [ ! -z "$jwt_secret" ]; then
+            sed -i "s/JWT_SECRET=.*/JWT_SECRET=$jwt_secret/" .env
+        fi
+        
+        # LanguageTool API Key
+        read -p "Entrez votre LanguageTool API Key (optionnel, appuyez sur Entrée pour ignorer) : " lt_key
+        if [ ! -z "$lt_key" ]; then
+            sed -i "s/LANGUAGETOOL_API_KEY=.*/LANGUAGETOOL_API_KEY=$lt_key/" .env
+        fi
+        
+        # Expo Push Token
+        read -p "Entrez votre Expo Push Token (optionnel, appuyez sur Entrée pour ignorer) : " expo_token
+        if [ ! -z "$expo_token" ]; then
+            sed -i "s/EXPO_PUSH_TOKEN=.*/EXPO_PUSH_TOKEN=$expo_token/" .env
+        fi
+        
+        log_success "Configuration .env terminée!"
     else
         log_warning "Le fichier .env existe déjà"
     fi
@@ -135,10 +182,13 @@ start_docker_services() {
     log_info "Lancement des services Docker (MongoDB, Redis, API)..."
     
     # Arrêter les services existants s'ils tournent
-    docker compose down 2>/dev/null || true
-    
-    # Lancer les services
-    docker compose up -d
+    if docker compose version &> /dev/null; then
+        docker compose down 2>/dev/null || true
+        docker compose up -d
+    else
+        docker compose down 2>/dev/null || true
+        docker compose up -d
+    fi
     
     # Attendre que les services soient prêts
     log_info "Attente que les services soient prêts..."
@@ -146,7 +196,11 @@ start_docker_services() {
     
     # Vérifier le statut des services
     log_info "Vérification du statut des services..."
-    docker compose ps
+    if docker compose version &> /dev/null; then
+        docker compose ps
+    else
+        docker compose ps
+    fi
     
     log_success "Services Docker lancés avec succès!"
 }
@@ -162,7 +216,12 @@ start_frontend() {
     log_warning "Le frontend va s'ouvrir dans votre navigateur. Appuyez sur Ctrl+C pour arrêter."
     
     # Lancer Expo
-    npm start
+    if command -v expo &> /dev/null; then
+        npm start
+    else
+        log_info "Utilisation de npx expo..."
+        npx expo start
+    fi
 }
 
 # Fonction principale
@@ -172,6 +231,18 @@ main() {
     check_prerequisites
     clone_project
     create_env_file
+    
+    # Proposer la configuration avancée
+    echo ""
+    log_info "Voulez-vous configurer les variables d'environnement maintenant ?"
+    log_info "Cela vous permettra de définir JWT_SECRET, API keys, etc."
+    read -p "Configurer maintenant ? (y/N) : " configure_now
+    if [[ $configure_now =~ ^[Yy]$ ]]; then
+        ./configure-env.sh
+    else
+        log_warning "Configuration ignorée. Vous pourrez la faire plus tard avec : ./configure-env.sh"
+    fi
+    
     install_dependencies
     build_backend
     start_docker_services
@@ -194,7 +265,11 @@ main() {
 # Gestion des signaux pour un arrêt propre
 cleanup() {
     log_info "Arrêt des services..."
-    docker compose down
+    if docker compose version &> /dev/null; then
+        docker compose down
+    else
+        docker compose down
+    fi
     log_success "Services arrêtés proprement"
     exit 0
 }
