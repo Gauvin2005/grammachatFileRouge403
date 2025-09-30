@@ -43,9 +43,14 @@ const ChatScreen: React.FC = () => {
   });
 
   useEffect(() => {
-    // Charger les messages au montage du composant
-    dispatch(fetchMessages({}));
-  }, [dispatch]);
+    // Charger les messages seulement s'ils ne sont pas déjà chargés
+    if (messages.length === 0) {
+      console.log('Chargement initial des messages');
+      dispatch(fetchMessages({}));
+    } else {
+      console.log('Messages déjà chargés, utilisation du cache');
+    }
+  }, [dispatch, messages.length]);
 
   const onSubmit = async (data: MessageFormData) => {
     try {

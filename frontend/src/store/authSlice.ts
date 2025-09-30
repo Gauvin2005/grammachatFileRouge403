@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { AuthState, User, AuthRequest, RegisterRequest } from '../types';
-import apiService from '../services/api';
+import { optimizedApi } from '../services/optimizedApi';
 
 const initialState: AuthState = {
   user: null,
@@ -16,10 +16,12 @@ export const loginUser = createAsyncThunk(
   async (credentials: AuthRequest, { rejectWithValue }) => {
     try {
       console.log('Tentative de connexion avec:', credentials.email);
-      const response = await apiService.login(credentials);
+      const response = await optimizedApi.login(credentials);
       console.log('Réponse API:', response);
       
       if (response.success && response.data) {
+        // Utiliser l'API service pour les opérations de stockage
+        const { apiService } = await import('../services/api');
         await apiService.setAuthToken(response.data.token);
         await apiService.setUserData(response.data.user);
         console.log('Connexion réussie');
@@ -49,8 +51,10 @@ export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData: RegisterRequest, { rejectWithValue }) => {
     try {
-      const response = await apiService.register(userData);
+      const response = await optimizedApi.register(userData);
       if (response.success && response.data) {
+        // Utiliser l'API service pour les opérations de stockage
+        const { apiService } = await import('../services/api');
         await apiService.setAuthToken(response.data.token);
         await apiService.setUserData(response.data.user);
         return response.data;
@@ -67,10 +71,19 @@ export const registerUser = createAsyncThunk(
 
 export const loadUserProfile = createAsyncThunk(
   'auth/loadProfile',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const response = await apiService.getProfile();
+      // Vérifier si l'utilisateur est déjà chargé pour éviter les appels redondants
+      const state = getState() as { auth: AuthState };
+      if (state.auth.user && !state.auth.isLoading) {
+        console.log('Profil utilisateur déjà chargé, utilisation du cache');
+        return state.auth.user;
+      }
+
+      const response = await optimizedApi.getUserProfile({ useCache: true });
       if (response.success && response.data) {
+        // Utiliser l'API service pour les opérations de stockage
+        const { apiService } = await import('../services/api');
         await apiService.setUserData(response.data.user);
         return response.data.user;
       } else {
@@ -88,7 +101,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await apiService.logout();
+      await optimizedApi.logout();
       return true;
     } catch (error: any) {
       return rejectWithValue('Erreur lors de la déconnexion');
@@ -104,13 +117,15 @@ export const initializeAuth = createAsyncThunk(
       
       // Test de connectivité d'abord
       try {
-        await apiService.checkHealth();
+        await optimizedApi.checkHealth();
         console.log('Serveur accessible');
       } catch (error) {
         console.log('Serveur inaccessible, initialisation sans token');
         return null;
       }
       
+      // Utiliser l'API service pour les opérations de stockage
+      const { apiService } = await import('../services/api');
       const token = await apiService.getAuthToken();
       const userData = await apiService.getUserData();
       
@@ -118,15 +133,15 @@ export const initializeAuth = createAsyncThunk(
       console.log('Données utilisateur trouvées:', !!userData);
       
       if (token && userData) {
-        // Vérifier si le token est encore valide
+        // Vérifier si le token est encore valide avec cache
         try {
-          await apiService.getProfile();
+          await optimizedApi.getUserProfile({ useCache: false, forceRefresh: true });
           console.log('Token valide, utilisateur connecté');
           return { token, user: userData };
         } catch (error) {
           console.log('Token expiré, nettoyage des données');
           // Token expiré, nettoyer les données
-          await apiService.logout();
+          await optimizedApi.logout();
           return null;
         }
       }

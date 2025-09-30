@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { MessageState, Message, MessageRequest, PaginationParams } from '../types';
-import apiService from '../services/api';
+import { optimizedApi } from '../services/optimizedApi';
 
 const initialState: MessageState = {
   messages: [],
@@ -14,7 +14,7 @@ export const sendMessage = createAsyncThunk(
   'messages/send',
   async (messageData: MessageRequest, { rejectWithValue }) => {
     try {
-      const response = await apiService.sendMessage(messageData);
+      const response = await optimizedApi.sendMessage(messageData);
       if (response.success && response.data) {
         return response.data;
       } else {
@@ -30,9 +30,16 @@ export const sendMessage = createAsyncThunk(
 
 export const fetchMessages = createAsyncThunk(
   'messages/fetch',
-  async (params: PaginationParams = {}, { rejectWithValue }) => {
+  async (params: PaginationParams = {}, { rejectWithValue, getState }) => {
     try {
-      const response = await apiService.getMessages(params);
+      // Vérifier si les messages sont déjà chargés pour éviter les appels redondants
+      const state = getState() as { messages: MessageState };
+      if (state.messages.messages.length > 0 && !state.messages.isLoading) {
+        console.log('Messages déjà chargés, utilisation du cache');
+        return { data: state.messages.messages, pagination: state.messages.pagination };
+      }
+
+      const response = await optimizedApi.getMessages(params, { useCache: true });
       if (response.success && response.data) {
         return response.data;
       } else {
@@ -48,8 +55,18 @@ export const fetchMessages = createAsyncThunk(
 
 export const fetchMessage = createAsyncThunk(
   'messages/fetchOne',
-  async (messageId: string, { rejectWithValue }) => {
+  async (messageId: string, { rejectWithValue, getState }) => {
     try {
+      // Vérifier si le message est déjà dans le store
+      const state = getState() as { messages: MessageState };
+      const existingMessage = state.messages.messages.find(msg => msg.id === messageId);
+      if (existingMessage) {
+        console.log('Message déjà chargé, utilisation du cache');
+        return existingMessage;
+      }
+
+      // Utiliser l'API service pour récupérer un message spécifique
+      const { apiService } = await import('../services/api');
       const response = await apiService.getMessage(messageId);
       if (response.success && response.data) {
         return response.data.message;
@@ -68,8 +85,12 @@ export const deleteMessage = createAsyncThunk(
   'messages/delete',
   async (messageId: string, { rejectWithValue }) => {
     try {
+      // Utiliser l'API service pour supprimer un message
+      const { apiService } = await import('../services/api');
       const response = await apiService.deleteMessage(messageId);
       if (response.success) {
+        // Invalider le cache des messages après suppression
+        optimizedApi.invalidateMessagesCache();
         return messageId;
       } else {
         return rejectWithValue(response.message || 'Erreur de suppression du message');
@@ -90,7 +111,8 @@ export const loadMoreMessages = createAsyncThunk(
       const currentPage = state.messages.pagination?.page || 1;
       const nextPage = currentPage + 1;
       
-      const response = await apiService.getMessages({ ...params, page: nextPage });
+      // Utiliser l'API optimisée pour charger plus de messages
+      const response = await optimizedApi.getMessages({ ...params, page: nextPage }, { useCache: false });
       if (response.success && response.data) {
         return response.data;
       } else {

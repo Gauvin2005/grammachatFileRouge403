@@ -18,8 +18,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { logoutUser, updateUserXP } from '../store/authSlice';
+import { logoutUser, updateUserXP, loadUserProfile } from '../store/authSlice';
 import { colors, spacing, typography } from '../utils/theme';
+import { optimizedApi } from '../services/optimizedApi';
 
 const ProfileScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -42,11 +43,24 @@ const ProfileScreen: React.FC = () => {
     );
   };
 
-  const handleSaveUsername = () => {
-    if (username.trim() && username !== user?.username) {
-      // TODO: Implémenter la mise à jour du nom d'utilisateur
-      Alert.alert('Succès', 'Nom d\'utilisateur mis à jour !');
-      setIsEditing(false);
+  const handleSaveUsername = async () => {
+    if (username.trim() && username !== user?.username && user?.id) {
+      try {
+        console.log('Mise à jour du nom d\'utilisateur');
+        const response = await optimizedApi.updateUserProfile(user.id, { username: username.trim() });
+        
+        if (response.success && response.data) {
+          // Recharger le profil pour mettre à jour le store
+          await dispatch(loadUserProfile()).unwrap();
+          Alert.alert('Succès', 'Nom d\'utilisateur mis à jour !');
+          setIsEditing(false);
+        } else {
+          Alert.alert('Erreur', 'Échec de la mise à jour du nom d\'utilisateur');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour:', error);
+        Alert.alert('Erreur', 'Échec de la mise à jour du nom d\'utilisateur');
+      }
     } else {
       setIsEditing(false);
     }
