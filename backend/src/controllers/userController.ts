@@ -6,12 +6,10 @@ import User from '../models/User';
 import { ApiResponse, PaginationParams, PaginatedResponse } from '../types';
 
 /**
- * Créer un nouvel utilisateur (rôle forcé à 'user')
+ * Créer un nouvel utilisateur (accessible uniquement par admin)
  */
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('Création d\'un nouvel utilisateur:', req.body);
-
     const { email, password, username } = req.body;
 
     // Validation des données requises
@@ -43,14 +41,10 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    // Hasher le mot de passe
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
     // Créer l'utilisateur avec rôle forcé à 'user'
     const newUser = new User({
       email,
-      password: hashedPassword,
+      password,
       username,
       role: 'user', // Rôle forcé à 'user' par défaut
       xp: 0,
@@ -58,18 +52,6 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     });
 
     await newUser.save();
-    console.log('Utilisateur créé avec succès:', newUser._id);
-
-    // Générer un token JWT
-    const token = jwt.sign(
-      { 
-        userId: newUser._id, 
-        email: newUser.email, 
-        role: newUser.role 
-      },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '7d' }
-    );
 
     // Retourner la réponse sans le mot de passe
     const userResponse = {
@@ -87,8 +69,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       success: true,
       message: 'Utilisateur créé avec succès',
       data: {
-        user: userResponse,
-        token: token
+        user: userResponse
       }
     };
 

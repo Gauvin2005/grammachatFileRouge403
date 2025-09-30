@@ -17,9 +17,10 @@ const router = Router();
  * /api/users:
  *   post:
  *     summary: Créer un nouvel utilisateur
- *     description: Crée un nouveau compte utilisateur avec rôle forcé à "user" (route publique)
+ *     description: Crée un nouveau compte utilisateur avec rôle forcé à "user" (réservé aux administrateurs)
  *     tags: [Users]
- *     security: []
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -70,11 +71,20 @@ const router = Router();
  *                   properties:
  *                     user:
  *                       $ref: '#/components/schemas/User'
- *                     token:
- *                       type: string
- *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *       400:
  *         description: Données invalides
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Token JWT invalide ou manquant
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       403:
+ *         description: Accès refusé - droits administrateur requis
  *         content:
  *           application/json:
  *             schema:
@@ -86,7 +96,8 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/', createUser);
+// Route pour créer un utilisateur (accessible uniquement par admin)
+router.post('/', authenticateToken, requireAdmin, createUser);
 
 /**
  * @swagger

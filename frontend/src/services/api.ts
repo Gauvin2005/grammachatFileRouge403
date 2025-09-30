@@ -286,6 +286,16 @@ class ApiService {
     return response.data;
   }
 
+  async createUser(userData: { username: string; email: string; password: string }): Promise<ApiResponse<{ user: User }>> {
+    const response = await this.api.post('/users', userData);
+    return response.data;
+  }
+
+  async deleteUser(userId: string): Promise<ApiResponse> {
+    const response = await this.api.delete(`/users/${userId}`);
+    return response.data;
+  }
+
   async updateProfile(userId: string, userData: Partial<User>): Promise<ApiResponse<{ user: User }>> {
     if (this.DEMO_MODE) {
       console.log('MODE DÉMO - Mise à jour profil simulée');

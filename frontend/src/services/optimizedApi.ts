@@ -226,6 +226,88 @@ class OptimizedApiService {
   }
 
   /**
+   * Récupérer tous les utilisateurs (admin seulement)
+   */
+  async getUsers(
+    params: PaginationParams = {},
+    options: OptimizedApiOptions = {}
+  ): Promise<ApiResponse<{ data: any[]; pagination: any }>> {
+    const { useCache = true, forceRefresh = false } = options;
+    const cacheKey = `${CACHE_KEYS.USERS}_${JSON.stringify(params)}`;
+
+    if (useCache && !forceRefresh) {
+      const cachedData = apiCache.get<ApiResponse<{ data: any[]; pagination: any }>>(cacheKey);
+      if (cachedData) {
+        console.log('Utilisateurs récupérés depuis le cache');
+        return cachedData;
+      }
+    }
+
+    try {
+      console.log('Récupération des utilisateurs depuis l\'API');
+      const response = await apiService.getUsers(params);
+      
+      if (response.success && useCache) {
+        apiCache.set(cacheKey, response, CACHE_TTL.USERS || 30000);
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des utilisateurs:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Créer un nouvel utilisateur (admin seulement)
+   */
+  async createUser(userData: { username: string; email: string; password: string }): Promise<ApiResponse<{ user: any }>> {
+    try {
+      console.log('Création d\'un nouvel utilisateur');
+      const response = await apiService.createUser(userData);
+      
+      // Invalider le cache des utilisateurs après création
+      this.invalidateUsersCache();
+      
+      return response;
+    } catch (error) {
+      console.error('Erreur lors de la création de l\'utilisateur:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Supprimer un utilisateur (admin seulement)
+   */
+  async deleteUser(userId: string): Promise<ApiResponse> {
+    try {
+      console.log('Suppression de l\'utilisateur');
+      const response = await apiService.deleteUser(userId);
+      
+      // Invalider le cache des utilisateurs après suppression
+      this.invalidateUsersCache();
+      
+      return response;
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'utilisateur:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Invalider le cache des utilisateurs
+   */
+  invalidateUsersCache(): void {
+    const stats = apiCache.getStats();
+    stats.keys.forEach(key => {
+      if (key.startsWith(CACHE_KEYS.USERS)) {
+        apiCache.delete(key);
+      }
+    });
+    console.log('Cache des utilisateurs invalidé');
+  }
+
+  /**
    * Méthodes d'authentification (sans cache)
    */
   async login(credentials: any) {

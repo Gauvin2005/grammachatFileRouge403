@@ -21,12 +21,25 @@ import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { logoutUser, updateUserXP, loadUserProfile } from '../store/authSlice';
 import { colors, spacing, typography } from '../utils/theme';
 import { optimizedApi } from '../services/optimizedApi';
+import AdminDashboardScreen from './AdminDashboardScreen';
 
 const ProfileScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState(user?.username || '');
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+  const [isDemoAdmin, setIsDemoAdmin] = useState(false);
+
+  // Si l'utilisateur est admin (ou en mode démo admin) et veut voir le tableau de bord admin
+  if ((user?.role === 'admin' || isDemoAdmin) && showAdminDashboard) {
+    return (
+      <AdminDashboardScreen 
+        onBack={() => setShowAdminDashboard(false)}
+        isDemoMode={isDemoAdmin}
+      />
+    );
+  }
 
   const handleLogout = () => {
     Alert.alert(
@@ -64,6 +77,17 @@ const ProfileScreen: React.FC = () => {
     } else {
       setIsEditing(false);
     }
+  };
+
+  const handleToggleDemoAdmin = () => {
+    setIsDemoAdmin(!isDemoAdmin);
+    Alert.alert(
+      isDemoAdmin ? 'Mode admin désactivé' : 'Mode admin activé',
+      isDemoAdmin 
+        ? 'Vous n\'avez plus accès aux fonctionnalités d\'administration.'
+        : 'Mode démo admin activé ! Vous pouvez maintenant accéder à la gestion des utilisateurs.',
+      [{ text: 'OK' }]
+    );
   };
 
   const getLevelProgress = () => {
@@ -172,7 +196,11 @@ const ProfileScreen: React.FC = () => {
           
           <List.Item
             title="Rôle"
-            description={user?.role === 'admin' ? 'Administrateur' : 'Utilisateur'}
+            description={
+              isDemoAdmin 
+                ? 'Administrateur (Mode Démo)' 
+                : (user?.role === 'admin' ? 'Administrateur' : 'Utilisateur')
+            }
             left={(props) => <List.Icon {...props} icon="shield-account" />}
           />
           
@@ -240,6 +268,45 @@ const ProfileScreen: React.FC = () => {
           />
         </Card.Content>
       </Card>
+
+      <Card style={styles.card}>
+        <Card.Content>
+          <Text style={styles.cardTitle}>Mode Démo</Text>
+          
+          <List.Item
+            title={isDemoAdmin ? "Désactiver le mode admin" : "Activer le mode admin"}
+            description={isDemoAdmin ? "Retourner au mode utilisateur standard" : "Accéder aux fonctionnalités d'administration"}
+            left={(props) => <List.Icon {...props} icon={isDemoAdmin ? "shield-off" : "shield-account"} />}
+            right={() => (
+              <Button 
+                mode={isDemoAdmin ? "outlined" : "contained"}
+                onPress={handleToggleDemoAdmin}
+                compact
+                buttonColor={isDemoAdmin ? colors.error : colors.primary}
+                textColor={isDemoAdmin ? colors.error : colors.surface}
+              >
+                {isDemoAdmin ? "Désactiver" : "DEMO ADMIN"}
+              </Button>
+            )}
+          />
+        </Card.Content>
+      </Card>
+
+      {(user?.role === 'admin' || isDemoAdmin) && (
+        <Card style={styles.card}>
+          <Card.Content>
+            <Text style={styles.cardTitle}>Administration</Text>
+            
+            <List.Item
+              title="Gestion des utilisateurs"
+              description="Voir et gérer tous les utilisateurs"
+              left={(props) => <List.Icon {...props} icon="account-group" />}
+              right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => setShowAdminDashboard(true)}
+            />
+          </Card.Content>
+        </Card>
+      )}
 
       <Card style={styles.card}>
         <Card.Content>
