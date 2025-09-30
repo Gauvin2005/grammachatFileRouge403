@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useKeyboard } from '../contexts/KeyboardContext';
 import {
   Text,
   TextInput,
@@ -28,6 +28,8 @@ const RegisterScreen: React.FC = () => {
   const { isLoading, error } = useAppSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const insets = useSafeAreaInsets();
+  const { keyboardHeight } = useKeyboard();
 
   const {
     control,
@@ -66,14 +68,21 @@ const RegisterScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAwareScrollView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      contentContainerStyle={[
+        styles.scrollContainer,
+        {
+          paddingBottom: insets.bottom + keyboardHeight,
+        }
+      ]}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      extraScrollHeight={keyboardHeight}
+      enableOnAndroid={true}
+      enableAutomaticScroll={true}
+      extraHeight={keyboardHeight}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
         <View style={styles.header}>
           <Ionicons name="flame" size={80} color={colors.phoenix} />
           <Text style={styles.title}>Grammachat</Text>
@@ -115,7 +124,9 @@ const RegisterScreen: React.FC = () => {
                   autoComplete="username"
                   error={!!errors.username}
                   style={styles.input}
-                  onFocus={clearErrorMessage}
+                  onFocus={() => {
+                    clearErrorMessage();
+                  }}
                 />
               )}
             />
@@ -145,7 +156,9 @@ const RegisterScreen: React.FC = () => {
                   autoComplete="email"
                   error={!!errors.email}
                   style={styles.input}
-                  onFocus={clearErrorMessage}
+                  onFocus={() => {
+                    clearErrorMessage();
+                  }}
                 />
               )}
             />
@@ -174,7 +187,9 @@ const RegisterScreen: React.FC = () => {
                   autoComplete="password-new"
                   error={!!errors.password}
                   style={styles.input}
-                  onFocus={clearErrorMessage}
+                  onFocus={() => {
+                    clearErrorMessage();
+                  }}
                   right={
                     <TextInput.Icon
                       icon={showPassword ? 'eye-off' : 'eye'}
@@ -207,7 +222,9 @@ const RegisterScreen: React.FC = () => {
                   autoComplete="password-new"
                   error={!!errors.confirmPassword}
                   style={styles.input}
-                  onFocus={clearErrorMessage}
+                  onFocus={() => {
+                    clearErrorMessage();
+                  }}
                   right={
                     <TextInput.Icon
                       icon={showConfirmPassword ? 'eye-off' : 'eye'}
@@ -276,8 +293,7 @@ const RegisterScreen: React.FC = () => {
             <Text style={styles.linkText}>Se connecter</Text>
           </Text>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 };
 

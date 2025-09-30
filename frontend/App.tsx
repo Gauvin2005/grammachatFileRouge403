@@ -12,6 +12,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { theme } from './src/utils/theme';
 import { initializeAuth } from './src/store/authSlice';
 import { useAppDispatch } from './src/hooks/redux';
+import { KeyboardProvider } from './src/contexts/KeyboardContext';
 // 🔔 NOTIFICATIONS TEMPORAIREMENT DÉSACTIVÉES
 // import notificationService from './src/services/notificationService';
 
@@ -52,12 +53,14 @@ const AppContent: React.FC = () => {
 
   return (
     <SafeAreaProvider>
-      <PaperProvider theme={theme}>
-        <NavigationContainer>
-          <AppNavigator />
-          <StatusBar style="auto" />
-        </NavigationContainer>
-      </PaperProvider>
+      <KeyboardProvider>
+        <PaperProvider theme={theme}>
+          <NavigationContainer>
+            <AppNavigator />
+            <StatusBar style="auto" />
+          </NavigationContainer>
+        </PaperProvider>
+      </KeyboardProvider>
     </SafeAreaProvider>
   );
 };

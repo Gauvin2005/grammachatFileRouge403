@@ -3,10 +3,11 @@ import {
   View,
   StyleSheet,
   FlatList,
-  KeyboardAvoidingView,
   Platform,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useKeyboard } from '../contexts/KeyboardContext';
 import {
   Text,
   TextInput,
@@ -30,6 +31,8 @@ const ChatScreen: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
   const { messages, isLoading, error } = useAppSelector((state) => state.messages);
   const flatListRef = useRef<FlatList>(null);
+  const insets = useSafeAreaInsets();
+  const { keyboardHeight, isKeyboardVisible } = useKeyboard();
 
   const {
     control,
@@ -51,6 +54,7 @@ const ChatScreen: React.FC = () => {
       console.log('Messages déjà chargés, utilisation du cache');
     }
   }, [dispatch, messages.length]);
+
 
   const onSubmit = async (data: MessageFormData) => {
     try {
@@ -142,7 +146,7 @@ const ChatScreen: React.FC = () => {
             
             {/* Contenu du message */}
             <Text style={styles.simpleMessageText}>
-              {item.content || item.text || item.message || 'Message vide'}
+              {item.content || 'Message vide'}
             </Text>
             
             {/* Erreurs détectées */}
@@ -171,10 +175,7 @@ const ChatScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.userInfo}>
           <Avatar.Text 
@@ -197,7 +198,12 @@ const ChatScreen: React.FC = () => {
         renderItem={renderMessage}
         keyExtractor={(item) => item.id}
         style={styles.messagesList}
-        contentContainerStyle={styles.messagesContainer}
+        contentContainerStyle={[
+          styles.messagesContainer,
+          {
+            paddingBottom: insets.bottom + keyboardHeight + 100, // Espace pour le champ de saisie
+          }
+        ]}
         onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
         onLayout={() => flatListRef.current?.scrollToEnd({ animated: false })}
         ListEmptyComponent={
@@ -219,46 +225,63 @@ const ChatScreen: React.FC = () => {
         </View>
       )}
 
-      <Card style={styles.inputCard}>
-        <Card.Content>
-          <Controller
-            control={control}
-            name="content"
-            rules={{
-              required: 'Message requis',
-              maxLength: {
-                value: 1000,
-                message: 'Le message ne peut pas dépasser 1000 caractères',
-              },
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                label="Tapez votre message..."
-                mode="outlined"
-                value={value}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                multiline
-                maxLength={1000}
-                error={!!errors.content}
-                style={styles.messageInput}
-                onFocus={clearErrorMessage}
-                right={
-                  <TextInput.Icon
-                    icon="send"
-                    onPress={handleSubmit(onSubmit)}
-                    disabled={isLoading || !value?.trim()}
-                  />
-                }
-              />
+      <View style={[
+        styles.inputContainer,
+        {
+          position: 'absolute' as const,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          paddingBottom: insets.bottom + keyboardHeight,
+        }
+      ]}>
+        <Card style={styles.inputCard}>
+          <Card.Content>
+            <Controller
+              control={control}
+              name="content"
+              rules={{
+                required: 'Message requis',
+                maxLength: {
+                  value: 1000,
+                  message: 'Le message ne peut pas dépasser 1000 caractères',
+                },
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  label="Tapez votre message..."
+                  mode="outlined"
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  multiline
+                  maxLength={1000}
+                  error={!!errors.content}
+                  style={styles.messageInput}
+                  onFocus={() => {
+                    clearErrorMessage();
+                    // Scroll automatique vers le bas pour voir les derniers messages
+                    setTimeout(() => {
+                      flatListRef.current?.scrollToEnd({ animated: true });
+                    }, 100);
+                  }}
+                  right={
+                    <TextInput.Icon
+                      icon="send"
+                      onPress={handleSubmit(onSubmit)}
+                      disabled={isLoading || !value?.trim()}
+                    />
+                  }
+                />
+              )}
+            />
+            {errors.content && (
+              <Text style={styles.inputError}>{errors.content.message}</Text>
             )}
-          />
-          {errors.content && (
-            <Text style={styles.inputError}>{errors.content.message}</Text>
-          )}
-        </Card.Content>
-      </Card>
-    </KeyboardAvoidingView>
+          </Card.Content>
+        </Card>
+      </View>
+    </View>
   );
 };
 
@@ -294,7 +317,6 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     padding: spacing.md,
-    paddingBottom: spacing.lg,
   },
   messageContainer: {
     marginBottom: spacing.sm,
@@ -456,12 +478,24 @@ const styles = StyleSheet.create({
     color: colors.error,
     textAlign: 'center',
   },
+  inputContainer: {
+    backgroundColor: colors.background,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
   inputCard: {
     margin: spacing.sm,
     elevation: 4,
   },
   messageInput: {
     backgroundColor: colors.surface,
+    maxHeight: 80,
+    minHeight: 40,
   },
   inputError: {
     color: colors.error,

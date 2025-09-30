@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
-  Modal,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useKeyboard } from '../contexts/KeyboardContext';
 import {
   Text,
   TextInput,
@@ -32,6 +31,8 @@ const LoginScreen: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const insets = useSafeAreaInsets();
+  const { keyboardHeight } = useKeyboard();
 
   const {
     control,
@@ -135,14 +136,21 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAwareScrollView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      contentContainerStyle={[
+        styles.scrollContainer,
+        {
+          paddingBottom: insets.bottom + keyboardHeight,
+        }
+      ]}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      extraScrollHeight={keyboardHeight}
+      enableOnAndroid={true}
+      enableAutomaticScroll={true}
+      extraHeight={keyboardHeight}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
         <View style={styles.header}>
           <Ionicons name="flame" size={80} color={colors.phoenix} />
           <Text style={styles.title}>Grammachat</Text>
@@ -178,7 +186,9 @@ const LoginScreen: React.FC = () => {
                   autoComplete="email"
                   error={!!errors.email}
                   style={styles.input}
-                  onFocus={clearErrorMessage}
+                  onFocus={() => {
+                    clearErrorMessage();
+                  }}
                 />
               )}
             />
@@ -208,7 +218,9 @@ const LoginScreen: React.FC = () => {
                   autoComplete="password"
                   error={!!errors.password}
                   style={styles.input}
-                  onFocus={clearErrorMessage}
+                  onFocus={() => {
+                    clearErrorMessage();
+                  }}
                   right={
                     <TextInput.Icon
                       icon={showPassword ? 'eye-off' : 'eye'}
@@ -266,7 +278,6 @@ const LoginScreen: React.FC = () => {
             Créer un compte
           </Button>
         </View>
-      </ScrollView>
 
       {/* Modal d'inscription */}
       <Portal>
@@ -279,10 +290,22 @@ const LoginScreen: React.FC = () => {
             Créer un compte
           </Dialog.Title>
           
-          <Dialog.Content>
-            <Text style={styles.modalSubtitle}>
-              Rejoignez Grammachat et améliorez votre orthographe !
-            </Text>
+          <KeyboardAwareScrollView
+            style={styles.modalScrollView}
+            contentContainerStyle={{
+              paddingBottom: insets.bottom + keyboardHeight,
+            }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            extraScrollHeight={keyboardHeight}
+            enableOnAndroid={true}
+            enableAutomaticScroll={true}
+            extraHeight={keyboardHeight}
+          >
+            <Dialog.Content>
+              <Text style={styles.modalSubtitle}>
+                Rejoignez Grammachat et améliorez votre orthographe !
+              </Text>
 
             {/* Champ Nom d'utilisateur */}
             <Controller
@@ -413,7 +436,8 @@ const LoginScreen: React.FC = () => {
             <Text style={styles.roleNote}>
               Votre compte sera créé avec le rôle "utilisateur" par défaut
             </Text>
-          </Dialog.Content>
+            </Dialog.Content>
+          </KeyboardAwareScrollView>
 
           <Dialog.Actions>
             <Button
@@ -437,7 +461,7 @@ const LoginScreen: React.FC = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -515,6 +539,9 @@ const styles = StyleSheet.create({
   // Styles pour le modal d'inscription
   registerModal: {
     maxHeight: '80%',
+  },
+  modalScrollView: {
+    maxHeight: 400,
   },
   modalTitle: {
     ...typography.h2,
