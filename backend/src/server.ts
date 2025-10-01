@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
-import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
@@ -11,6 +10,12 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import messageRoutes from './routes/messages';
 import userRoutes from './routes/users';
+
+// Services
+import { redisService } from './services/redisService';
+
+// Middleware
+import { apiRateLimit } from './middleware/rateLimiting';
 
 // Swagger
 import { setupSwagger } from './config/swagger';
@@ -21,22 +26,12 @@ dotenv.config({ path: '../.env' });
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuration de la limite de taux
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limite chaque IP à 100 requêtes par windowMs
-  message: {
-    success: false,
-    message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
 // Middleware de sécurité
 app.use(helmet());
 app.use(compression());
-app.use(limiter);
+
+// Rate limiting avec Redis (remplace express-rate-limit)
+app.use(apiRateLimit);
 
 // Middleware CORS
 const corsOptions = {
@@ -141,15 +136,28 @@ const connectDB = async (): Promise<void> => {
   }
 };
 
+// Connexion à Redis
+const connectRedis = async (): Promise<void> => {
+  try {
+    await redisService.connect();
+    console.log('Connexion à Redis réussie');
+  } catch (error) {
+    console.error('Erreur de connexion à Redis:', error);
+    console.log('Le serveur continue sans Redis (mode dégradé)');
+  }
+};
+
 // Démarrage du serveur
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
+    await connectRedis();
     
     app.listen(PORT, () => {
       console.log(`Serveur Grammachat démarré sur le port ${PORT}`);
       console.log(`Environnement: ${process.env.NODE_ENV}`);
       console.log(`API disponible sur: http://localhost:${PORT}/api`);
+      console.log(`Redis: ${redisService.isRedisConnected() ? 'Connecté' : 'Non connecté'}`);
     });
   } catch (error) {
     console.error('Erreur lors du démarrage du serveur:', error);
@@ -162,10 +170,11 @@ process.on('SIGTERM', async () => {
   console.log('Signal SIGTERM reçu, fermeture du serveur...');
   try {
     await mongoose.connection.close();
-    console.log('Connexion MongoDB fermée');
+    await redisService.disconnect();
+    console.log('Connexions fermées');
     process.exit(0);
   } catch (error) {
-    console.error('Erreur lors de la fermeture MongoDB:', error);
+    console.error('Erreur lors de la fermeture:', error);
     process.exit(1);
   }
 });
@@ -174,10 +183,11 @@ process.on('SIGINT', async () => {
   console.log('Signal SIGINT reçu, fermeture du serveur...');
   try {
     await mongoose.connection.close();
-    console.log('Connexion MongoDB fermée');
+    await redisService.disconnect();
+    console.log('Connexions fermées');
     process.exit(0);
   } catch (error) {
-    console.error('Erreur lors de la fermeture MongoDB:', error);
+    console.error('Erreur lors de la fermeture:', error);
     process.exit(1);
   }
 });

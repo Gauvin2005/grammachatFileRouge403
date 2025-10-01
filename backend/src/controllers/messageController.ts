@@ -3,6 +3,7 @@ import { body, validationResult, query } from 'express-validator';
 import Message from '../models/Message';
 import User from '../models/User';
 import { LanguageToolService } from '../services/LanguageToolService';
+import { redisService } from '../services/redisService';
 import { ApiResponse, MessageRequest, PaginationParams, PaginatedResponse } from '../types';
 
 const languageToolService = new LanguageToolService();
@@ -39,6 +40,9 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
 
     await message.save();
 
+    // Invalider le cache des messages après envoi
+    await redisService.invalidateMessagesCache();
+
     // Ajouter l'XP à l'utilisateur
     const user = await User.findById(userId);
     if (user) {
@@ -48,6 +52,11 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
       // Vérifier si l'utilisateur a monté de niveau
       xpCalculation.levelUp = user.level > oldLevel;
       xpCalculation.newLevel = user.level;
+
+      // Invalider le cache leaderboard si l'XP a changé
+      if (xpCalculation.totalXP > 0) {
+        await redisService.invalidateLeaderboardCache();
+      }
     }
 
     // Populer les données de l'expéditeur
@@ -92,12 +101,25 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
 
+    // Construire la clé de cache
+    const userId = req.user!._id;
+    const role = req.user!.role;
+    const cacheKey = `messages:${role}:${userId}:${page}:${limit}`;
+
+    // Essayer de récupérer depuis le cache
+    const cachedData = await redisService.getMessagesCache(cacheKey);
+    if (cachedData) {
+      console.log('Messages récupérés depuis le cache Redis');
+      res.json(cachedData);
+      return;
+    }
+
     // Construire la requête de filtrage
     const filter: any = {};
     
     // Si l'utilisateur n'est pas admin, il ne voit que ses propres messages
-    if (req.user!.role !== 'admin') {
-      filter.senderId = req.user!._id;
+    if (role !== 'admin') {
+      filter.senderId = userId;
     }
 
     // Récupérer les messages avec pagination
@@ -136,6 +158,9 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
         }
       }
     };
+
+    // Mettre en cache la réponse
+    await redisService.setMessagesCache(cacheKey, response);
 
     res.json(response);
   } catch (error) {
@@ -227,6 +252,9 @@ export const deleteMessage = async (req: Request, res: Response): Promise<void> 
       });
       return;
     }
+
+    // Invalider le cache des messages après suppression
+    await redisService.invalidateMessagesCache();
 
     const response: ApiResponse = {
       success: true,

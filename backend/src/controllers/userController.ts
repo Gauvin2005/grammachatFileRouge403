@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { query, validationResult, body } from 'express-validator';
 import User from '../models/User';
+import { redisService } from '../services/redisService';
 import { ApiResponse, PaginationParams, PaginatedResponse } from '../types';
 
 /**
@@ -303,6 +304,14 @@ export const getLeaderboard = async (req: Request, res: Response): Promise<void>
   try {
     const limit = parseInt(req.query.limit as string) || 10;
 
+    // Essayer de récupérer depuis le cache
+    const cachedData = await redisService.getLeaderboardCache(limit);
+    if (cachedData) {
+      console.log('Leaderboard récupéré depuis le cache Redis');
+      res.json(cachedData);
+      return;
+    }
+
     const users = await User.find({})
       .select('username xp level')
       .sort({ xp: -1 })
@@ -320,6 +329,9 @@ export const getLeaderboard = async (req: Request, res: Response): Promise<void>
         }))
       }
     };
+
+    // Mettre en cache la réponse
+    await redisService.setLeaderboardCache(limit, response);
 
     res.json(response);
   } catch (error) {
