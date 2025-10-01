@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,24 @@ const userSchema = new mongoose.Schema({
   level: { type: Number, default: 1 },
   role: { type: String, default: 'user' }
 }, { timestamps: true });
+
+// Middleware pour hasher le mot de passe avant sauvegarde
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  
+  try {
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Méthode pour comparer les mots de passe
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 
@@ -87,8 +106,18 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    const user = await User.findOne({ email, password });
+    // Trouver l'utilisateur par email
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Email ou mot de passe incorrect'
+      });
+    }
+
+    // Vérifier le mot de passe
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         message: 'Email ou mot de passe incorrect'

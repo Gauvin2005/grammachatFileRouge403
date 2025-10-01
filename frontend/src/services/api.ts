@@ -14,12 +14,12 @@ import {
 class ApiService {
   private api: AxiosInstance;
   private baseURL: string;
-  private DEMO_MODE = true; // MODE DÉMO TEMPORAIRE
+  private DEMO_MODE = false; // MODE DÉMO DÉSACTIVÉ
 
   constructor() {
     this.baseURL = __DEV__ 
-      ? 'http://localhost:3000/api'  // IP de l'ordinateur pour mobile physique
-      : 'https://your-production-api.com/api';
+      ? 'http://localhost:3000/api'  // IP locale pour mobile physique
+      : 'https://ma-production-api.com/api';
     
     console.log('Configuration API:', {
       baseURL: this.baseURL,
