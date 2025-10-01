@@ -42,9 +42,9 @@ class OptimizedApiService {
       const response = await apiService.getProfile();
       
       // Mettre en cache si la requête a réussi
-      if (response.success && useCache) {
-        apiCache.set(cacheKey, response, CACHE_TTL.USER_PROFILE);
-      }
+      // if (response.success && useCache) {
+      //   apiCache.set(cacheKey, response, CACHE_TTL.USER_PROFILE);
+      // }
       
       return response;
     } catch (error) {
@@ -77,9 +77,9 @@ class OptimizedApiService {
       const response = await apiService.getMessages(params);
       
       // Mettre en cache si la requête a réussi
-      if (response.success && useCache) {
-        apiCache.set(cacheKey, response, CACHE_TTL.MESSAGES);
-      }
+      // if (response.success && useCache) {
+      //   apiCache.set(cacheKey, response, CACHE_TTL.MESSAGES);
+      // }
       
       return response;
     } catch (error) {

@@ -1,6 +1,6 @@
 [Unit]
 Description=Grammachat Webhook Server
-Documentation=https://github.com/your-username/grammachat
+Documentation=https://github.com/Gauvin2005/grammachat
 After=network.target
 
 [Service]

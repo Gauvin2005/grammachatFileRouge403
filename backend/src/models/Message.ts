@@ -6,10 +6,10 @@ export interface MessageDocument extends Omit<IMessage, '_id'>, Document {}
 const LanguageToolErrorSchema = new Schema({
   message: String,
   shortMessage: String,
-  replacements: [String],
+  replacements: [Schema.Types.Mixed], // Permet des objets complexes
   offset: Number,
   length: Number,
-  context: String,
+  context: Schema.Types.Mixed, // Permet des objets complexes
   sentence: String,
   type: {
     typeName: String

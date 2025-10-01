@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
 import User from '../src/models/User';
+import { config } from 'dotenv';
+
+// Charger les variables d'environnement depuis le répertoire racine du projet
+config({ path: require('path').resolve(__dirname, '../../.env') });
 
 // Configuration de la base de données
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat';

@@ -20,8 +20,8 @@ import User from '../src/models/User';
 import { config } from 'dotenv';
 import { generateToken } from '../src/middleware/auth';
 
-// Charger les variables d'environnement
-config();
+// Charger les variables d'environnement depuis le répertoire racine du projet
+config({ path: require('path').resolve(__dirname, '../../.env') });
 
 interface AdminCreationResult {
   success: boolean;

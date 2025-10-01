@@ -18,7 +18,7 @@ class ApiService {
 
   constructor() {
     this.baseURL = __DEV__ 
-      ? 'http://localhost:3000/api'  // IP locale pour mobile physique
+      ? 'http://10.8.251.172:3000/api'  // IP locale pour mobile physique
       : 'https://ma-production-api.com/api';
     
     console.log('Configuration API:', {
