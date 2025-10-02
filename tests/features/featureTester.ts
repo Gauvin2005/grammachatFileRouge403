@@ -40,7 +40,7 @@ class FeatureTester {
   }
 
   async runAllTests(): Promise<void> {
-    console.log('=== TESTS FONCTIONNALITÉS GRAMMACHAT ===\n');
+    console.log('\x1b[36m=== TESTS FONCTIONNALITÉS GRAMMACHAT ===\x1b[0m\n');
 
     await this.runTestSuite('User Registration Flow', this.testUserRegistrationFlow.bind(this));
     await this.runTestSuite('Authentication Flow', this.testAuthenticationFlow.bind(this));
@@ -54,7 +54,7 @@ class FeatureTester {
   }
 
   private async runTestSuite(suiteName: string, testFunction: () => Promise<void>): Promise<void> {
-    console.log(`\n--- ${suiteName} ---`);
+    console.log(`\n\x1b[33m--- ${suiteName} ---\x1b[0m`);
     const suite: TestSuite = {
       name: suiteName,
       tests: [],
@@ -97,7 +97,7 @@ class FeatureTester {
         status: 'PASS',
         duration
       });
-      console.log(`✓ ${testName} (${duration}ms)`);
+      console.log(`\x1b[32m✓ ${testName} (${duration}ms)\x1b[0m`);
     } catch (error) {
       const duration = Date.now() - startTime;
       currentSuite.tests.push({
@@ -106,7 +106,7 @@ class FeatureTester {
         duration,
         error: error instanceof Error ? error.message : String(error)
       });
-      console.log(`✗ ${testName} (${duration}ms) - ${error}`);
+      console.log(`\x1b[31m✗ ${testName} (${duration}ms) - ${error}\x1b[0m`);
     }
   }
 

@@ -35,7 +35,7 @@ class APITester {
   }
 
   async runAllTests(): Promise<void> {
-    console.log('=== TESTS API GRAMMACHAT ===\n');
+    console.log('\x1b[36m=== TESTS API GRAMMACHAT ===\x1b[0m\n');
 
     await this.runTestSuite('Authentication', this.testAuthentication.bind(this));
     await this.runTestSuite('User Management', this.testUserManagement.bind(this));
@@ -48,7 +48,7 @@ class APITester {
   }
 
   private async runTestSuite(suiteName: string, testFunction: () => Promise<void>): Promise<void> {
-    console.log(`\n--- ${suiteName} ---`);
+    console.log(`\n\x1b[33m--- ${suiteName} ---\x1b[0m`);
     const suite: TestSuite = {
       name: suiteName,
       tests: [],
@@ -91,7 +91,7 @@ class APITester {
         status: 'PASS',
         duration
       });
-      console.log(`✓ ${testName} (${duration}ms)`);
+      console.log(`\x1b[32m✓ ${testName} (${duration}ms)\x1b[0m`);
     } catch (error) {
       const duration = Date.now() - startTime;
       currentSuite.tests.push({
@@ -100,7 +100,7 @@ class APITester {
         duration,
         error: error instanceof Error ? error.message : String(error)
       });
-      console.log(`✗ ${testName} (${duration}ms) - ${error}`);
+      console.log(`\x1b[31m✗ ${testName} (${duration}ms) - ${error}\x1b[0m`);
     }
   }
 
@@ -349,7 +349,7 @@ class APITester {
   }
 
   private printFinalResults(): void {
-    console.log('\n=== RÉSULTATS FINAUX ===\n');
+    console.log('\n\x1b[35m=== RÉSULTATS FINAUX ===\x1b[0m\n');
 
     let totalTests = 0;
     let totalPassed = 0;
@@ -368,9 +368,9 @@ class APITester {
       console.log(`${suite.name}: ${suite.passCount}/${suite.tests.length} (${successRate.toFixed(1)}%)`);
     });
 
-    console.log(`\nTotal: ${totalPassed}/${totalTests} tests passed`);
-    console.log(`Duration: ${totalDuration}ms`);
-    console.log(`Success Rate: ${((totalPassed / totalTests) * 100).toFixed(1)}%`);
+    console.log(`\n\x1b[36mTotal: ${totalPassed}/${totalTests} tests passed\x1b[0m`);
+    console.log(`\x1b[36mDuration: ${totalDuration}ms\x1b[0m`);
+    console.log(`\x1b[36mSuccess Rate: ${((totalPassed / totalTests) * 100).toFixed(1)}%\x1b[0m`);
 
     if (totalFailed > 0) {
       console.log('\nFailed Tests:');
@@ -382,7 +382,7 @@ class APITester {
     }
 
     if (totalPassed === totalTests) {
-      console.log('\nAll tests passed successfully!');
+      console.log('\n\x1b[32mAll tests passed successfully!\x1b[0m');
     }
   }
 

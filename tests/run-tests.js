@@ -61,10 +61,11 @@ class TestRunner {
     console.log('\nExécution de la suite de tests complète...');
     
     return new Promise((resolve, reject) => {
-      const testProcess = spawn('npx', ['ts-node', 'comprehensiveTestRunner.ts'], {
-        cwd: __dirname,
-        stdio: 'inherit'
-      });
+          const testProcess = spawn('npx', ['ts-node', 'comprehensiveTestRunner.ts'], {
+            cwd: __dirname,
+            stdio: 'inherit',
+            env: { ...process.env, MONGODB_URI: 'mongodb://localhost:27017' }
+          });
 
       testProcess.on('close', (code) => {
         if (code === 0) {

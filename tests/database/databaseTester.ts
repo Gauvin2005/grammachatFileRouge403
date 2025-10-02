@@ -33,7 +33,7 @@ class DatabaseTester {
   }
 
   async runAllTests(): Promise<void> {
-    console.log('=== TESTS BASE DE DONNÉES GRAMMACHAT ===\n');
+    console.log('\x1b[36m=== TESTS BASE DE DONNÉES GRAMMACHAT ===\x1b[0m\n');
 
     await this.runTestSuite('Connection', this.testConnection.bind(this));
     await this.runTestSuite('User Model', this.testUserModel.bind(this));
@@ -47,7 +47,7 @@ class DatabaseTester {
   }
 
   private async runTestSuite(suiteName: string, testFunction: () => Promise<void>): Promise<void> {
-    console.log(`\n--- ${suiteName} ---`);
+    console.log(`\n\x1b[33m--- ${suiteName} ---\x1b[0m`);
     const suite: TestSuite = {
       name: suiteName,
       tests: [],
@@ -90,7 +90,7 @@ class DatabaseTester {
         status: 'PASS',
         duration
       });
-      console.log(`✓ ${testName} (${duration}ms)`);
+      console.log(`\x1b[32m✓ ${testName} (${duration}ms)\x1b[0m`);
     } catch (error) {
       const duration = Date.now() - startTime;
       currentSuite.tests.push({
@@ -99,7 +99,7 @@ class DatabaseTester {
         duration,
         error: error instanceof Error ? error.message : String(error)
       });
-      console.log(`✗ ${testName} (${duration}ms) - ${error}`);
+      console.log(`\x1b[31m✗ ${testName} (${duration}ms) - ${error}\x1b[0m`);
     }
   }
 
@@ -179,7 +179,8 @@ class DatabaseTester {
       const userData = {
         email: `test-${Date.now()}@example.com`,
         username: `testuser${Date.now().toString().slice(-6)}`,
-        password: 'TestPassword123!'
+        password: 'TestPassword123!',
+        role: 'user'
       };
 
       const user = new User(userData);
@@ -196,7 +197,8 @@ class DatabaseTester {
       const userData = {
         email: `test-${Date.now()}@example.com`,
         username: `testuser${Date.now().toString().slice(-6)}`,
-        password: 'TestPassword123!'
+        password: 'TestPassword123!',
+        role: 'user'
       };
 
       const user = new User(userData);
@@ -226,7 +228,8 @@ class DatabaseTester {
       const userData = {
         email: `test-${Date.now()}@example.com`,
         username: `testuser${Date.now().toString().slice(-6)}`,
-        password: 'TestPassword123!'
+        password: 'TestPassword123!',
+        role: 'user'
       };
 
       testUser = new User(userData);
@@ -304,7 +307,8 @@ class DatabaseTester {
       const userData = {
         email: `test-${Date.now()}@example.com`,
         username: `testuser${Date.now().toString().slice(-6)}`,
-        password: 'TestPassword123!'
+        password: 'TestPassword123!',
+        role: 'user'
       };
 
       testUser = new User(userData);
