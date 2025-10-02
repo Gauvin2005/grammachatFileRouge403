@@ -1,32 +1,36 @@
 {
   "name": "grammachat-tests",
-  "version": "1.0.0",
-  "description": "Suite de tests organisée pour Grammachat",
+  "version": "2.0.0",
+  "description": "Suite de tests complète et professionnelle pour Grammachat",
   "main": "run-tests.js",
   "scripts": {
     "test": "node run-tests.js",
-    "test:api": "node run-tests.js --category api",
-    "test:database": "node run-tests.js --category database",
-    "test:frontend": "node run-tests.js --category frontend",
-    "test:integration": "node run-tests.js --category integration",
-    "test:no-frontend": "node run-tests.js --no-frontend",
-    "test:verbose": "node run-tests.js --verbose"
+    "test:comprehensive": "npx ts-node comprehensiveTestRunner.ts",
+    "test:api": "npx ts-node api/apiTester.ts",
+    "test:database": "npx ts-node database/databaseTester.ts",
+    "test:services": "npx ts-node services/serviceTester.ts",
+    "test:features": "npx ts-node features/featureTester.ts"
   },
   "dependencies": {
     "mongoose": "^8.0.3",
     "bcryptjs": "^2.4.3",
-    "puppeteer": "^22.0.0",
+    "axios": "^1.6.0",
+    "mongodb": "^6.0.0",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20.10.4"
+    "@types/node": "^20.10.4",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
   },
   "keywords": [
     "testing",
     "grammachat",
     "api",
-    "frontend",
-    "database"
+    "database",
+    "services",
+    "features",
+    "comprehensive"
   ],
   "author": "Grammachat Team",
   "license": "MIT"
