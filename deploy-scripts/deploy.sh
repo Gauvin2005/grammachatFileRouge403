@@ -104,12 +104,12 @@ module.exports = {
     {
       name: 'grammachat-frontend',
       script: 'npx',
-      args: 'serve -s frontend/dist -l 8082',
+      args: 'serve -s frontend/dist -l 8081',
       cwd: '/opt/grammachat/grammachatFileRouge403',
       instances: 1,
       env: {
         NODE_ENV: 'production',
-        PORT: 8082
+        PORT: 8081
       },
       error_file: '/var/log/grammachat/frontend-error.log',
       out_file: '/var/log/grammachat/frontend-out.log',
@@ -149,7 +149,7 @@ else
 fi
 
 # Vérifier le Frontend
-if curl -f http://localhost:8082 > /dev/null 2>&1; then
+if curl -f http://localhost:8081 > /dev/null 2>&1; then
     log "Frontend opérationnel"
 else
     error "Frontend non accessible"
@@ -162,7 +162,7 @@ sudo systemctl reload nginx
 
 log "Déploiement terminé avec succès!"
 log "API disponible sur: http://$(hostname -I | awk '{print $1}'):3000"
-log "Frontend disponible sur: http://$(hostname -I | awk '{print $1}'):8082"
+log "Frontend disponible sur: http://$(hostname -I | awk '{print $1}'):8081"
 
 # Nettoyage des anciennes sauvegardes (garder seulement les 5 dernières)
 log "Nettoyage des anciennes sauvegardes..."

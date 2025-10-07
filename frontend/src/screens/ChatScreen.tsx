@@ -47,13 +47,13 @@ const ChatScreen: React.FC = () => {
 
   useEffect(() => {
     // Charger les messages seulement s'ils ne sont pas déjà chargés
-    if (messages.length === 0) {
+    if (!messages || messages.length === 0) {
       console.log('Chargement initial des messages');
       dispatch(fetchMessages({}));
     } else {
       console.log('Messages déjà chargés, utilisation du cache');
     }
-  }, [dispatch, messages.length]);
+  }, [dispatch, messages]);
 
 
   const onSubmit = async (data: MessageFormData) => {
@@ -106,7 +106,7 @@ const ChatScreen: React.FC = () => {
         {/* Nom et heure AU-DESSUS de la bulle */}
         <View style={styles.messageHeaderOutside}>
           <Text style={styles.senderNameOutside}>
-            {item.sender.username || 'NO_USERNAME'}
+            {item.sender?.username || 'NO_USERNAME'}
           </Text>
           <Text style={styles.timestampOutside}>
             {new Date(item.timestamp).toLocaleTimeString('fr-FR', {
@@ -126,7 +126,7 @@ const ChatScreen: React.FC = () => {
             <View style={styles.messageHeader}>
               <Avatar.Text 
                 size={28} 
-                label={item.sender.username.charAt(0).toUpperCase()}
+                label={(item.sender?.username || 'U').charAt(0).toUpperCase()}
                 style={[
                   styles.avatar,
                   isOwnMessage ? styles.ownAvatar : styles.otherAvatar
@@ -150,7 +150,7 @@ const ChatScreen: React.FC = () => {
             </Text>
             
             {/* Erreurs détectées */}
-            {item.errorsFound && item.errorsFound.length > 0 && (
+            {item.errorsFound && Array.isArray(item.errorsFound) && item.errorsFound.length > 0 && (
               <View style={styles.errorsContainer}>
                 <Text style={styles.errorsTitle}>
                   <Ionicons name="warning" size={14} color={colors.warning} />{' '}
@@ -180,7 +180,7 @@ const ChatScreen: React.FC = () => {
         <View style={styles.userInfo}>
           <Avatar.Text 
             size={40} 
-            label={user?.username.charAt(0).toUpperCase() || 'U'}
+            label={(user?.username || 'U').charAt(0).toUpperCase()}
             style={styles.userAvatar}
           />
           <View>
@@ -192,9 +192,9 @@ const ChatScreen: React.FC = () => {
         </View>
       </View>
 
-      <FlatList
+        <FlatList
         ref={flatListRef}
-        data={messages}
+        data={messages || []}
         renderItem={renderMessage}
         keyExtractor={(item) => item.id}
         style={styles.messagesList}

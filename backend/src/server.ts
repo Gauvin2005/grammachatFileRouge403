@@ -41,9 +41,20 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Middleware de parsing
-app.use(express.json({ limit: '10mb' }));
+// Middleware de parsing avec gestion des corps vides
+app.use(express.json({ 
+  limit: '10mb',
+  strict: false
+}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Middleware pour gérer les corps de requête vides ou null
+app.use((req, res, next) => {
+  if (req.method === 'GET' && (!req.body || Object.keys(req.body).length === 0)) {
+    req.body = {};
+  }
+  next();
+});
 
 // Middleware de logging
 if (process.env.NODE_ENV === 'development') {

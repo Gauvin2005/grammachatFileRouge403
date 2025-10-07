@@ -132,11 +132,11 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
     // Compter le total des messages
     const total = await Message.countDocuments(filter);
 
-    const response: ApiResponse<PaginatedResponse<any>> = {
+    const response: ApiResponse = {
       success: true,
       message: 'Messages récupérés avec succès',
       data: {
-        data: messages.map(message => ({
+        messages: messages.map(message => ({
           id: message._id,
           content: message.content,
           timestamp: message.timestamp,

@@ -307,7 +307,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack, isD
             <Text style={styles.demoModeText}>Mode Démo</Text>
           )}
           <Text style={styles.subtitle}>
-            {users.length} utilisateur{users.length > 1 ? 's' : ''} au total
+            {users?.length || 0} utilisateur{(users?.length || 0) > 1 ? 's' : ''} au total
           </Text>
         </View>
 
@@ -368,7 +368,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack, isD
           ))}
         </View>
 
-        {filteredUsers.length === 0 && (
+        {(!filteredUsers || filteredUsers.length === 0) && (
           <Card style={styles.emptyCard}>
             <Card.Content style={styles.emptyContent}>
               <Ionicons name="people-outline" size={64} color={colors.textSecondary} />
@@ -540,12 +540,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    ...typography.subtitle1,
+    ...typography.h3,
     color: colors.text,
     marginBottom: spacing.xs,
   },
   userEmail: {
-    ...typography.body2,
+    ...typography.body,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },

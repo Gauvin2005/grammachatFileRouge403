@@ -198,7 +198,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     if (req.user!._id?.toString() !== userId && req.user!.role !== 'admin') {
       res.status(403).json({
         success: false,
-        message: 'Accès non autorisé'
+        message: 'Accès non autorisé à cette ressource'
       });
       return;
     }
@@ -321,7 +321,7 @@ export const getLeaderboard = async (req: Request, res: Response): Promise<void>
       success: true,
       message: 'Classement récupéré avec succès',
       data: {
-        leaderboard: users.map((user, index) => ({
+        users: users.map((user, index) => ({
           rank: index + 1,
           username: user.username,
           xp: user.xp,

@@ -63,13 +63,13 @@ module.exports = {
       // Configuration du Frontend (serveur statique)
       name: 'grammachat-frontend',
       script: 'npx',
-      args: 'serve -s frontend/dist -l 8082 -n',
+      args: 'serve -s frontend/dist -l 8081 -n',
       cwd: '/opt/grammachat/grammachatFileRouge403',
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 8082
+        PORT: 8081
       },
       error_file: '/var/log/grammachat/frontend-error.log',
       out_file: '/var/log/grammachat/frontend-out.log',

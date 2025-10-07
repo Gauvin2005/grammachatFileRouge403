@@ -118,7 +118,7 @@ ufw allow ssh
 ufw allow 80/tcp
 ufw allow 443/tcp
 ufw allow 3000/tcp  # API Backend
-ufw allow 8082/tcp  # Frontend
+ufw allow 8081/tcp  # Frontend
 ufw allow 9000/tcp  # Webhook
 ufw allow 27017/tcp # MongoDB (si exposé)
 ufw allow 6379/tcp  # Redis (si exposé)
@@ -243,7 +243,7 @@ echo "• Service webhook: grammachat-webhook"
 echo ""
 echo "URLs d'accès:"
 echo "• API: http://$(hostname -I | awk '{print $1}'):3000"
-echo "• Frontend: http://$(hostname -I | awk '{print $1}'):8082"
+echo "• Frontend: http://$(hostname -I | awk '{print $1}'):8081"
 echo "• Webhook: http://$(hostname -I | awk '{print $1}'):9000/webhook"
 echo ""
 echo "Commandes utiles:"

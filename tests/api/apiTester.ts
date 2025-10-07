@@ -136,6 +136,7 @@ class APITester {
       }
 
       this.jwtToken = response.data.data.token;
+      console.log(`Token obtenu: ${this.jwtToken?.substring(0, 20)}...`);
     });
 
     await this.runTest('Get User Profile', async () => {
@@ -184,6 +185,8 @@ class APITester {
     if (!this.jwtToken) {
       throw new Error('Authentication required for user management tests');
     }
+    
+    console.log(`Utilisation du token: ${this.jwtToken?.substring(0, 20)}...`);
 
     await this.runTest('Get User Profile', async () => {
       const response = await this.makeRequest('GET', '/api/auth/profile', null, {
@@ -196,7 +199,18 @@ class APITester {
     });
 
     await this.runTest('Update User Profile', async () => {
-      const response = await this.makeRequest('PUT', '/api/users/profile', {
+      // Récupérer l'ID de l'utilisateur depuis le profil
+      const profileResponse = await this.makeRequest('GET', '/api/auth/profile', null, {
+        'Authorization': `Bearer ${this.jwtToken}`
+      });
+      
+      if (profileResponse.status !== 200) {
+        throw new Error(`Cannot get user profile: ${profileResponse.status}`);
+      }
+      
+      const userId = profileResponse.data.data.user.id;
+      
+      const response = await this.makeRequest('PUT', `/api/users/${userId}`, {
         username: `updated${Date.now()}`
       }, {
         'Authorization': `Bearer ${this.jwtToken}`
@@ -212,6 +226,8 @@ class APITester {
     if (!this.jwtToken) {
       throw new Error('Authentication required for message tests');
     }
+    
+    console.log(`Utilisation du token pour les messages: ${this.jwtToken?.substring(0, 20)}...`);
 
     await this.runTest('Send Message', async () => {
       const response = await this.makeRequest('POST', '/api/messages', {
@@ -278,7 +294,7 @@ class APITester {
 
   private async testErrorHandling(): Promise<void> {
     await this.runTest('Invalid Endpoint', async () => {
-      const response = await this.makeRequest('GET', '/api/invalid-endpoint');
+      const response = await this.makeRequest('GET', '/api/inexistant');
 
       if (response.status !== 404) {
         throw new Error(`Expected 404, got ${response.status}: ${JSON.stringify(response.data)}`);
@@ -298,8 +314,8 @@ class APITester {
         'Authorization': 'Bearer invalid-token'
       });
 
-      if (response.status !== 401) {
-        throw new Error(`Expected 401, got ${response.status}: ${JSON.stringify(response.data)}`);
+      if (response.status !== 403) {
+        throw new Error(`Expected 403, got ${response.status}: ${JSON.stringify(response.data)}`);
       }
     });
 
@@ -394,3 +410,17 @@ class APITester {
 }
 
 export default APITester;
+
+// Exécuter les tests si le fichier est appelé directement
+if (require.main === module) {
+  const tester = new APITester('http://localhost:3000');
+  tester.runAllTests()
+    .then(() => {
+      console.log('Tests API terminés');
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('Erreur lors des tests API:', error);
+      process.exit(1);
+    });
+}

@@ -125,7 +125,7 @@ sudo -u grammachat pm2 restart all
 ### URLs d'Accès
 
 - **API Backend** : `http://10.6.0.7:3000`
-- **Frontend** : `http://10.6.0.7:8082`
+- **Frontend** : `http://10.6.0.7:8081`
 - **Webhook** : `http://10.6.0.7:9000/webhook`
 - **Health Check** : `http://10.6.0.7:9000/health`
 
@@ -150,7 +150,7 @@ Le script configure automatiquement UFW avec les ports nécessaires :
 - 80 (HTTP)
 - 443 (HTTPS)
 - 3000 (API)
-- 8082 (Frontend)
+- 8081 (Frontend)
 - 9000 (Webhook)
 
 ## Dépannage

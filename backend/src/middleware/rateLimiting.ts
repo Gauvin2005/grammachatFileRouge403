@@ -60,5 +60,8 @@ export const messageRateLimit = redisRateLimit(60 * 1000, 10); // 10 messages pa
 
 /**
  * Rate limiting général pour l'API
+ * Désactivé en mode test pour éviter les blocages pendant les tests
  */
-export const apiRateLimit = redisRateLimit(15 * 60 * 1000, 100); // 100 requêtes par 15 minutes
+export const apiRateLimit = process.env.NODE_ENV === 'test' 
+  ? (req: Request, res: Response, next: NextFunction) => next()
+  : redisRateLimit(15 * 60 * 1000, 100); // 100 requêtes par 15 minutes

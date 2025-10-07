@@ -51,7 +51,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-      res.status(403).json({
+      res.status(401).json({
         success: false,
         message: 'Token invalide'
       });

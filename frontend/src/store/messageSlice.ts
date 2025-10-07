@@ -34,7 +34,7 @@ export const fetchMessages = createAsyncThunk(
     try {
       // Vérifier si les messages sont déjà chargés pour éviter les appels redondants
       const state = getState() as { messages: MessageState };
-      if (state.messages.messages.length > 0 && !state.messages.isLoading) {
+      if (state.messages.messages && state.messages.messages.length > 0 && !state.messages.isLoading) {
         console.log('Messages déjà chargés, utilisation du cache');
         return { data: state.messages.messages, pagination: state.messages.pagination };
       }

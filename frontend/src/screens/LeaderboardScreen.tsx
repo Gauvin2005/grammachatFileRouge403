@@ -74,13 +74,13 @@ const LeaderboardScreen: React.FC = () => {
 
   useEffect(() => {
     // Charger le leaderboard seulement s'il n'est pas déjà chargé
-    if (leaderboard.length === 0) {
+    if (!leaderboard || leaderboard.length === 0) {
       console.log('Chargement initial du leaderboard');
       fetchLeaderboard();
     } else {
       console.log('Leaderboard déjà chargé, utilisation du cache');
     }
-  }, [leaderboard.length]);
+  }, [leaderboard]);
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -123,7 +123,7 @@ const LeaderboardScreen: React.FC = () => {
           
           <Avatar.Text 
             size={48} 
-            label={item.username.charAt(0).toUpperCase()}
+            label={(item.username || 'U').charAt(0).toUpperCase()}
             style={[
               styles.avatar,
               { backgroundColor: getRankColor(item.rank) }
@@ -194,9 +194,9 @@ const LeaderboardScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={leaderboard}
+        data={leaderboard || []}
         renderItem={renderLeaderboardItem}
-        keyExtractor={(item) => item.username}
+        keyExtractor={(item) => item.username || 'unknown'}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmptyState}
         refreshControl={
