@@ -3,6 +3,7 @@ import {
   View,
   StyleSheet,
   Alert,
+  Modal,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -24,6 +25,7 @@ import { loginUser, clearError } from '../store/authSlice';
 import { LoginFormData, RegisterFormData } from '../types';
 import { colors, spacing, typography } from '../utils/theme';
 import { apiService } from '../services/api';
+import AccountSelector from '../components/AccountSelector';
 
 const LoginScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -31,6 +33,7 @@ const LoginScreen: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [showAccountSelector, setShowAccountSelector] = useState(false);
   const insets = useSafeAreaInsets();
   const { keyboardHeight } = useKeyboard();
 
@@ -38,6 +41,8 @@ const LoginScreen: React.FC = () => {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm<LoginFormData>({
     defaultValues: {
       email: '',
@@ -135,6 +140,21 @@ const LoginScreen: React.FC = () => {
     dispatch(clearError());
   };
 
+  // Gestion de la sélection de compte
+  const handleAccountSelect = (email: string, password: string) => {
+    setValue('email', email);
+    if (password) {
+      setValue('password', password);
+    }
+    setShowAccountSelector(false);
+    clearErrorMessage();
+  };
+
+  const handleOpenAccountSelector = () => {
+    setShowAccountSelector(true);
+    clearErrorMessage();
+  };
+
   return (
     <KeyboardAwareScrollView
       style={styles.container}
@@ -162,6 +182,18 @@ const LoginScreen: React.FC = () => {
         <Card style={styles.card}>
           <Card.Content>
             <Text style={styles.cardTitle}>Connexion</Text>
+            
+            {/* Bouton de sélection de compte */}
+            <Button
+              mode="outlined"
+              onPress={handleOpenAccountSelector}
+              style={styles.accountSelectorButton}
+              contentStyle={styles.accountSelectorButtonContent}
+              icon="account-multiple"
+              labelStyle={styles.accountSelectorButtonLabel}
+            >
+              Sélectionner un compte
+            </Button>
 
             <Controller
               control={control}
@@ -461,6 +493,19 @@ const LoginScreen: React.FC = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
+
+      {/* Modal de sélection de compte */}
+      <Modal
+        visible={showAccountSelector}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowAccountSelector(false)}
+      >
+        <AccountSelector
+          onAccountSelect={handleAccountSelect}
+          onClose={() => setShowAccountSelector(false)}
+        />
+      </Modal>
     </KeyboardAwareScrollView>
   );
 };
@@ -473,7 +518,8 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
   },
   header: {
     alignItems: 'center',
@@ -494,6 +540,7 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: spacing.lg,
     elevation: 4,
+    borderRadius: 16,
   },
   cardTitle: {
     ...typography.h2,
@@ -502,7 +549,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
+    backgroundColor: colors.background,
   },
   errorText: {
     color: colors.error,
@@ -567,6 +615,22 @@ const styles = StyleSheet.create({
   },
   registerSubmitButton: {
     marginLeft: spacing.sm,
+  },
+  // Styles pour le sélecteur de comptes
+  accountSelectorButton: {
+    marginBottom: spacing.lg,
+    borderColor: colors.phoenix,
+    borderWidth: 2,
+    borderRadius: 8,
+  },
+  accountSelectorButtonContent: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    minHeight: 48,
+  },
+  accountSelectorButtonLabel: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 
