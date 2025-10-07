@@ -117,10 +117,9 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
     // Construire la requête de filtrage
     const filter: any = {};
     
-    // Si l'utilisateur n'est pas admin, il ne voit que ses propres messages
-    if (role !== 'admin') {
-      filter.senderId = userId;
-    }
+    // TOUS les utilisateurs voient TOUS les messages (comme WhatsApp/Messenger)
+    // Seuls les admins peuvent voir des messages spécifiques si nécessaire
+    // Pas de filtrage par senderId pour permettre la messagerie globale
 
     // Récupérer les messages avec pagination
     const messages = await Message.find(filter)

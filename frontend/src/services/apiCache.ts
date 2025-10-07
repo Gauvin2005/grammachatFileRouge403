@@ -134,7 +134,7 @@ export const CACHE_KEYS = {
 // TTL personnalisés pour différents types de données
 export const CACHE_TTL = {
   USER_PROFILE: 10 * 60 * 1000, // 10 minutes
-  MESSAGES: 2 * 60 * 1000, // 2 minutes
+  MESSAGES: 30 * 60 * 1000, // 30 minutes (plus long pour la persistance)
   LEADERBOARD: 5 * 60 * 1000, // 5 minutes
   USER_STATS: 15 * 60 * 1000, // 15 minutes
   USERS: 30 * 1000 // 30 secondes pour les utilisateurs (données sensibles)

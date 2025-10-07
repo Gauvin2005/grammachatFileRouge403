@@ -21,10 +21,11 @@ import { useForm, Controller } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { sendMessage, fetchMessages, clearError } from '../store/messageSlice';
+import { sendMessage, fetchMessages, clearError, loadMessagesFromCache } from '../store/messageSlice';
 import { updateUserXP } from '../store/authSlice';
 import { MessageFormData, Message } from '../types';
 import { colors, spacing, typography } from '../utils/theme';
+import { optimizedApi } from '../services/optimizedApi';
 
 const ChatScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -46,14 +47,17 @@ const ChatScreen: React.FC = () => {
   });
 
   useEffect(() => {
-    // Charger les messages seulement s'ils ne sont pas déjà chargés
-    if (!messages || messages.length === 0) {
-      console.log('Chargement initial des messages');
-      dispatch(fetchMessages({}));
-    } else {
-      console.log('Messages déjà chargés, utilisation du cache');
-    }
-  }, [dispatch, messages]);
+    // Charger les messages depuis le cache local d'abord (instantané)
+    dispatch(loadMessagesFromCache()).catch(error => {
+      console.log('Erreur lors du chargement du cache local:', error);
+    });
+    
+    // Puis synchroniser avec le serveur
+    console.log('Synchronisation avec le serveur');
+    dispatch(fetchMessages({})).catch(error => {
+      console.log('Erreur lors de la synchronisation (gérée silencieusement):', error);
+    });
+  }, [dispatch]);
 
 
   const onSubmit = async (data: MessageFormData) => {

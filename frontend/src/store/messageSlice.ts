@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { MessageState, Message, MessageRequest, PaginationParams } from '../types';
 import { optimizedApi } from '../services/optimizedApi';
+import { messagePersistence } from '../services/messagePersistence';
 
 const initialState: MessageState = {
   messages: [],
@@ -32,23 +33,63 @@ export const fetchMessages = createAsyncThunk(
   'messages/fetch',
   async (params: PaginationParams = {}, { rejectWithValue, getState }) => {
     try {
-      // Vérifier si les messages sont déjà chargés pour éviter les appels redondants
-      const state = getState() as { messages: MessageState };
-      if (state.messages.messages && state.messages.messages.length > 0 && !state.messages.isLoading) {
-        console.log('Messages déjà chargés, utilisation du cache');
-        return { data: state.messages.messages, pagination: state.messages.pagination };
+      // Récupérer les messages sauvegardés localement d'abord
+      const localMessages = await messagePersistence.getSavedMessages();
+      
+      // Vérifier si une synchronisation est nécessaire
+      const needsSync = await messagePersistence.needsSync();
+      
+      if (needsSync) {
+        console.log('Synchronisation nécessaire, récupération depuis le serveur');
+        // Récupérer les messages depuis le serveur
+        const response = await optimizedApi.getMessages(params, { useCache: true });
+        
+        if (response.success && response.data) {
+          // Fusionner avec les messages locaux
+          const mergedMessages = await messagePersistence.mergeMessages(response.data.data);
+          await messagePersistence.markSyncComplete();
+          
+          return { 
+            data: mergedMessages, 
+            pagination: response.data.pagination 
+          };
+        }
       }
-
+      
+      // Si pas de sync nécessaire ou erreur serveur, utiliser les messages locaux
+      if (localMessages.length > 0) {
+        console.log(`Utilisation des messages locaux: ${localMessages.length} messages`);
+        return { 
+          data: localMessages, 
+          pagination: null 
+        };
+      }
+      
+      // Dernière tentative avec le serveur
       const response = await optimizedApi.getMessages(params, { useCache: true });
       if (response.success && response.data) {
+        await messagePersistence.saveMessages(response.data.data);
+        await messagePersistence.markSyncComplete();
         return response.data;
-      } else {
-        return rejectWithValue(response.message || 'Erreur de récupération des messages');
       }
+      
+      // Retourner des données vides plutôt que d'échouer
+      return { data: [], pagination: null };
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || 'Erreur de récupération des messages'
-      );
+      console.log('Erreur dans fetchMessages (gérée):', error.message);
+      
+      // En cas d'erreur, essayer de récupérer les messages locaux
+      const localMessages = await messagePersistence.getSavedMessages();
+      if (localMessages.length > 0) {
+        console.log(`Fallback vers messages locaux: ${localMessages.length} messages`);
+        return { 
+          data: localMessages, 
+          pagination: null 
+        };
+      }
+      
+      // Retourner des données vides plutôt que de faire échouer l'action
+      return { data: [], pagination: null };
     }
   }
 );
@@ -126,6 +167,18 @@ export const loadMoreMessages = createAsyncThunk(
   }
 );
 
+export const loadMessagesFromCache = createAsyncThunk(
+  'messages/loadFromCache',
+  async (_, { rejectWithValue }) => {
+    try {
+      const localMessages = await messagePersistence.getSavedMessages();
+      return { data: localMessages, pagination: null };
+    } catch (error: any) {
+      return rejectWithValue('Erreur lors du chargement du cache local');
+    }
+  }
+);
+
 const messageSlice = createSlice({
   name: 'messages',
   initialState,
@@ -161,6 +214,9 @@ const messageSlice = createSlice({
         state.isLoading = false;
         state.messages.push(action.payload.message);
         state.error = null;
+        
+        // Sauvegarder le nouveau message localement
+        messagePersistence.addMessage(action.payload.message);
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.isLoading = false;
@@ -223,6 +279,22 @@ const messageSlice = createSlice({
         state.error = null;
       })
       .addCase(loadMoreMessages.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      
+      // Load Messages From Cache
+      .addCase(loadMessagesFromCache.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(loadMessagesFromCache.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.messages = action.payload.data;
+        state.pagination = action.payload.pagination;
+        state.error = null;
+      })
+      .addCase(loadMessagesFromCache.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });

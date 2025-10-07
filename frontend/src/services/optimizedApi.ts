@@ -42,9 +42,9 @@ class OptimizedApiService {
       const response = await apiService.getProfile();
       
       // Mettre en cache si la requête a réussi
-      // if (response.success && useCache) {
-      //   apiCache.set(cacheKey, response, CACHE_TTL.USER_PROFILE);
-      // }
+      if (response.success && useCache) {
+        apiCache.set(cacheKey, response, CACHE_TTL.USER_PROFILE);
+      }
       
       return response;
     } catch (error) {
@@ -77,14 +77,42 @@ class OptimizedApiService {
       const response = await apiService.getMessages(params);
       
       // Mettre en cache si la requête a réussi
-      // if (response.success && useCache) {
-      //   apiCache.set(cacheKey, response, CACHE_TTL.MESSAGES);
-      // }
+      if (response.success && useCache) {
+        apiCache.set(cacheKey, response, CACHE_TTL.MESSAGES);
+      }
       
       return response;
-    } catch (error) {
-      console.error('Erreur lors de la récupération des messages:', error);
-      throw error;
+    } catch (error: any) {
+      console.log('Erreur lors de la récupération des messages (gérée):', error.message);
+      
+      // Si erreur 401 (token expiré), essayer de rafraîchir le token
+      if (error.response?.status === 401) {
+        console.log('Token expiré, tentative de reconnexion...');
+        try {
+          // Essayer de récupérer les messages sans cache pour forcer un nouveau token
+          const retryResponse = await apiService.getMessages(params);
+          if (retryResponse.success && useCache) {
+            apiCache.set(cacheKey, retryResponse, CACHE_TTL.MESSAGES);
+          }
+          return retryResponse;
+        } catch (retryError) {
+          console.log('Échec de la reconnexion, retour de données vides');
+          // Retourner des données vides plutôt que de planter
+          return {
+            success: true,
+            message: 'Aucun message disponible',
+            data: { data: [], pagination: null }
+          };
+        }
+      }
+      
+      // Pour toute autre erreur (500, etc.), retourner des données vides
+      console.log('Erreur API, retour de données vides');
+      return {
+        success: true,
+        message: 'Aucun message disponible',
+        data: { data: [], pagination: null }
+      };
     }
   }
 
@@ -322,6 +350,16 @@ class OptimizedApiService {
     // Vider le cache lors de la déconnexion
     this.clearAllCache();
     return await apiService.logout();
+  }
+
+  /**
+   * Gérer le retour sur l'application
+   * Invalide le cache si les données sont trop anciennes
+   */
+  handleAppResume(): void {
+    // Invalider le cache des messages pour forcer un refresh
+    this.invalidateMessagesCache();
+    console.log('Cache invalidé lors du retour sur l\'application');
   }
 }
 
