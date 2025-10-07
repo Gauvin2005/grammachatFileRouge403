@@ -8,8 +8,7 @@ import { Message } from '../types';
 
 const STORAGE_KEYS = {
   MESSAGES: 'grammachat_messages',
-  LAST_SYNC: 'grammachat_last_sync',
-  USER_MESSAGES: 'grammachat_user_messages'
+  LAST_SYNC: 'grammachat_last_sync'
 } as const;
 
 class MessagePersistenceService {
@@ -43,8 +42,8 @@ class MessagePersistenceService {
 
       const parsed = JSON.parse(data);
       
-      // Vérifier si les données ne sont pas trop anciennes (24h max)
-      const maxAge = 24 * 60 * 60 * 1000; // 24 heures
+      // Vérifier si les données ne sont pas trop anciennes (7 jours max)
+      const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 jours
       if (Date.now() - parsed.timestamp > maxAge) {
         console.log('Messages locaux trop anciens, suppression');
         await this.clearSavedMessages();
@@ -52,7 +51,11 @@ class MessagePersistenceService {
       }
 
       console.log(`Messages récupérés localement: ${parsed.messages.length} messages`);
-      return parsed.messages || [];
+      // Trier les messages par timestamp (du plus ancien au plus récent)
+      const sortedMessages = (parsed.messages || []).sort((a: Message, b: Message) => 
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+      return sortedMessages;
     } catch (error) {
       console.error('Erreur lors de la récupération des messages:', error);
       return [];
@@ -65,10 +68,11 @@ class MessagePersistenceService {
   async addMessage(message: Message): Promise<void> {
     try {
       const existingMessages = await this.getSavedMessages();
-      const updatedMessages = [message, ...existingMessages];
+      // Ajouter le nouveau message à la fin (puisque les messages sont triés chronologiquement)
+      const updatedMessages = [...existingMessages, message];
       
-      // Limiter à 100 messages pour éviter la surcharge
-      const limitedMessages = updatedMessages.slice(0, 100);
+      // Garder les 100 messages les plus récents
+      const limitedMessages = updatedMessages.slice(-100);
       
       await this.saveMessages(limitedMessages);
       console.log('Message ajouté à la sauvegarde locale');
@@ -99,9 +103,9 @@ class MessagePersistenceService {
         }
       });
       
-      // Convertir en array et trier par timestamp
+      // Convertir en array et trier par timestamp (du plus ancien au plus récent)
       const mergedMessages = Array.from(messageMap.values())
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
       
       // Sauvegarder la version fusionnée
       await this.saveMessages(mergedMessages, userId);

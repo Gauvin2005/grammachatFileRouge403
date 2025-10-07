@@ -11,10 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connexion MongoDB
-mongoose.connect('mongodb://localhost:27017/grammachat', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
+mongoose.connect('mongodb://localhost:27017/grammachat').then(() => {
   console.log('Connexion à MongoDB réussie');
 }).catch(err => {
   console.error('Erreur de connexion à MongoDB:', err);
@@ -26,9 +23,8 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   xp: { type: Number, default: 0 },
-  level: { type: Number, default: 1 },
-  role: { type: String, default: 'user' }
-}, { timestamps: true });
+  level: { type: Number, default: 1 }
+});
 
 // Middleware pour hasher le mot de passe avant sauvegarde
 userSchema.pre('save', async function(next) {
@@ -163,8 +159,7 @@ app.post('/api/messages', async (req, res) => {
     
     // Mettre à jour l'XP de l'utilisateur
     await User.findByIdAndUpdate(senderId, { 
-      $inc: { xp: xpEarned },
-      $set: { level: Math.floor(xpEarned / 100) + 1 }
+      $inc: { xp: xpEarned }
     });
     
     res.status(201).json({
@@ -193,7 +188,7 @@ app.get('/api/messages', async (req, res) => {
   try {
     const messages = await Message.find()
       .populate('senderId', 'username email')
-      .sort({ timestamp: -1 })
+      .sort({ timestamp: 1 })
       .limit(20);
     
     res.json({

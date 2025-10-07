@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { body, validationResult, query } from 'express-validator';
+import { validationResult } from 'express-validator';
 import Message from '../models/Message';
 import User from '../models/User';
 import { LanguageToolService } from '../services/LanguageToolService';
 import { redisService } from '../services/redisService';
-import { ApiResponse, MessageRequest, PaginationParams, PaginatedResponse } from '../types';
+import { ApiResponse, MessageRequest } from '../types';
 
 const languageToolService = new LanguageToolService();
 
@@ -102,9 +102,7 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
     const skip = (page - 1) * limit;
 
     // Construire la clé de cache
-    const userId = req.user!._id;
-    const role = req.user!.role;
-    const cacheKey = `messages:${role}:${userId}:${page}:${limit}`;
+    const cacheKey = `messages:${page}:${limit}`;
 
     // Essayer de récupérer depuis le cache
     const cachedData = await redisService.getMessagesCache(cacheKey);
@@ -116,15 +114,11 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
 
     // Construire la requête de filtrage
     const filter: any = {};
-    
-    // TOUS les utilisateurs voient TOUS les messages (comme WhatsApp/Messenger)
-    // Seuls les admins peuvent voir des messages spécifiques si nécessaire
-    // Pas de filtrage par senderId pour permettre la messagerie globale
 
-    // Récupérer les messages avec pagination
+    // Récupérer les messages avec pagination (du plus ancien au plus récent)
     const messages = await Message.find(filter)
       .populate('senderId', 'username email')
-      .sort({ timestamp: -1 })
+      .sort({ timestamp: 1 })
       .skip(skip)
       .limit(limit);
 
@@ -270,26 +264,3 @@ export const deleteMessage = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-/**
- * Validation pour l'envoi de message
- */
-export const validateMessage = [
-  body('content')
-    .trim()
-    .isLength({ min: 1, max: 1000 })
-    .withMessage('Le contenu du message doit contenir entre 1 et 1000 caractères')
-];
-
-/**
- * Validation pour la pagination
- */
-export const validatePagination = [
-  query('page')
-    .optional()
-    .isInt({ min: 1 })
-    .withMessage('La page doit être un nombre entier positif'),
-  query('limit')
-    .optional()
-    .isInt({ min: 1, max: 100 })
-    .withMessage('La limite doit être un nombre entre 1 et 100')
-];
