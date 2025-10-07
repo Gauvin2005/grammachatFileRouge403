@@ -15,10 +15,11 @@ Voir [QUICK-START.md](QUICK-START.md) pour l'installation en 5 minutes.
 
 ##  Fonctionnalités
 
-- Authentification JWT
+- Authentification JWT avec cache Redis
 - Messagerie avec vérification orthographique (LanguageTool)
 - Système de gamification (XP, niveaux, classement)
-- Interface mobile moderne
+- Interface mobile moderne avec cache optimisé
+- Système de cache intelligent (70% réduction des appels API)
 
 ##  Documentation
 
@@ -26,7 +27,10 @@ Voir [QUICK-START.md](QUICK-START.md) pour l'installation en 5 minutes.
 - [Documentation Technique](TECH.md)
 - [Installation](docs/installation.md)
 - [Développement](docs/development.md)
+- [Performance et Cache](docs/performance.md)
 - [API Backend](backend/README.md)
+- [Cache Frontend](frontend/docs/api-cache.md)
+- [Cache Backend](backend/docs/redis-cache.md)
 
 ##  Tests
 

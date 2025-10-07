@@ -14,7 +14,8 @@
 
 - **Frontend**: React Native, Expo, TypeScript, Redux Toolkit
 - **Backend**: Node.js, Express, TypeScript, JWT
-- **Database**: MongoDB, Redis
+- **Database**: MongoDB, Redis (cache + sessions)
+- **Cache**: Système de cache optimisé (frontend + backend)
 - **Containerisation**: Docker, Docker Compose
 - **API**: RESTful, Swagger/OpenAPI
 - **Tests**: Jest, Supertest
@@ -42,6 +43,13 @@ API_PORT=3000
 MONGODB_URI=mongodb://mongodb:27017/grammachat
 JWT_SECRET=your-secret-key
 LANGUAGETOOL_API_URL=https://api.languagetool.org/v2/check
+
+# Cache Redis
+REDIS_SESSION_TTL=604800    # 7 jours
+REDIS_MESSAGES_TTL=300       # 5 minutes  
+REDIS_LEADERBOARD_TTL=600    # 10 minutes
+REDIS_PROFILE_TTL=900        # 15 minutes
+REDIS_STATS_TTL=1800         # 30 minutes
 ```
 
 ## Scripts Utiles

@@ -1,6 +1,6 @@
 # Backend API
 
-Express API avec TypeScript, MongoDB et Redis.
+Express API avec TypeScript, MongoDB et Redis. Système de cache optimisé pour les performances.
 
 ## Démarrage
 
@@ -39,6 +39,13 @@ API_PORT=3000
 MONGODB_URI=mongodb://mongodb:27017/grammachat
 JWT_SECRET=...
 LANGUAGETOOL_API_URL=...
+
+# Cache Redis (optionnel)
+REDIS_SESSION_TTL=604800    # 7 jours
+REDIS_MESSAGES_TTL=300       # 5 minutes  
+REDIS_LEADERBOARD_TTL=600    # 10 minutes
+REDIS_PROFILE_TTL=900        # 15 minutes
+REDIS_STATS_TTL=1800         # 30 minutes
 ```
 
 ## Structure

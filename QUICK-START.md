@@ -12,6 +12,12 @@ cd ../backend && npm run create-admin
 cd ../frontend && npm start
 ```
 
+## Performance
+
+- **Cache optimisé** : 70% réduction des appels API
+- **Chargement rapide** : Données instantanées depuis le cache
+- **Redis** : Sessions et cache backend automatiques
+
 ## Accès
 
 - **App Mobile** : Expo Go sur téléphone

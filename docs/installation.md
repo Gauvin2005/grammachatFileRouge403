@@ -33,6 +33,13 @@ API_PORT=3000
 MONGODB_URI=mongodb://mongodb:27017/grammachat
 JWT_SECRET=cle_secrete_ici
 LANGUAGETOOL_API_URL=https://api.languagetool.org/v2/check
+
+# Cache Redis (optionnel - valeurs par défaut)
+REDIS_SESSION_TTL=604800    # 7 jours
+REDIS_MESSAGES_TTL=300       # 5 minutes  
+REDIS_LEADERBOARD_TTL=600    # 10 minutes
+REDIS_PROFILE_TTL=900        # 15 minutes
+REDIS_STATS_TTL=1800         # 30 minutes
 ```
 
 ## Vérification

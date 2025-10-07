@@ -17,8 +17,9 @@ cd frontend && npm start
 
 ```
 grammachat/
-├── backend/     # API Node.js/Express
-├── frontend/    # App React Native
+├── backend/     # API Node.js/Express + Redis cache
+├── frontend/    # App React Native + cache optimisé
+├── docs/        # Documentation technique
 └── docker-compose.yml
 ```
 
