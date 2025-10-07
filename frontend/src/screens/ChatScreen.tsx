@@ -49,13 +49,13 @@ const ChatScreen: React.FC = () => {
   useEffect(() => {
     // Charger les messages depuis le cache local d'abord (instantané)
     dispatch(loadMessagesFromCache()).catch(error => {
-      console.log('Erreur lors du chargement du cache local:', error);
+      console.log('Erreur lors du chargement du cache local (non critique):', error?.message || error);
     });
     
     // Puis synchroniser avec le serveur
     console.log('Synchronisation avec le serveur');
     dispatch(fetchMessages({})).catch(error => {
-      console.log('Erreur lors de la synchronisation (gérée silencieusement):', error);
+      console.log('Erreur lors de la synchronisation (gérée silencieusement):', error?.message || error);
     });
   }, [dispatch]);
 

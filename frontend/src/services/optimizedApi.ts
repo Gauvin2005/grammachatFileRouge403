@@ -83,10 +83,13 @@ class OptimizedApiService {
       
       return response;
     } catch (error: any) {
-      console.log('Erreur lors de la récupération des messages (gérée):', error.message);
+      const statusCode = error.response?.status;
+      const errorMessage = error.message || 'Erreur inconnue';
+      
+      console.log(`Erreur lors de la récupération des messages (${statusCode || 'N/A'}):`, errorMessage);
       
       // Si erreur 401 (token expiré), essayer de rafraîchir le token
-      if (error.response?.status === 401) {
+      if (statusCode === 401) {
         console.log('Token expiré, tentative de reconnexion...');
         try {
           // Essayer de récupérer les messages sans cache pour forcer un nouveau token
@@ -100,17 +103,17 @@ class OptimizedApiService {
           // Retourner des données vides plutôt que de planter
           return {
             success: true,
-            message: 'Aucun message disponible',
+            message: 'Aucun message disponible (token expiré)',
             data: { data: [], pagination: null }
           };
         }
       }
       
       // Pour toute autre erreur (500, etc.), retourner des données vides
-      console.log('Erreur API, retour de données vides');
+      console.log(`Erreur API (${statusCode}), retour de données vides`);
       return {
         success: true,
-        message: 'Aucun message disponible',
+        message: `Serveur temporairement indisponible (${statusCode})`,
         data: { data: [], pagination: null }
       };
     }
