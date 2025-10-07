@@ -70,13 +70,6 @@ const AccountSelector: React.FC<AccountSelectorProps> = ({
     },
   ];
 
-  // Mots de passe par défaut (pour les comptes connus)
-  const defaultPasswords: Record<string, string> = {
-    'user1@grammachat.com': 'password123',
-    'user2@grammachat.com': 'password123',
-    'admin@grammachat.com': 'admin123',
-  };
-
   useEffect(() => {
     loadUsers();
   }, []);
@@ -114,21 +107,8 @@ const AccountSelector: React.FC<AccountSelectorProps> = ({
   }, [users, searchQuery]);
 
   const handleAccountSelect = (user: User) => {
-    const password = defaultPasswords[user.email];
-    
-    if (!password) {
-      Alert.alert(
-        'Mot de passe requis',
-        `Le mot de passe pour ${user.email} n'est pas connu. Veuillez le saisir manuellement.`,
-        [
-          { text: 'Annuler', style: 'cancel' },
-          { text: 'Continuer', onPress: () => onAccountSelect(user.email, '') }
-        ]
-      );
-      return;
-    }
-
-    onAccountSelect(user.email, password);
+    // Ne passer que l'email, sans le mot de passe
+    onAccountSelect(user.email, '');
   };
 
   const renderUserItem = ({ item }: { item: User }) => (
