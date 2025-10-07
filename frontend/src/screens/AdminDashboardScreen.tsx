@@ -51,10 +51,9 @@ interface UsersResponse {
 
 interface AdminDashboardScreenProps {
   onBack?: () => void;
-  isDemoMode?: boolean;
 }
 
-const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack, isDemoMode = false }) => {
+const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const [users, setUsers] = useState<User[]>([]);
@@ -69,8 +68,8 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack, isD
     password: '',
   });
 
-  // Vérifier si l'utilisateur est admin ou en mode démo
-  const isAdmin = user?.role === 'admin' || isDemoMode;
+  // Vérifier si l'utilisateur est admin
+  const isAdmin = user?.role === 'admin';
   
   if (!isAdmin) {
     return (
@@ -96,68 +95,6 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack, isD
   const loadUsers = async () => {
     try {
       setLoading(true);
-      
-      // En mode démo, utiliser des données fictives
-      if (isDemoMode) {
-        // Simuler un délai de chargement
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const demoUsers: User[] = [
-          {
-            id: 'demo-user-1',
-            username: 'alice',
-            email: 'alice@example.com',
-            role: 'user',
-            xp: 150,
-            level: 2,
-            createdAt: new Date(Date.now() - 86400000).toISOString(),
-            updatedAt: new Date().toISOString()
-          },
-          {
-            id: 'demo-user-2',
-            username: 'bob',
-            email: 'bob@example.com',
-            role: 'user',
-            xp: 95,
-            level: 1,
-            createdAt: new Date(Date.now() - 172800000).toISOString(),
-            updatedAt: new Date().toISOString()
-          },
-          {
-            id: 'demo-user-3',
-            username: 'charlie',
-            email: 'charlie@example.com',
-            role: 'user',
-            xp: 200,
-            level: 3,
-            createdAt: new Date(Date.now() - 259200000).toISOString(),
-            updatedAt: new Date().toISOString()
-          },
-          {
-            id: 'demo-user-4',
-            username: 'diana',
-            email: 'diana@example.com',
-            role: 'user',
-            xp: 80,
-            level: 1,
-            createdAt: new Date(Date.now() - 345600000).toISOString(),
-            updatedAt: new Date().toISOString()
-          },
-          {
-            id: 'demo-user-5',
-            username: 'eve',
-            email: 'eve@example.com',
-            role: 'user',
-            xp: 300,
-            level: 4,
-            createdAt: new Date(Date.now() - 432000000).toISOString(),
-            updatedAt: new Date().toISOString()
-          }
-        ];
-        
-        setUsers(demoUsers);
-        return;
-      }
       
       const response = await optimizedApi.getUsers();
       
@@ -191,13 +128,6 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack, isD
           style: 'destructive',
           onPress: async () => {
             try {
-              // En mode démo, simuler la suppression
-              if (isDemoMode) {
-                setUsers(prev => prev.filter(u => u.id !== userId));
-                Alert.alert('Succès', 'Utilisateur supprimé avec succès (Mode Démo)');
-                return;
-              }
-              
               const response = await optimizedApi.deleteUser(userId);
               if (response.success) {
                 Alert.alert('Succès', 'Utilisateur supprimé avec succès');
@@ -223,28 +153,6 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack, isD
 
     try {
       setCreateLoading(true);
-      
-      // En mode démo, simuler la création
-      if (isDemoMode) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        const newDemoUser: User = {
-          id: 'demo-user-' + Date.now(),
-          username: newUser.username,
-          email: newUser.email,
-          role: 'user',
-          xp: 0,
-          level: 1,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        
-        setUsers(prev => [newDemoUser, ...prev]);
-        Alert.alert('Succès', 'Utilisateur créé avec succès (Mode Démo)');
-        setShowCreateModal(false);
-        setNewUser({ username: '', email: '', password: '' });
-        return;
-      }
       
       const response = await optimizedApi.createUser(newUser);
       
@@ -303,9 +211,6 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack, isD
             </Button>
           )}
           <Text style={styles.title}>Gestion des utilisateurs</Text>
-          {isDemoMode && (
-            <Text style={styles.demoModeText}>Mode Démo</Text>
-          )}
           <Text style={styles.subtitle}>
             {users?.length || 0} utilisateur{(users?.length || 0) > 1 ? 's' : ''} au total
           </Text>
@@ -500,16 +405,6 @@ const styles = StyleSheet.create({
     ...typography.h2,
     color: colors.surface,
     marginBottom: spacing.xs,
-  },
-  demoModeText: {
-    ...typography.caption,
-    color: colors.surface + 'CC',
-    backgroundColor: colors.accent + '40',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: 12,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
   },
   subtitle: {
     ...typography.body,
