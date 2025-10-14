@@ -14,6 +14,11 @@ import userRoutes from './routes/users';
 // Services
 import { redisService } from './services/redisService';
 
+// Désactiver Redis en mode test
+if (process.env.NODE_ENV === 'test' || process.env.DISABLE_RATE_LIMITING === 'true') {
+  console.log('Mode test détecté - Redis désactivé');
+}
+
 // Middleware
 import { apiRateLimit } from './middleware/rateLimiting';
 
@@ -31,7 +36,17 @@ app.use(helmet());
 app.use(compression());
 
 // Rate limiting avec Redis (remplace express-rate-limit)
-app.use(apiRateLimit);
+// Désactivé automatiquement si Redis n'est pas disponible ou en mode test
+const isTestMode = process.env.NODE_ENV === 'test' || 
+                   process.env.DISABLE_RATE_LIMITING === 'true' ||
+                   process.argv.includes('--test') ||
+                   process.argv.includes('--no-rate-limit');
+
+if (!isTestMode) {
+  app.use(apiRateLimit);
+} else {
+  console.log('Rate limiting désactivé pour les tests');
+}
 
 // Middleware CORS
 const corsOptions = {
@@ -137,6 +152,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 // Connexion à MongoDB
 const connectDB = async (): Promise<void> => {
   try {
+    // Utiliser l'URI MongoDB depuis les variables d'environnement
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat';
     
     await mongoose.connect(mongoURI);

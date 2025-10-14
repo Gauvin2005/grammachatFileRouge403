@@ -7,6 +7,11 @@ import { redisService } from '../services/redisService';
  */
 export const redisRateLimit = (windowMs: number = 15 * 60 * 1000, maxRequests: number = 100) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    // Désactiver complètement en mode test
+    if (process.env.NODE_ENV === 'test' || process.env.DISABLE_RATE_LIMITING === 'true') {
+      return next();
+    }
+
     try {
       // Utiliser l'IP comme clé
       const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
@@ -62,6 +67,14 @@ export const messageRateLimit = redisRateLimit(60 * 1000, 10); // 10 messages pa
  * Rate limiting général pour l'API
  * Désactivé en mode test pour éviter les blocages pendant les tests
  */
-export const apiRateLimit = process.env.NODE_ENV === 'test' 
+export const apiRateLimit = (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development' || process.env.DISABLE_RATE_LIMITING === 'true') 
   ? (req: Request, res: Response, next: NextFunction) => next()
   : redisRateLimit(15 * 60 * 1000, 100); // 100 requêtes par 15 minutes
+
+/**
+ * Rate limiting pour les tests - toujours désactivé
+ */
+export const testRateLimit = (req: Request, res: Response, next: NextFunction) => {
+  // Toujours passer sans limitation pour les tests
+  next();
+};

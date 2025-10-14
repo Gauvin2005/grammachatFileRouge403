@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { validationResult } from 'express-validator';
+import { validationResult, body, query } from 'express-validator';
 import Message from '../models/Message';
 import User from '../models/User';
 import { LanguageToolService } from '../services/LanguageToolService';
@@ -263,4 +263,30 @@ export const deleteMessage = async (req: Request, res: Response): Promise<void> 
     });
   }
 };
+
+/**
+ * Validation pour l'envoi de message
+ */
+export const validateMessage = [
+  body('content')
+    .notEmpty()
+    .withMessage('Le contenu du message est requis')
+    .isLength({ min: 1, max: 1000 })
+    .withMessage('Le message doit contenir entre 1 et 1000 caractères')
+    .trim()
+];
+
+/**
+ * Validation pour la pagination des messages
+ */
+export const validatePagination = [
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('La page doit être un entier positif'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('La limite doit être un entier entre 1 et 100')
+];
 

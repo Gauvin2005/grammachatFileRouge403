@@ -80,6 +80,22 @@ export class LanguageToolService {
     errors: LanguageToolError[];
     xpCalculation: XPCalculationResult;
   }> {
+    // Si le texte est vide, retourner 0 XP
+    if (!text || text.trim().length === 0) {
+      return {
+        errors: [],
+        xpCalculation: {
+          baseXP: 0,
+          bonusXP: 0,
+          penaltyXP: 0,
+          totalXP: 0,
+          errorsCount: 0,
+          levelUp: false,
+          newLevel: 1
+        }
+      };
+    }
+
     const response = await this.checkText(text, language);
     const xpCalculation = this.calculateXP(text, response.matches);
 
