@@ -25,6 +25,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { colors, spacing, typography } from '../utils/theme';
 import { optimizedApi } from '../services/optimizedApi';
+import { fetchUsers } from '../store/userSlice';
 
 interface User {
   id: string;
@@ -56,8 +57,7 @@ interface AdminDashboardScreenProps {
 const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { users, isLoading: usersLoading, error: usersError } = useAppSelector((state) => state.users);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -94,20 +94,10 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack }) =
 
   const loadUsers = async () => {
     try {
-      setLoading(true);
-      
-      const response = await optimizedApi.getUsers();
-      
-      if (response.success && response.data) {
-        setUsers(response.data.data);
-      } else {
-        Alert.alert('Erreur', 'Impossible de charger les utilisateurs');
-      }
+      await dispatch(fetchUsers()).unwrap();
     } catch (error) {
       console.error('Erreur lors du chargement des utilisateurs:', error);
       Alert.alert('Erreur', 'Impossible de charger les utilisateurs');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -179,9 +169,9 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ onBack }) =
 
   useEffect(() => {
     loadUsers();
-  }, []);
+  }, [dispatch]);
 
-  if (loading) {
+  if (usersLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
