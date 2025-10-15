@@ -43,7 +43,9 @@ const ChatScreen: React.FC = () => {
   const [showXPAnimation, setShowXPAnimation] = useState(false);
   const [xpGained, setXpGained] = useState(0);
   const [previousXP, setPreviousXP] = useState(user?.xp || 0);
-  const xpProgressAnim = useRef(new Animated.Value(0)).current;
+  // Initialiser avec la progression actuelle au lieu de 0
+  const currentXPProgress = ((user?.xp || 0) % 100) / 100;
+  const xpProgressAnim = useRef(new Animated.Value(currentXPProgress)).current;
   const xpGlowAnim = useRef(new Animated.Value(0)).current;
 
   const {
@@ -74,6 +76,11 @@ const ChatScreen: React.FC = () => {
   useEffect(() => {
     if (user?.xp !== undefined) {
       setPreviousXP(user.xp);
+      // Synchroniser la barre de progression avec la valeur réelle au chargement
+      const currentProgress = ((user.xp || 0) % 100) / 100;
+      if (!showXPAnimation) {
+        xpProgressAnim.setValue(currentProgress);
+      }
     }
   }, [user?.xp]);
 
@@ -82,13 +89,13 @@ const ChatScreen: React.FC = () => {
     // Vérifier si l'XP a changé et qu'une animation est en cours
     if (showXPAnimation && xpGained > 0 && user?.xp !== previousXP) {
       
-      // Réinitialiser l'animation pour qu'elle se base sur la nouvelle valeur
-      xpProgressAnim.setValue(0);
+      // Calculer la progression XP actuelle
+      const newXPProgress = ((user?.xp || 0) % 100) / 100;
       
-      // Déclencher l'animation avec la nouvelle valeur d'XP
+      // Animer depuis la position précédente vers la nouvelle position
       Animated.sequence([
         Animated.timing(xpProgressAnim, {
-          toValue: 1,
+          toValue: newXPProgress,
           duration: 800,
           useNativeDriver: false,
         }),
@@ -103,11 +110,10 @@ const ChatScreen: React.FC = () => {
           useNativeDriver: false,
         }),
       ]).start(() => {
-        // Réinitialiser l'animation après 2 secondes
+        // Masquer le texte "+XP" après 3 secondes, mais garder la barre visible
         setTimeout(() => {
           setShowXPAnimation(false);
-          xpProgressAnim.setValue(0);
-        }, 2000);
+        }, 3000);
       });
     }
   }, [user?.xp, showXPAnimation, xpGained, previousXP]);
@@ -224,10 +230,10 @@ const ChatScreen: React.FC = () => {
     const xpForNextLevel = currentLevel * 100;
     const xpProgress = (currentXP % 100) / 100;
     
-    // Animation basée sur la progression réelle de l'XP
+    // Animation basée sur la valeur animée de la progression (qui persiste)
     const animatedWidth = xpProgressAnim.interpolate({
       inputRange: [0, 1],
-      outputRange: ['0%', `${xpProgress * 100}%`],
+      outputRange: ['0%', '100%'],
     });
 
     const glowOpacity = xpGlowAnim.interpolate({
@@ -478,6 +484,8 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    zIndex: 100, // S'assurer que le header reste au-dessus des messages
+    elevation: 4, // Pour Android
   },
   userInfo: {
     flexDirection: 'row',
