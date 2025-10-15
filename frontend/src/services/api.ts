@@ -10,15 +10,15 @@ import {
   LeaderboardEntry,
   PaginationParams 
 } from '../types';
+import { getNetworkConfig, getTestUrls, getNetworkErrorMessage } from '../utils/networkUtils';
 
 class ApiService {
   private api: AxiosInstance;
   private baseURL: string;
 
   constructor() {
-    this.baseURL = __DEV__ 
-      ? 'http://10.8.251.234:3000/api'  // IP locale pour mobile physique
-      : 'https://ma-production-api.com/api';
+    // Configuration dynamique selon l'environnement
+    this.baseURL = this.getApiBaseUrl();
     
     console.log('Configuration API:', {
       baseURL: this.baseURL,
@@ -36,13 +36,23 @@ class ApiService {
     this.setupInterceptors();
   }
 
+  /**
+   * Détermine l'URL de base de l'API selon l'environnement
+   */
+  private getApiBaseUrl(): string {
+    const config = getNetworkConfig();
+    return config.baseUrl;
+  }
+
   private setupInterceptors(): void {
     // Intercepteur pour ajouter le token d'authentification
     this.api.interceptors.request.use(
       async (config) => {
         const token = await SecureStore.getItemAsync('auth_token');
+        console.log('Token récupéré pour la requête:', token ? 'PRÉSENT' : 'ABSENT');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
+          console.log('Token ajouté aux headers:', `Bearer ${token.substring(0, 20)}...`);
         }
         return config;
       },
@@ -92,7 +102,7 @@ class ApiService {
   }
 
   async register(userData: RegisterRequest): Promise<ApiResponse<{ user: User; token: string }>> {
-    const response = await this.api.post('/users', userData);
+    const response = await this.api.post('/auth/register', userData);
     return response.data;
   }
 
@@ -103,7 +113,12 @@ class ApiService {
 
   // Méthodes pour les messages
   async sendMessage(messageData: MessageRequest): Promise<ApiResponse<{ message: Message & { xpCalculation: any } }>> {
+    console.log('Envoi de message via API service:', { content: messageData.content });
+    console.log('URL de l\'API:', `${this.baseURL}/messages`);
+    
     const response = await this.api.post('/messages', messageData);
+    console.log('Réponse API sendMessage:', response.status, response.data);
+    
     return response.data;
   }
 
@@ -164,8 +179,47 @@ class ApiService {
       return response.data;
     } catch (error: any) {
       console.log('Serveur inaccessible:', error.message);
+      
+      // Améliorer la gestion d'erreur réseau
+      if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+        const networkError = new Error(getNetworkErrorMessage(error));
+        networkError.name = 'NetworkError';
+        throw networkError;
+      }
+      
       throw error;
     }
+  }
+
+  /**
+   * Teste plusieurs URLs pour trouver celle qui fonctionne
+   */
+  async findWorkingUrl(): Promise<string | null> {
+    if (!__DEV__) {
+      return this.baseURL;
+    }
+
+    const testUrls = getTestUrls(3000);
+
+    for (const url of testUrls) {
+      try {
+        console.log(`Test de l'URL: ${url}`);
+        const testApi = axios.create({
+          baseURL: url,
+          timeout: 3000,
+        });
+        
+        await testApi.get('/health');
+        console.log(`URL fonctionnelle trouvée: ${url}`);
+        return url;
+      } catch (error) {
+        console.log(`URL non accessible: ${url}`);
+        continue;
+      }
+    }
+
+    console.log('Aucune URL fonctionnelle trouvée');
+    return null;
   }
 
   // Gestion du token
