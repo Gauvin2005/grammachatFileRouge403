@@ -5,6 +5,7 @@ import {
   FlatList,
   Platform,
   Alert,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useKeyboard } from '../contexts/KeyboardContext';
@@ -16,13 +17,15 @@ import {
   ActivityIndicator,
   Chip,
   Avatar,
+  ProgressBar,
 } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
+import * as Animatable from 'react-native-animatable';
 
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { sendMessage, fetchMessages, clearError, loadMessagesFromCache } from '../store/messageSlice';
-import { updateUserXP } from '../store/authSlice';
+import { updateUserXP, loadUserProfile } from '../store/authSlice';
 import { updateUserXP as updateUserXPInList } from '../store/userSlice';
 import { MessageFormData, Message } from '../types';
 import { colors, spacing, typography } from '../utils/theme';
@@ -35,6 +38,13 @@ const ChatScreen: React.FC = () => {
   const flatListRef = useRef<FlatList>(null);
   const insets = useSafeAreaInsets();
   const { keyboardHeight, isKeyboardVisible } = useKeyboard();
+
+  // États pour l'animation d'XP
+  const [showXPAnimation, setShowXPAnimation] = useState(false);
+  const [xpGained, setXpGained] = useState(0);
+  const [previousXP, setPreviousXP] = useState(user?.xp || 0);
+  const xpProgressAnim = useRef(new Animated.Value(0)).current;
+  const xpGlowAnim = useRef(new Animated.Value(0)).current;
 
   const {
     control,
@@ -60,26 +70,119 @@ const ChatScreen: React.FC = () => {
     });
   }, [dispatch]);
 
+  // Effet pour synchroniser l'état local avec l'état Redux au chargement
+  useEffect(() => {
+    if (user?.xp !== undefined) {
+      setPreviousXP(user.xp);
+    }
+  }, [user?.xp]);
+
+  // Effet pour surveiller les changements d'XP et déclencher l'animation
+  useEffect(() => {
+    // Vérifier si l'XP a changé et qu'une animation est en cours
+    if (showXPAnimation && xpGained > 0 && user?.xp !== previousXP) {
+      
+      // Réinitialiser l'animation pour qu'elle se base sur la nouvelle valeur
+      xpProgressAnim.setValue(0);
+      
+      // Déclencher l'animation avec la nouvelle valeur d'XP
+      Animated.sequence([
+        Animated.timing(xpProgressAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: false,
+        }),
+        Animated.timing(xpGlowAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+        Animated.timing(xpGlowAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: false,
+        }),
+      ]).start(() => {
+        // Réinitialiser l'animation après 2 secondes
+        setTimeout(() => {
+          setShowXPAnimation(false);
+          xpProgressAnim.setValue(0);
+        }, 2000);
+      });
+    }
+  }, [user?.xp, showXPAnimation, xpGained, previousXP]);
+
+  // Fonction pour déclencher l'animation d'XP
+  const triggerXPAnimation = (xpEarned: number) => {
+    setXpGained(xpEarned);
+    setShowXPAnimation(true);
+  };
+
 
   const onSubmit = async (data: MessageFormData) => {
     try {
       const result = await dispatch(sendMessage(data)).unwrap();
       
-      // Mettre à jour l'XP de l'utilisateur dans le store auth
-      if (result && 'xpCalculation' in result && result.xpCalculation) {
-        const xpCalc = result.xpCalculation as any;
-        dispatch(updateUserXP({
-          xp: user?.xp + xpCalc.totalXP || 0,
-          level: xpCalc.newLevel || user?.level || 1,
-        }));
+      // Le résultat contient { message: { xpCalculation: ... } }
+      const messageData = result.message || result;
+      
+      // Rafraîchir le profil utilisateur depuis l'API pour obtenir les données mises à jour
+      if (messageData && 'xpCalculation' in messageData && messageData.xpCalculation) {
+        const xpCalc = messageData.xpCalculation as any;
         
-        // Mettre à jour l'XP dans la liste des utilisateurs (pour admin dashboard, leaderboard, etc.)
-        if (user?.id) {
-          dispatch(updateUserXPInList({
-            userId: user.id,
-            xp: user.xp + xpCalc.totalXP,
-            level: xpCalc.newLevel || user.level
+        // Sauvegarder l'XP précédent pour l'animation
+        setPreviousXP(user?.xp || 0);
+        
+        try {
+          // Invalider le cache du profil utilisateur pour forcer une requête fraîche
+          optimizedApi.invalidateUserProfileCache();
+          
+          // Utiliser optimizedApi directement avec forceRefresh pour récupérer les données fraîches
+          const profileResponse = await optimizedApi.getUserProfile({ forceRefresh: true });
+          
+          if (profileResponse.success && profileResponse.data?.user) {
+            const updatedUser = profileResponse.data.user;
+            
+            // Mettre à jour le store auth avec les données fraîches de l'API
+            dispatch(updateUserXP({
+              xp: updatedUser.xp,
+              level: updatedUser.level,
+            }));
+            
+            // Mettre à jour l'XP dans la liste des utilisateurs (pour admin dashboard, leaderboard, etc.)
+            if (user?.id) {
+              dispatch(updateUserXPInList({
+                userId: user.id,
+                xp: updatedUser.xp,
+                level: updatedUser.level
+              }));
+            }
+            
+            triggerXPAnimation(xpCalc.totalXP);
+          }
+        } catch (profileError) {
+          console.error('Erreur lors de la récupération du profil mis à jour:', profileError);
+          
+          // Fallback : utiliser les valeurs calculées localement si l'API échoue
+          const currentXP = user?.xp || 0;
+          const currentLevel = user?.level || 1;
+          const newXP = currentXP + xpCalc.totalXP;
+          const newLevel = xpCalc.newLevel || currentLevel;
+          
+          dispatch(updateUserXP({
+            xp: newXP,
+            level: newLevel,
           }));
+          
+          if (user?.id) {
+            dispatch(updateUserXPInList({
+              userId: user.id,
+              xp: newXP,
+              level: newLevel
+            }));
+          }
+          
+          triggerXPAnimation(xpCalc.totalXP);
         }
       }
 
@@ -109,6 +212,72 @@ const ChatScreen: React.FC = () => {
 
   const clearErrorMessage = () => {
     dispatch(clearError());
+  };
+
+  // Composant pour la barre de progression d'XP animée
+  const XPProgressBar = () => {
+    // Utiliser directement les valeurs du state Redux pour garantir la synchronisation
+    const currentXP = user?.xp || 0;
+    const currentLevel = user?.level || 1;
+    
+    // Calculer l'XP nécessaire pour le niveau suivant (formule simple)
+    const xpForNextLevel = currentLevel * 100;
+    const xpProgress = (currentXP % 100) / 100;
+    
+    // Animation basée sur la progression réelle de l'XP
+    const animatedWidth = xpProgressAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0%', `${xpProgress * 100}%`],
+    });
+
+    const glowOpacity = xpGlowAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 0.8],
+    });
+
+    return (
+      <View style={styles.xpContainer}>
+        <View style={styles.xpInfo}>
+          <Text style={styles.xpText}>
+            Niveau {currentLevel} • {currentXP} XP
+          </Text>
+          {showXPAnimation && (
+            <Animatable.Text 
+              animation="bounceIn" 
+              style={styles.xpGainedText}
+              duration={600}
+            >
+              +{xpGained} XP
+            </Animatable.Text>
+          )}
+        </View>
+        
+        <View style={styles.progressBarContainer}>
+          <View style={styles.progressBarBackground}>
+            <Animated.View 
+              style={[
+                styles.progressBarFill,
+                {
+                  width: animatedWidth,
+                }
+              ]}
+            />
+            <Animated.View 
+              style={[
+                styles.progressBarGlow,
+                {
+                  opacity: glowOpacity,
+                  width: animatedWidth,
+                }
+              ]}
+            />
+          </View>
+          <Text style={styles.xpToNext}>
+            {xpForNextLevel - (currentXP % 100)} XP jusqu'au niveau {currentLevel + 1}
+          </Text>
+        </View>
+      </View>
+    );
   };
 
   const renderMessage = ({ item }: { item: Message }) => {
@@ -152,7 +321,7 @@ const ChatScreen: React.FC = () => {
                 <Chip 
                   icon="star" 
                   style={styles.xpChip}
-                  textStyle={styles.xpText}
+                  textStyle={styles.xpChipText}
                   compact
                 >
                   +{item.xpEarned}
@@ -199,11 +368,9 @@ const ChatScreen: React.FC = () => {
             label={(user?.username || 'U').charAt(0).toUpperCase()}
             style={styles.userAvatar}
           />
-          <View>
+          <View style={styles.userDetails}>
             <Text style={styles.userName}>{user?.username}</Text>
-            <Text style={styles.userStats}>
-              Niveau {user?.level} • {user?.xp} XP
-            </Text>
+            <XPProgressBar />
           </View>
         </View>
       </View>
@@ -320,13 +487,89 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     marginRight: spacing.sm,
   },
+  userDetails: {
+    flex: 1,
+  },
   userName: {
     ...typography.h3,
     color: colors.text,
+    marginBottom: spacing.xs,
   },
   userStats: {
     ...typography.caption,
     color: colors.textSecondary,
+  },
+  // Styles pour l'animation d'XP
+  xpContainer: {
+    flex: 1,
+    paddingBottom: spacing.sm, // Espace supplémentaire pour éviter la coupure du texte
+  },
+  xpInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm, // Augmenté pour plus d'espace
+    minHeight: 24, // Hauteur minimale pour éviter la coupure
+  },
+  xpText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  xpGainedText: {
+    ...typography.caption,
+    color: '#22c55e', // Vert plus visible
+    fontWeight: 'bold',
+    fontSize: 12,
+    backgroundColor: 'rgba(34, 197, 94, 0.1)', // Fond subtil pour meilleure visibilité
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
+    borderRadius: 4,
+    elevation: 2, // Élévation pour passer au-dessus des autres éléments
+    zIndex: 10, // Z-index élevé pour s'assurer qu'il soit visible
+  },
+  progressBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.xs, // Espacement supplémentaire
+  },
+  progressBarBackground: {
+    flex: 1,
+    height: 8, // Hauteur augmentée pour meilleure visibilité
+    backgroundColor: colors.border,
+    borderRadius: 4,
+    marginRight: spacing.sm,
+    overflow: 'hidden',
+    position: 'relative',
+    elevation: 1, // Légère élévation pour la profondeur
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#22c55e',
+    borderRadius: 4,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+  },
+  progressBarGlow: {
+    height: '100%',
+    backgroundColor: '#22c55e',
+    borderRadius: 4,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    shadowColor: '#22c55e',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  xpToNext: {
+    ...typography.small,
+    color: colors.textSecondary,
+    fontSize: 10,
+    minWidth: 80,
+    textAlign: 'right',
   },
   messagesList: {
     flex: 1,
@@ -406,7 +649,7 @@ const styles = StyleSheet.create({
   xpChip: {
     backgroundColor: colors.xp,
   },
-  xpText: {
+  xpChipText: {
     color: colors.surface,
     fontSize: 10,
   },
