@@ -18,13 +18,11 @@ export const KeyboardProvider: React.FC<KeyboardProviderProps> = ({ children }) 
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      console.log('Keyboard shown, height:', e.endCoordinates.height);
       setKeyboardHeight(e.endCoordinates.height);
       setIsKeyboardVisible(true);
     });
     
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      console.log('Keyboard hidden');
       setKeyboardHeight(0);
       setIsKeyboardVisible(false);
     });
