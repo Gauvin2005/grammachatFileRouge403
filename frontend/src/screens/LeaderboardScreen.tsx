@@ -18,57 +18,25 @@ import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { LeaderboardEntry } from '../types';
 import { colors, spacing, typography } from '../utils/theme';
 import { optimizedApi } from '../services/optimizedApi';
+import { fetchLeaderboard } from '../store/userSlice';
 
 const LeaderboardScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const [leaderboard, setLeaderboard] = React.useState<LeaderboardEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { leaderboard, isLoading, error } = useAppSelector((state) => state.users);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchLeaderboard = async (forceRefresh = false) => {
-    setIsLoading(true);
+  const loadLeaderboard = async (forceRefresh = false) => {
     try {
-      console.log('Récupération du leaderboard avec cache:', !forceRefresh);
-      const response = await optimizedApi.getLeaderboard(10, { 
-        useCache: true, 
-        forceRefresh 
-      });
-      
-      if (response.success && response.data) {
-        setLeaderboard(response.data.leaderboard);
-        console.log('Leaderboard récupéré avec succès');
-      } else {
-        console.error('Erreur lors de la récupération du leaderboard:', response.message);
-        // Fallback vers des données de test en cas d'erreur
-        const mockData: LeaderboardEntry[] = [
-          { rank: 1, username: 'GrammarMaster', xp: 2500, level: 25 },
-          { rank: 2, username: 'SpellingChamp', xp: 2300, level: 23 },
-          { rank: 3, username: 'WordWizard', xp: 2100, level: 21 },
-          { rank: 4, username: 'TextTitan', xp: 1900, level: 19 },
-          { rank: 5, username: 'LanguageLegend', xp: 1700, level: 17 },
-        ];
-        setLeaderboard(mockData);
-      }
+      await dispatch(fetchLeaderboard()).unwrap();
     } catch (error) {
-      console.error('Erreur lors du chargement du classement:', error);
-      // Fallback vers des données de test en cas d'erreur
-      const mockData: LeaderboardEntry[] = [
-        { rank: 1, username: 'GrammarMaster', xp: 2500, level: 25 },
-        { rank: 2, username: 'SpellingChamp', xp: 2300, level: 23 },
-        { rank: 3, username: 'WordWizard', xp: 2100, level: 21 },
-        { rank: 4, username: 'TextTitan', xp: 1900, level: 19 },
-        { rank: 5, username: 'LanguageLegend', xp: 1700, level: 17 },
-      ];
-      setLeaderboard(mockData);
-    } finally {
-      setIsLoading(false);
+      console.error('Erreur lors du chargement du leaderboard:', error);
     }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchLeaderboard(true); // Forcer le rafraîchissement
+    await loadLeaderboard(true); // Forcer le rafraîchissement
     setRefreshing(false);
   };
 
@@ -76,11 +44,11 @@ const LeaderboardScreen: React.FC = () => {
     // Charger le leaderboard seulement s'il n'est pas déjà chargé
     if (!leaderboard || leaderboard.length === 0) {
       console.log('Chargement initial du leaderboard');
-      fetchLeaderboard();
+      loadLeaderboard();
     } else {
       console.log('Leaderboard déjà chargé, utilisation du cache');
     }
-  }, [leaderboard]);
+  }, [dispatch]);
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
