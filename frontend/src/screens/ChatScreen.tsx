@@ -23,6 +23,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { sendMessage, fetchMessages, clearError, loadMessagesFromCache } from '../store/messageSlice';
 import { updateUserXP } from '../store/authSlice';
+import { updateUserXP as updateUserXPInList } from '../store/userSlice';
 import { MessageFormData, Message } from '../types';
 import { colors, spacing, typography } from '../utils/theme';
 import { optimizedApi } from '../services/optimizedApi';
@@ -64,13 +65,22 @@ const ChatScreen: React.FC = () => {
     try {
       const result = await dispatch(sendMessage(data)).unwrap();
       
-      // Mettre à jour l'XP de l'utilisateur
+      // Mettre à jour l'XP de l'utilisateur dans le store auth
       if (result && 'xpCalculation' in result && result.xpCalculation) {
         const xpCalc = result.xpCalculation as any;
         dispatch(updateUserXP({
           xp: user?.xp + xpCalc.totalXP || 0,
           level: xpCalc.newLevel || user?.level || 1,
         }));
+        
+        // Mettre à jour l'XP dans la liste des utilisateurs (pour admin dashboard, leaderboard, etc.)
+        if (user?.id) {
+          dispatch(updateUserXPInList({
+            userId: user.id,
+            xp: user.xp + xpCalc.totalXP,
+            level: xpCalc.newLevel || user.level
+          }));
+        }
       }
 
       // Afficher un message de succès avec les détails XP
@@ -90,8 +100,10 @@ const ChatScreen: React.FC = () => {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
-    } catch (error) {
-      Alert.alert('Erreur', 'Échec de l\'envoi du message');
+    } catch (error: any) {
+      console.error('Erreur lors de l\'envoi du message:', error);
+      const errorMessage = error?.message || error?.toString() || 'Erreur inconnue';
+      Alert.alert('Erreur', `Échec de l'envoi du message: ${errorMessage}`);
     }
   };
 
