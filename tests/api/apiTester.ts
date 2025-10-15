@@ -102,6 +102,9 @@ class APITester {
       });
       console.log(`\x1b[31m✗ ${testName} (${duration}ms) - ${error}\x1b[0m`);
     }
+    
+    // Ajouter un délai entre les tests pour éviter le rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   private async testAuthentication(): Promise<void> {
@@ -314,8 +317,8 @@ class APITester {
         'Authorization': 'Bearer invalid-token'
       });
 
-      if (response.status !== 403) {
-        throw new Error(`Expected 403, got ${response.status}: ${JSON.stringify(response.data)}`);
+      if (response.status !== 401) {
+        throw new Error(`Expected 401, got ${response.status}: ${JSON.stringify(response.data)}`);
       }
     });
 

@@ -84,21 +84,29 @@ class MessagePersistenceService {
   /**
    * Fusionner les messages du serveur avec ceux sauvegardés localement
    */
-  async mergeMessages(serverMessages: Message[], userId?: string): Promise<Message[]> {
+  async mergeMessages(serverMessages: Message[] | undefined | null, userId?: string): Promise<Message[]> {
     try {
       const localMessages = await this.getSavedMessages();
+      
+      // Vérifier que serverMessages est valide
+      if (!serverMessages || !Array.isArray(serverMessages)) {
+        console.log('Messages serveur invalides, utilisation des messages locaux uniquement');
+        return localMessages;
+      }
       
       // Créer un Map pour éviter les doublons
       const messageMap = new Map<string, Message>();
       
       // Ajouter d'abord les messages du serveur (plus récents)
       serverMessages.forEach(msg => {
-        messageMap.set(msg.id, msg);
+        if (msg && msg.id) {
+          messageMap.set(msg.id, msg);
+        }
       });
       
       // Ajouter les messages locaux qui ne sont pas déjà présents
       localMessages.forEach(msg => {
-        if (!messageMap.has(msg.id)) {
+        if (msg && msg.id && !messageMap.has(msg.id)) {
           messageMap.set(msg.id, msg);
         }
       });
@@ -114,7 +122,14 @@ class MessagePersistenceService {
       return mergedMessages;
     } catch (error) {
       console.error('Erreur lors de la fusion des messages:', error);
-      return serverMessages;
+      // En cas d'erreur, essayer de récupérer les messages locaux ou retourner un tableau vide
+      try {
+        const localMessages = await this.getSavedMessages();
+        return localMessages || [];
+      } catch (localError) {
+        console.error('Erreur lors de la récupération des messages locaux:', localError);
+        return [];
+      }
     }
   }
 

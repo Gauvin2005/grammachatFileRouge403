@@ -5,11 +5,13 @@
   "main": "run-tests.js",
   "scripts": {
     "test": "node run-tests.js",
+    "test:failing": "NODE_ENV=test DISABLE_RATE_LIMITING=true npx ts-node test-failing.ts",
+    "test:with-server": "node test-with-server.js",
     "test:comprehensive": "npx ts-node comprehensiveTestRunner.ts",
-    "test:api": "npx ts-node --compiler-options='{\"moduleResolution\":\"node\"}' api/apiTester.ts",
-    "test:database": "npx ts-node database/databaseTester.ts",
-    "test:services": "npx ts-node services/serviceTester.ts",
-    "test:features": "npx ts-node features/featureTester.ts"
+    "test:api": "NODE_ENV=test DISABLE_RATE_LIMITING=true npx ts-node --compiler-options='{\"moduleResolution\":\"node\"}' api/apiTester.ts",
+    "test:database": "NODE_ENV=test npx ts-node database/databaseTester.ts",
+    "test:services": "NODE_ENV=test npx ts-node services/serviceTester.ts",
+    "test:features": "NODE_ENV=test npx ts-node features/featureTester.ts"
   },
   "dependencies": {
     "mongoose": "^8.0.3",

@@ -26,6 +26,7 @@ import { LoginFormData, RegisterFormData } from '../types';
 import { colors, spacing, typography } from '../utils/theme';
 import { apiService } from '../services/api';
 import AccountSelector from '../components/AccountSelector';
+import { NetworkDiagnostic } from '../components/NetworkDiagnostic';
 
 const LoginScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +35,7 @@ const LoginScreen: React.FC = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [showAccountSelector, setShowAccountSelector] = useState(false);
+  const [showNetworkDiagnostic, setShowNetworkDiagnostic] = useState(false);
   const insets = useSafeAreaInsets();
   const { keyboardHeight } = useKeyboard();
 
@@ -95,7 +97,7 @@ const LoginScreen: React.FC = () => {
         role: 'user' as const, // Force le rôle à 'user'
       };
       
-      // Envoyer la requête POST vers /api/users
+      // Envoyer la requête POST vers /api/auth/register
       const result = await apiService.register(registerData);
       console.log('Inscription réussie:', result);
       
@@ -284,6 +286,18 @@ const LoginScreen: React.FC = () => {
           </Button>
         </View>
 
+        {/* Bouton de diagnostic réseau */}
+        <View style={styles.diagnosticSection}>
+          <Button
+            mode="outlined"
+            onPress={() => setShowNetworkDiagnostic(true)}
+            style={styles.diagnosticButton}
+            icon="wifi"
+          >
+            Diagnostic Réseau
+          </Button>
+        </View>
+
       {/* Modal d'inscription */}
       <Portal>
         <Dialog 
@@ -467,6 +481,25 @@ const LoginScreen: React.FC = () => {
         </Dialog>
       </Portal>
 
+      {/* Modal de diagnostic réseau */}
+      <Portal>
+        <Dialog 
+          visible={showNetworkDiagnostic} 
+          onDismiss={() => setShowNetworkDiagnostic(false)}
+          style={styles.diagnosticModal}
+        >
+          <Dialog.Title>Diagnostic Réseau</Dialog.Title>
+          <Dialog.Content>
+            <NetworkDiagnostic />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setShowNetworkDiagnostic(false)}>
+              Fermer
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
       {/* Modal de sélection de compte */}
       <Modal
         visible={showAccountSelector}
@@ -599,6 +632,18 @@ const styles = StyleSheet.create({
   accountSelectorButtonLabel: {
     fontSize: 14,
     fontWeight: '600',
+  },
+  diagnosticSection: {
+    marginTop: spacing.lg,
+    alignItems: 'center',
+  },
+  diagnosticButton: {
+    borderColor: colors.secondary,
+  },
+  diagnosticModal: {
+    maxHeight: '95%',
+    maxWidth: '95%',
+    margin: 20,
   },
 });
 

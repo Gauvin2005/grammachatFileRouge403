@@ -159,15 +159,22 @@ class OptimizedApiService {
    */
   async sendMessage(messageData: MessageRequest): Promise<ApiResponse<{ message: Message & { xpCalculation: any } }>> {
     try {
-      console.log('Envoi du message');
+      console.log('Envoi du message avec données:', { content: messageData.content });
       const response = await apiService.sendMessage(messageData);
+      console.log('Réponse de l\'envoi de message:', response);
       
       // Invalider le cache des messages après envoi
       this.invalidateMessagesCache();
       
       return response;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de l\'envoi du message:', error);
+      console.error('Détails de l\'erreur:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        config: error.config
+      });
       throw error;
     }
   }
@@ -194,13 +201,34 @@ class OptimizedApiService {
   }
 
   /**
-   * Vérifier la connectivité du serveur
+   * Vérifier la connectivité du serveur avec détection automatique
    */
   async checkHealth(): Promise<ApiResponse> {
     try {
       return await apiService.checkHealth();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de la vérification de la connectivité:', error);
+      
+      // Si erreur réseau, essayer de trouver une URL qui fonctionne
+      if (error.name === 'NetworkError' || error.message?.includes('Network Error')) {
+        console.log('Tentative de détection automatique de l\'URL du serveur...');
+        
+        try {
+          const workingUrl = await apiService.findWorkingUrl();
+          if (workingUrl) {
+            console.log('URL fonctionnelle trouvée, mise à jour de la configuration');
+            // Note: Vous devriez redémarrer l'app ou reconfigurer l'API ici
+            return {
+              success: true,
+              message: `Serveur trouvé à ${workingUrl}`,
+              data: null
+            };
+          }
+        } catch (detectionError) {
+          console.log('Échec de la détection automatique:', detectionError);
+        }
+      }
+      
       throw error;
     }
   }
@@ -336,6 +364,15 @@ class OptimizedApiService {
       }
     });
     console.log('Cache des utilisateurs invalidé');
+  }
+
+  /**
+   * Invalider tous les caches liés aux XP (utilisateurs + leaderboard)
+   */
+  invalidateAllXPCaches(): void {
+    this.invalidateUsersCache();
+    this.invalidateLeaderboardCache();
+    console.log('Tous les caches XP invalidés');
   }
 
   /**

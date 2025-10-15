@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { MessageState, Message, MessageRequest, PaginationParams } from '../types';
 import { optimizedApi } from '../services/optimizedApi';
 import { messagePersistence } from '../services/messagePersistence';
+import { updateUserXP } from './userSlice';
 
 const initialState: MessageState = {
   messages: [],
@@ -13,10 +14,33 @@ const initialState: MessageState = {
 // Actions asynchrones
 export const sendMessage = createAsyncThunk(
   'messages/send',
-  async (messageData: MessageRequest, { rejectWithValue }) => {
+  async (messageData: MessageRequest, { rejectWithValue, dispatch, getState }) => {
     try {
       const response = await optimizedApi.sendMessage(messageData);
       if (response.success && response.data) {
+        // Invalider le cache des utilisateurs et leaderboard après envoi de message
+        optimizedApi.invalidateUsersCache();
+        optimizedApi.invalidateLeaderboardCache();
+        
+        // Si le message contient des informations XP, mettre à jour les autres utilisateurs
+        if (response.data.message && 'xpCalculation' in response.data.message) {
+          const xpCalc = response.data.message.xpCalculation as any;
+          const state = getState() as any;
+          const currentUser = state.auth.user;
+          
+          if (currentUser && xpCalc.totalXP > 0) {
+            // Mettre à jour l'XP de l'utilisateur dans le store des utilisateurs
+            dispatch(updateUserXP({
+              userId: currentUser.id,
+              xp: currentUser.xp + xpCalc.totalXP,
+              level: xpCalc.newLevel || currentUser.level
+            }));
+            
+            // Forcer un refresh des données utilisateurs pour les autres écrans
+            dispatch({ type: 'users/invalidateUsersCache' });
+          }
+        }
+        
         return response.data;
       } else {
         return rejectWithValue(response.message || 'Erreur d\'envoi du message');
@@ -44,7 +68,7 @@ export const fetchMessages = createAsyncThunk(
         // Récupérer les messages depuis le serveur
         const response = await optimizedApi.getMessages(params, { useCache: true });
         
-        if (response.success && response.data) {
+        if (response.success && response.data && response.data.data) {
           // Fusionner avec les messages locaux
           const mergedMessages = await messagePersistence.mergeMessages(response.data.data);
           await messagePersistence.markSyncComplete();
@@ -67,7 +91,7 @@ export const fetchMessages = createAsyncThunk(
       
       // Dernière tentative avec le serveur
       const response = await optimizedApi.getMessages(params, { useCache: true });
-      if (response.success && response.data) {
+      if (response.success && response.data && response.data.data) {
         await messagePersistence.saveMessages(response.data.data);
         await messagePersistence.markSyncComplete();
         return response.data;

@@ -168,6 +168,12 @@ const authSlice = createSlice({
         state.user.level = action.payload.level;
       }
     },
+    updateUserXPById: (state, action: PayloadAction<{ userId: string; xp: number; level: number }>) => {
+      // Cette action sera utilisée pour mettre à jour les XP d'autres utilisateurs
+      // dans les listes (admin dashboard, leaderboard, etc.)
+      // Pour l'instant, on ne fait rien car on n'a pas de liste d'utilisateurs dans authSlice
+      // Cette action sera utilisée par d'autres slices
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -262,5 +268,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, updateUserXP } = authSlice.actions;
+export const { clearError, updateUserXP, updateUserXPById } = authSlice.actions;
 export default authSlice.reducer;

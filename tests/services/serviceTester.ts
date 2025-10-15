@@ -97,11 +97,33 @@ class ServiceTester {
 
   private async testRedisService(): Promise<void> {
     await this.runTest('Redis Connection', async () => {
-      const isConnected = await redisService.isRedisConnected();
-      if (!isConnected) {
-        throw new Error('Redis connection failed');
+      // Essayer de se connecter à Redis d'abord
+      try {
+        await redisService.connect();
+        const isConnected = await redisService.isRedisConnected();
+        if (!isConnected) {
+          throw new Error('Redis connection failed');
+        }
+      } catch (error) {
+        // Si Redis n'est pas accessible, skip les tests Redis
+        console.log('Redis not available - skipping Redis tests');
+        throw new Error('Redis connection failed - Redis may not be running');
       }
     });
+
+    // Skip les autres tests Redis si la connexion échoue
+    if (!redisService.isRedisConnected()) {
+      await this.runTest('User Session Cache', async () => {
+        throw new Error('Skipped - Redis not connected');
+      });
+      await this.runTest('Messages Cache', async () => {
+        throw new Error('Skipped - Redis not connected');
+      });
+      await this.runTest('Leaderboard Cache', async () => {
+        throw new Error('Skipped - Redis not connected');
+      });
+      return;
+    }
 
     await this.runTest('User Session Cache', async () => {
       const userId = 'test-user-123';

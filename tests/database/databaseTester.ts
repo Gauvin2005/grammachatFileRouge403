@@ -30,20 +30,28 @@ class DatabaseTester {
   constructor(mongoUri: string = 'mongodb://localhost:27017', dbName: string = 'grammachat') {
     this.mongoUri = mongoUri;
     this.dbName = dbName;
+    
+    // Configuration Mongoose globale pour les tests
+    mongoose.set('bufferCommands', true);
   }
 
   async runAllTests(): Promise<void> {
     console.log('\x1b[36m=== TESTS BASE DE DONNÉES GRAMMACHAT ===\x1b[0m\n');
 
-    await this.runTestSuite('Connection', this.testConnection.bind(this));
-    await this.runTestSuite('User Model', this.testUserModel.bind(this));
-    await this.runTestSuite('Message Model', this.testMessageModel.bind(this));
-    await this.runTestSuite('Relations', this.testRelations.bind(this));
-    await this.runTestSuite('Indexes', this.testIndexes.bind(this));
-    await this.runTestSuite('Constraints', this.testConstraints.bind(this));
-    await this.runTestSuite('Performance', this.testPerformance.bind(this));
+    try {
+      await this.runTestSuite('Connection', this.testConnection.bind(this));
+      await this.runTestSuite('User Model', this.testUserModel.bind(this));
+      await this.runTestSuite('Message Model', this.testMessageModel.bind(this));
+      await this.runTestSuite('Relations', this.testRelations.bind(this));
+      await this.runTestSuite('Indexes', this.testIndexes.bind(this));
+      await this.runTestSuite('Constraints', this.testConstraints.bind(this));
+      await this.runTestSuite('Performance', this.testPerformance.bind(this));
 
-    this.printFinalResults();
+      this.printFinalResults();
+    } finally {
+      // Toujours nettoyer les connexions
+      await this.cleanup();
+    }
   }
 
   private async runTestSuite(suiteName: string, testFunction: () => Promise<void>): Promise<void> {
@@ -74,6 +82,16 @@ class DatabaseTester {
     suite.skipCount = suite.tests.filter(t => t.status === 'SKIP').length;
   }
 
+  private async cleanupDatabase(): Promise<void> {
+    try {
+      // Nettoyer les collections de test
+      await User.deleteMany({ email: { $regex: /test|perf|unique/ } });
+      await Message.deleteMany({ content: { $regex: /test|Test/ } });
+    } catch (error) {
+      console.log('Cleanup failed:', error);
+    }
+  }
+
   private async runTest(testName: string, testFunction: () => Promise<void>): Promise<void> {
     const startTime = Date.now();
     const currentSuite = this.results[this.results.length - 1];
@@ -91,6 +109,9 @@ class DatabaseTester {
         duration
       });
       console.log(`\x1b[32m✓ ${testName} (${duration}ms)\x1b[0m`);
+      
+      // Nettoyer après chaque test
+      await this.cleanupDatabase();
     } catch (error) {
       const duration = Date.now() - startTime;
       currentSuite.tests.push({
@@ -100,6 +121,9 @@ class DatabaseTester {
         error: error instanceof Error ? error.message : String(error)
       });
       console.log(`\x1b[31m✗ ${testName} (${duration}ms) - ${error}\x1b[0m`);
+      
+      // Nettoyer même en cas d'erreur
+      await this.cleanupDatabase();
     }
   }
 
@@ -115,7 +139,21 @@ class DatabaseTester {
     });
 
     await this.runTest('Mongoose Connection', async () => {
-      await mongoose.connect(`${this.mongoUri}/${this.dbName}`);
+      const mongoUri = `${this.mongoUri}/${this.dbName}`;
+      
+      // Fermer toute connexion existante
+      if (mongoose.connection.readyState !== 0) {
+        await mongoose.disconnect();
+      }
+      
+      await mongoose.connect(mongoUri, {
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 30000,
+        connectTimeoutMS: 30000,
+        maxPoolSize: 1,
+        minPoolSize: 1,
+        bufferCommands: true
+      });
       
       if (mongoose.connection.readyState !== 1) {
         throw new Error('Mongoose connection not established');
@@ -432,10 +470,11 @@ class DatabaseTester {
     });
 
     await this.runTest('Username Uniqueness', async () => {
-      const username = `uniqueuser${Date.now()}`;
+      const timestamp = Date.now();
+      const username = `u${timestamp}`; // Nom d'utilisateur court
       
       const user1 = new User({
-        email: `user1-${Date.now()}@example.com`,
+        email: `user1-${timestamp}@example.com`,
         username,
         password: 'TestPassword123!',
         role: 'user'
@@ -443,7 +482,7 @@ class DatabaseTester {
       await user1.save();
 
       const user2 = new User({
-        email: `user2-${Date.now()}@example.com`,
+        email: `user2-${timestamp}@example.com`,
         username,
         password: 'TestPassword123!',
         role: 'user'
@@ -465,11 +504,13 @@ class DatabaseTester {
   private async testPerformance(): Promise<void> {
     await this.runTest('Bulk User Creation', async () => {
       const users = [];
+      const timestamp = Date.now();
       for (let i = 0; i < 100; i++) {
         users.push({
-          email: `perf-${Date.now()}-${i}@example.com`,
-          username: `perfuser${Date.now()}${i}`,
-          password: 'TestPassword123!'
+          email: `perf-${timestamp}-${i}@example.com`,
+          username: `perf${i}`, // Nom d'utilisateur court
+          password: 'TestPassword123!',
+          role: 'user' // Ajouter le champ role requis
         });
       }
 
@@ -487,9 +528,10 @@ class DatabaseTester {
     });
 
     await this.runTest('Query Performance', async () => {
+      const timestamp = Date.now();
       const userData = {
-        email: `perf-${Date.now()}@example.com`,
-        username: `perfuser${Date.now()}`,
+        email: `perf-${timestamp}@example.com`,
+        username: `perf${timestamp}`, // Nom d'utilisateur court
         password: 'TestPassword123!',
         role: 'user'
       };

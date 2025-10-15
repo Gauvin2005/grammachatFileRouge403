@@ -5,6 +5,7 @@ import { combineReducers } from '@reduxjs/toolkit';
 
 import authReducer from './authSlice';
 import messageReducer from './messageSlice';
+import userReducer from './userSlice';
 
 // Configuration de la persistance
 const persistConfig = {
@@ -16,6 +17,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   messages: messageReducer,
+  users: userReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
