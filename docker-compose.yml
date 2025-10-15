@@ -45,6 +45,11 @@ services:
       - "${API_PORT:-3000}:3000"
     env_file:
       - .env
+    environment:
+      - NODE_ENV=development
+      - DISABLE_RATE_LIMITING=true
+      - REDIS_URL=redis://redis:6379
+      - MONGODB_URI=mongodb://mongodb:27017/grammachat
     depends_on:
       mongodb:
         condition: service_healthy
