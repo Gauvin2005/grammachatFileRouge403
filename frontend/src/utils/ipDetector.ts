@@ -42,7 +42,7 @@ export const detectHostIP = async (): Promise<string | null> => {
  */
 const findWorkingIP = async (): Promise<string | null> => {
   const testIPs = [
-    '10.8.252.74',    // IP actuelle
+    '10.8.251.168',    // IP actuelle
     '10.8.251.148',   // Ancienne IP (compatibilité)
     '192.168.1.100',
     '192.168.0.100',

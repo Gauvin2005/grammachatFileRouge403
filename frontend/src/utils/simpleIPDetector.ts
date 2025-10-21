@@ -10,11 +10,11 @@ import { Platform } from 'react-native';
 export const getWorkingIP = async (): Promise<string> => {
   try {
     // Utiliser l'IP actuelle pour tous les environnements de dev
-    return '10.8.252.74';
+    return '10.8.251.168';
     
   } catch (error) {
     console.error('Erreur lors de la détection d\'IP:', error);
-    return '10.8.252.74';
+    return '10.8.251.168';
   }
 };
 

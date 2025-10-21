@@ -50,7 +50,7 @@ export const ConnectionDebugComponent: React.FC = () => {
     setIsTesting(true);
     
     try {
-      const testUrl = Platform.OS === 'android' ? 'http://10.8.252.74:3000/api' : 'http://localhost:3000/api';
+      const testUrl = Platform.OS === 'android' ? 'http://10.8.252.251:3000/api' : 'http://localhost:3000/api';
       
       const response = await fetch(`${testUrl}/auth/login`, {
         method: 'POST',
@@ -104,7 +104,7 @@ export const ConnectionDebugComponent: React.FC = () => {
           <View style={styles.infoContainer}>
             <Text style={styles.infoLabel}>URL attendue:</Text>
             <Text style={styles.infoValue}>
-              {Platform.OS === 'android' ? 'http://10.8.252.74:3000/api' : 'http://localhost:3000/api'}
+              {Platform.OS === 'android' ? 'http://10.8.252.251:3000/api' : 'http://localhost:3000/api'}
             </Text>
           </View>
           

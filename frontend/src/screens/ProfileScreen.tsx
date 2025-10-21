@@ -14,21 +14,28 @@ import {
   List,
   Switch,
   TextInput,
+  Snackbar,
 } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { logoutUser, updateUserXP, loadUserProfile } from '../store/authSlice';
+import { logoutUser, updateUserXP, loadUserProfile, updateUserProfileLocally } from '../store/authSlice';
 import { colors, spacing, typography } from '../utils/theme';
 import { optimizedApi } from '../services/optimizedApi';
+import { useOfflineSync } from '../hooks/useOfflineSync';
+import { offlineStorageService } from '../services/offlineStorageService';
+import { offlineSyncService } from '../services/offlineSyncService';
 import AdminDashboardScreen from './AdminDashboardScreen';
 
 const ProfileScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
+  const { isOffline, isSyncing, pendingItemsCount } = useOfflineSync();
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState(user?.username || '');
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+  const [showOfflineMessage, setShowOfflineMessage] = useState(false);
+  const [offlineMessage, setOfflineMessage] = useState('');
 
   // Si l'utilisateur est admin et veut voir le tableau de bord admin
   if (user?.role === 'admin' && showAdminDashboard) {
@@ -56,21 +63,85 @@ const ProfileScreen: React.FC = () => {
 
   const handleSaveUsername = async () => {
     if (username.trim() && username !== user?.username && user?.id) {
+      // Validation du nom d'utilisateur
+      if (username.trim().length < 3) {
+        Alert.alert('Erreur', 'Le nom d\'utilisateur doit contenir au moins 3 caractères');
+        return;
+      }
+      
       try {
         console.log('Mise à jour du nom d\'utilisateur');
+        
+        // Appliquer immédiatement la modification dans le store Redux (base de données locale)
+        dispatch(updateUserProfileLocally({ username: username.trim() }));
+        console.log('Nom d\'utilisateur mis à jour localement dans le store Redux');
+        
+        if (isOffline) {
+          // Mode hors-ligne : sauvegarder dans AsyncStorage pour synchronisation future
+          console.log('Sauvegarde hors-ligne...', {
+            type: 'username',
+            data: { username: username.trim() },
+            userId: user.id,
+          });
+          
+          await offlineStorageService.savePendingProfileUpdate({
+            type: 'username',
+            data: { username: username.trim() },
+            userId: user.id,
+          });
+          
+          console.log('Sauvegarde AsyncStorage terminée');
+          
+          setOfflineMessage('Modification enregistrée localement, synchronisation en attente de connexion.');
+          setShowOfflineMessage(true);
+          console.log('Modification sauvegardée dans AsyncStorage - Synchronisation en attente de connexion');
+          
+          // Mettre à jour l'état local pour l'affichage immédiat
+          setIsEditing(false);
+          
+          return;
+        }
+
+        // Mode en ligne : synchronisation directe avec le serveur
         const response = await optimizedApi.updateUserProfile(user.id, { username: username.trim() });
         
         if (response.success && response.data) {
-          // Recharger le profil pour mettre à jour le store
+          // Recharger le profil pour mettre à jour le store avec les données du serveur
           await dispatch(loadUserProfile()).unwrap();
           Alert.alert('Succès', 'Nom d\'utilisateur mis à jour !');
           setIsEditing(false);
         } else {
           Alert.alert('Erreur', 'Échec de la mise à jour du nom d\'utilisateur');
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erreur lors de la mise à jour:', error);
-        Alert.alert('Erreur', 'Échec de la mise à jour du nom d\'utilisateur');
+        
+        // Vérifier si c'est une erreur réseau
+        if (error.name === 'NetworkError' || error.message?.includes('Network Error')) {
+          // En cas d'erreur réseau, sauvegarder dans AsyncStorage pour synchronisation future
+          try {
+            await offlineStorageService.savePendingProfileUpdate({
+              type: 'username',
+              data: { username: username.trim() },
+              userId: user.id,
+            });
+            
+            setOfflineMessage('Modification enregistrée localement, synchronisation en attente de connexion.');
+            setShowOfflineMessage(true);
+            console.log('Modification sauvegardée dans AsyncStorage après erreur réseau - Synchronisation en attente de connexion');
+            setIsEditing(false);
+          } catch (storageError) {
+            console.error('Erreur lors de la sauvegarde dans AsyncStorage:', storageError);
+            Alert.alert('Erreur', 'Impossible de sauvegarder la modification');
+          }
+        } else {
+          // Pour les autres erreurs, afficher un message d'erreur seulement si on est en ligne
+          if (!isOffline) {
+            Alert.alert('Erreur', 'Échec de la mise à jour du nom d\'utilisateur');
+          } else {
+            console.log('Erreur en mode hors-ligne (normal):', error);
+          }
+        }
       }
     } else {
       setIsEditing(false);
@@ -93,10 +164,10 @@ const ProfileScreen: React.FC = () => {
       <View style={styles.header}>
         <Avatar.Text 
           size={80} 
-          label={user?.username.charAt(0).toUpperCase() || 'U'}
+          label={username.charAt(0).toUpperCase() || 'U'}
           style={styles.avatar}
         />
-        <Text style={styles.userName}>{user?.username}</Text>
+        <Text style={styles.userName}>{username}</Text>
         <Text style={styles.userEmail}>{user?.email}</Text>
         
         <View style={styles.levelContainer}>
@@ -132,6 +203,26 @@ const ProfileScreen: React.FC = () => {
           <List.Item
             title="Nom d'utilisateur"
             description={isEditing ? (
+              <View>
+                <TextInput
+                  value={username}
+                  onChangeText={setUsername}
+                  mode="outlined"
+                  style={styles.editInput}
+                  right={
+                    <TextInput.Icon
+                      icon="check"
+                      onPress={handleSaveUsername}
+                    />
+                  }
+                />
+                {isOffline && (
+                  <Text style={styles.offlineIndicator}>
+                    Mode hors-ligne - Modification sauvegardée localement
+                  </Text>
+                )}
+              </View>
+            ) : (
               <TextInput
                 value={username}
                 onChangeText={setUsername}
@@ -141,11 +232,9 @@ const ProfileScreen: React.FC = () => {
                   <TextInput.Icon
                     icon="check"
                     onPress={handleSaveUsername}
-                  />
+              />
                 }
               />
-            ) : (
-              user?.username
             )}
             left={(props) => <List.Icon {...props} icon="account" />}
             right={() => (
@@ -294,7 +383,25 @@ const ProfileScreen: React.FC = () => {
         <Text style={styles.footerSubtext}>
           Améliorez votre orthographe en vous amusant !
         </Text>
+        {pendingItemsCount > 0 && (
+          <Text style={styles.pendingItemsText}>
+            {pendingItemsCount} modification(s) en attente de synchronisation
+          </Text>
+        )}
       </View>
+
+      <Snackbar
+        visible={showOfflineMessage}
+        onDismiss={() => setShowOfflineMessage(false)}
+        duration={4000}
+        style={styles.offlineSnackbar}
+        action={{
+          label: 'OK',
+          onPress: () => setShowOfflineMessage(false),
+        }}
+      >
+        {offlineMessage}
+      </Snackbar>
     </ScrollView>
   );
 };
@@ -414,6 +521,23 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: spacing.xs,
     textAlign: 'center',
+  },
+  offlineIndicator: {
+    ...typography.small,
+    color: colors.warning,
+    marginTop: spacing.xs,
+    fontStyle: 'italic',
+  },
+  pendingItemsText: {
+    ...typography.small,
+    color: colors.info,
+    marginTop: spacing.xs,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  offlineSnackbar: {
+    backgroundColor: colors.warning,
+    marginBottom: spacing.xl,
   },
 });
 

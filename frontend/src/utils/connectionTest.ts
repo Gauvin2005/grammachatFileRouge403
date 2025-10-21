@@ -11,11 +11,11 @@ export const testConnection = async () => {
   // Déterminer l'URL à tester selon la plateforme
   let testUrl: string;
   if (Platform.OS === 'android') {
-    testUrl = 'http://10.8.252.74:3000/api';
+    testUrl = 'http://10.8.252.251:3000/api';
   } else if (Platform.OS === 'ios') {
     testUrl = 'http://localhost:3000/api';
   } else {
-    testUrl = 'http://10.8.252.74:3000/api';
+    testUrl = 'http://10.8.252.251:3000/api';
   }
   
   console.log('URL testée:', testUrl);
@@ -64,7 +64,7 @@ export const testMultipleUrls = async () => {
   console.log('=== Test rapide de plusieurs URLs ===');
   
   const testUrls = [
-    'http://10.8.252.74:3000/api',
+    'http://10.8.252.251:3000/api',
     'http://10.0.2.2:3000/api',
     'http://localhost:3000/api',
     'http://127.0.0.1:3000/api'

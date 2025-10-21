@@ -174,6 +174,13 @@ const authSlice = createSlice({
       // Pour l'instant, on ne fait rien car on n'a pas de liste d'utilisateurs dans authSlice
       // Cette action sera utilisée par d'autres slices
     },
+    updateUserProfileLocally: (state, action: PayloadAction<Partial<User>>) => {
+      // Mettre à jour le profil utilisateur localement (pour le mode hors-ligne)
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+        console.log('Profil utilisateur mis à jour localement:', action.payload);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -268,5 +275,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, updateUserXP, updateUserXPById } = authSlice.actions;
+export const { clearError, updateUserXP, updateUserXPById, updateUserProfileLocally } = authSlice.actions;
 export default authSlice.reducer;

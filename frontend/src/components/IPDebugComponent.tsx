@@ -52,7 +52,7 @@ export const IPDebugComponent: React.FC = () => {
     addResult('Test des IPs spécifiques...');
     
     const testIPs = [
-      '10.8.252.74',
+      '10.8.251.168',
       '10.8.251.148',
       '192.168.1.100',
       '127.0.0.1',

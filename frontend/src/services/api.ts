@@ -41,7 +41,7 @@ class ApiService {
    */
   private getApiBaseUrl(): string {
     // URL fixe pour éviter les tests multiples
-    return 'http://10.8.252.74:3000/api';
+    return 'http://10.8.252.251:3000/api';
   }
 
   private setupInterceptors(): void {
@@ -159,8 +159,23 @@ class ApiService {
   }
 
   async updateProfile(userId: string, userData: Partial<User>): Promise<ApiResponse<{ user: User }>> {
-    const response = await this.api.put(`/users/${userId}`, userData);
-    return response.data;
+    console.log('Mise à jour du profil utilisateur - userId:', userId);
+    console.log('Mise à jour du profil utilisateur - userData:', userData);
+    
+    try {
+      const response = await this.api.put(`/users/${userId}`, userData);
+      console.log('Réponse de mise à jour du profil:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('Erreur lors de la mise à jour du profil:', error);
+      console.error('Détails de l\'erreur:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+      throw error;
+    }
   }
 
   async getLeaderboard(limit?: number): Promise<ApiResponse<{ leaderboard: LeaderboardEntry[] }>> {
