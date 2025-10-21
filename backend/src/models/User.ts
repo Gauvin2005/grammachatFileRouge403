@@ -24,7 +24,7 @@ const UserSchema = new Schema<UserDocument>({
     trim: true,
     minlength: [3, 'Le nom d\'utilisateur doit contenir au moins 3 caractères'],
     maxlength: [20, 'Le nom d\'utilisateur ne peut pas dépasser 20 caractères'],
-    match: [/^[a-zA-Z0-9_]+$/, 'Le nom d\'utilisateur ne peut contenir que des lettres, chiffres et underscores']
+    match: [/^[a-zA-ZÀ-ÿ0-9_]+$/, 'Le nom d\'utilisateur ne peut contenir que des lettres, chiffres et underscores']
   },
   password: {
     type: String,

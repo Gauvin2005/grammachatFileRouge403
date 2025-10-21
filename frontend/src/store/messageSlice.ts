@@ -37,7 +37,7 @@ export const sendMessage = createAsyncThunk(
             }));
             
             // Forcer un refresh des données utilisateurs pour les autres écrans
-            dispatch({ type: 'users/invalidateUsersCache' });
+            // dispatch({ type: 'users/invalidateUsersCache' }); // Cette action n'existe pas
           }
         }
         

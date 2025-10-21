@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken, requireAdmin, requireOwnership } from '../middleware/auth';
+import User from '../models/User';
 import {
   getUsers,
   getUser,
@@ -262,7 +263,6 @@ router.get('/public', async (req, res) => {
     
     // Essayer de récupérer les vrais utilisateurs depuis MongoDB
     try {
-      const User = require('../models/User');
       const users = await User.find({}, { password: 0 }).select('username email role xp level');
       
       if (users && users.length > 0) {
@@ -271,9 +271,12 @@ router.get('/public', async (req, res) => {
           success: true,
           data: users
         });
+      } else {
+        console.log('Aucun utilisateur trouvé en base, utilisation des données mockées');
       }
-    } catch (dbError) {
-      console.log('MongoDB non disponible, utilisation des données mockées');
+    } catch (dbError: any) {
+      console.log('Erreur MongoDB:', dbError.message);
+      console.log('Utilisation des données mockées');
     }
     
     // Fallback vers des données mockées si MongoDB n'est pas disponible
