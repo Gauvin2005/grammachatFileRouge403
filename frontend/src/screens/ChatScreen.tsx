@@ -24,6 +24,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { useIPDetection } from '../hooks/useIPDetection';
 import { sendMessage, fetchMessages, clearError, loadMessagesFromCache } from '../store/messageSlice';
 import { updateUserXP, loadUserProfile } from '../store/authSlice';
 import { updateUserXP as updateUserXPInList } from '../store/userSlice';
@@ -35,6 +36,7 @@ const ChatScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { messages, isLoading, error } = useAppSelector((state) => state.messages);
+  const { ip, isLoading: ipLoading, error: ipError, refreshIP } = useIPDetection();
   const flatListRef = useRef<FlatList>(null);
   const insets = useSafeAreaInsets();
   const { keyboardHeight, isKeyboardVisible } = useKeyboard();
@@ -375,7 +377,28 @@ const ChatScreen: React.FC = () => {
             style={styles.userAvatar}
           />
           <View style={styles.userDetails}>
-            <Text style={styles.userName}>{user?.username}</Text>
+            <View style={styles.userNameRow}>
+              <Text style={styles.userName}>{user?.username}</Text>
+              {/* Indicateur de statut de connexion */}
+              <View style={styles.connectionStatus}>
+                {ipLoading ? (
+                  <ActivityIndicator size="small" color={colors.warning} />
+                ) : ipError ? (
+                  <Ionicons 
+                    name="warning" 
+                    size={16} 
+                    color={colors.error}
+                    onPress={refreshIP}
+                  />
+                ) : ip ? (
+                  <Ionicons 
+                    name="checkmark-circle" 
+                    size={16} 
+                    color={colors.success}
+                  />
+                ) : null}
+              </View>
+            </View>
             <XPProgressBar />
           </View>
         </View>
@@ -498,10 +521,21 @@ const styles = StyleSheet.create({
   userDetails: {
     flex: 1,
   },
+  userNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
+  },
   userName: {
     ...typography.h3,
     color: colors.text,
-    marginBottom: spacing.xs,
+    flex: 1,
+  },
+  connectionStatus: {
+    marginLeft: spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   userStats: {
     ...typography.caption,

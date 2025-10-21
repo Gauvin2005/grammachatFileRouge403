@@ -11,10 +11,11 @@ import {
   PaginationParams 
 } from '../types';
 import { getNetworkConfig, getTestUrls, getNetworkErrorMessage } from '../utils/networkUtils';
+import { getApiUrl, getWorkingIP } from '../utils/ipDetector';
 
 class ApiService {
-  private api: AxiosInstance;
-  private baseURL: string;
+  public api: AxiosInstance;
+  public baseURL: string;
 
   constructor() {
     // Configuration dynamique selon l'environnement
@@ -34,6 +35,31 @@ class ApiService {
     });
 
     this.setupInterceptors();
+    
+    // Initialiser la détection automatique d'IP
+    this.initializeIPDetection();
+  }
+
+  /**
+   * Initialise la détection automatique d'IP
+   */
+  private async initializeIPDetection(): Promise<void> {
+    if (__DEV__) {
+      try {
+        console.log('Initialisation de la détection automatique d\'IP...');
+        const detectedUrl = await getApiUrl();
+        console.log('URL API détectée:', detectedUrl);
+        
+        // Mettre à jour l'URL de base si elle a changé
+        if (detectedUrl !== this.baseURL) {
+          console.log('Mise à jour de l\'URL API:', this.baseURL, '->', detectedUrl);
+          this.baseURL = detectedUrl;
+          this.api.defaults.baseURL = detectedUrl;
+        }
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation de la détection IP:', error);
+      }
+    }
   }
 
   /**
@@ -249,7 +275,29 @@ class ApiService {
     await SecureStore.deleteItemAsync('user_data');
   }
 
-  // Méthode pour déconnecter complètement
+  /**
+   * Force une nouvelle détection d'IP et met à jour l'URL
+   */
+  async refreshIP(): Promise<void> {
+    if (__DEV__) {
+      try {
+        console.log('Forçage d\'une nouvelle détection d\'IP...');
+        const { forceIPDetection } = await import('../utils/ipDetector');
+        const newIP = await forceIPDetection();
+        const newUrl = `http://${newIP}:3000/api`;
+        
+        console.log('Nouvelle URL API:', newUrl);
+        this.baseURL = newUrl;
+        this.api.defaults.baseURL = newUrl;
+      } catch (error) {
+        console.error('Erreur lors du refresh IP:', error);
+      }
+    }
+  }
+
+  /**
+   * Méthode pour déconnecter complètement
+   */
   async logout(): Promise<void> {
     await this.clearAuthToken();
     await this.clearUserData();

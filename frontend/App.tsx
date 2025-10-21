@@ -13,6 +13,7 @@ import { theme } from './src/utils/theme';
 import { initializeAuth } from './src/store/authSlice';
 import { useAppDispatch } from './src/hooks/redux';
 import { KeyboardProvider } from './src/contexts/KeyboardContext';
+import { initializeIPDetection } from './src/utils/ipInitializer';
 // 🔔 NOTIFICATIONS TEMPORAIREMENT DÉSACTIVÉES
 // import notificationService from './src/services/notificationService';
 
@@ -25,6 +26,10 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        // Initialiser la détection automatique d'IP en premier
+        console.log('Initialisation de la détection d\'IP...');
+        await initializeIPDetection();
+        
         // Initialiser l'authentification
         await dispatch(initializeAuth());
         

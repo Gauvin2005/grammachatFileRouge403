@@ -209,10 +209,10 @@ export const NetworkDiagnostic: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Instructions</Text>
         <Text style={styles.instructionText}>
-          1. Assurez-vous que votre serveur backend est démarré{'\n'}
-          2. Votre téléphone et PC doivent être sur le même WiFi{'\n'}
-          3. Si aucun test ne fonctionne, vérifiez votre pare-feu{'\n'}
-          4. L'IP de votre PC est : 10.8.251.148
+          1. S'assurer que le serveur backend est démarré{'\n'}
+          2. Le téléphone et PC doivent être sur le même WiFi{'\n'}
+          3. Si aucun test ne fonctionne, il faut vérifier le pare-feu{'\n'}
+          4. L'IP du PC est : 10.8.252.74
         </Text>
       </View>
     </ScrollView>

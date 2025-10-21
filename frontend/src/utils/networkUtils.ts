@@ -45,12 +45,7 @@ export const getTestUrls = (port: number = 3000): string[] => {
   
   // Ajouter des IPs locales communes (à adapter selon votre réseau)
   const localIPs = [
-    '10.8.252.74',   // IP actuelle de votre machine
-    '10.8.251.148',  // Ancienne IP
-    '192.168.1.100',
-    '192.168.0.100',
-    '192.168.1.1',
-    '192.168.0.1',
+    '10.8.252.74'
   ];
   
   const allUrls = [...baseUrls, ...localIPs];
