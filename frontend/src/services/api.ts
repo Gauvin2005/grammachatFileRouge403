@@ -10,7 +10,7 @@ import {
   LeaderboardEntry,
   PaginationParams 
 } from '../types';
-import { getNetworkErrorMessage } from '../utils/networkUtils';
+import { getNetworkErrorMessage, getTestUrls } from '../utils/networkUtils';
 
 class ApiService {
   public api: AxiosInstance;

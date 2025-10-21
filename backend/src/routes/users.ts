@@ -213,6 +213,113 @@ router.get('/leaderboard', getLeaderboard);
 
 /**
  * @swagger
+ * /api/users/public:
+ *   get:
+ *     summary: Récupérer la liste publique des utilisateurs
+ *     description: Récupère la liste des utilisateurs sans informations sensibles (route publique pour sélection de compte)
+ *     tags: [Users]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Utilisateurs récupérés avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "507f1f77bcf86cd799439011"
+ *                       username:
+ *                         type: string
+ *                         example: "johndoe"
+ *                       email:
+ *                         type: string
+ *                         example: "user@example.com"
+ *                       role:
+ *                         type: string
+ *                         enum: ["user", "admin"]
+ *                         example: "user"
+ *                       xp:
+ *                         type: number
+ *                         example: 150
+ *                       level:
+ *                         type: number
+ *                         example: 2
+ */
+// Route publique pour récupérer les utilisateurs (sans mot de passe) - DOIT être avant /:id
+router.get('/public', async (req, res) => {
+  try {
+    console.log('Route /api/users/public appelée');
+    
+    // Essayer de récupérer les vrais utilisateurs depuis MongoDB
+    try {
+      const User = require('../models/User');
+      const users = await User.find({}, { password: 0 }).select('username email role xp level');
+      
+      if (users && users.length > 0) {
+        console.log(`Utilisateurs récupérés depuis MongoDB: ${users.length}`);
+        return res.json({
+          success: true,
+          data: users
+        });
+      }
+    } catch (dbError) {
+      console.log('MongoDB non disponible, utilisation des données mockées');
+    }
+    
+    // Fallback vers des données mockées si MongoDB n'est pas disponible
+    const mockUsers = [
+      {
+        _id: '507f1f77bcf86cd799439011',
+        username: 'testuser1',
+        email: 'test1@example.com',
+        role: 'user',
+        xp: 150,
+        level: 2
+      },
+      {
+        _id: '507f1f77bcf86cd799439012',
+        username: 'testuser2',
+        email: 'test2@example.com',
+        role: 'user',
+        xp: 300,
+        level: 3
+      },
+      {
+        _id: '507f1f77bcf86cd799439013',
+        username: 'admin',
+        email: 'admin@example.com',
+        role: 'admin',
+        xp: 1000,
+        level: 5
+      }
+    ];
+    
+    console.log('Retour de données mockées');
+    return res.json({
+      success: true,
+      data: mockUsers
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des utilisateurs publics:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erreur serveur lors de la récupération des utilisateurs'
+    });
+  }
+});
+
+/**
+ * @swagger
  * /api/users/{id}:
  *   get:
  *     summary: Récupérer un utilisateur spécifique

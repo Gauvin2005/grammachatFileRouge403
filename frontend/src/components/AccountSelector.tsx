@@ -16,7 +16,7 @@ import {
   IconButton,
 } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { optimizedApi } from '../services/optimizedApi';
+import { apiService } from '../services/api';
 import { colors, spacing, typography } from '../utils/theme';
 
 interface User {
@@ -79,14 +79,37 @@ const AccountSelector: React.FC<AccountSelectorProps> = ({
       setLoading(true);
       setError(null);
       
-      // Utiliser uniquement les comptes par défaut pour éviter l'erreur 401
-      // L'API getUsers nécessite une authentification admin
-      console.log('Utilisation des comptes par défaut pour la sélection');
+      console.log('Chargement des utilisateurs depuis l\'API...');
+      
+      // Essayer de récupérer les vrais utilisateurs depuis l'API publique
+      try {
+        const response = await apiService.api.get('/users/public');
+        if (response.data && response.data.success && Array.isArray(response.data.data)) {
+          console.log('Utilisateurs récupérés depuis l\'API publique:', response.data.data.length);
+          setUsers(response.data.data);
+          return;
+        }
+      } catch (apiError: any) {
+        console.log('Erreur API publique:', apiError.response?.status, apiError.message);
+        
+        // Si erreur de connexion, utiliser les comptes par défaut
+        if (apiError.response?.status >= 500 || !apiError.response) {
+          console.log('Erreur serveur - utilisation des comptes par défaut');
+          setUsers(defaultAccounts);
+          setError('Serveur indisponible - comptes par défaut affichés');
+          return;
+        }
+      }
+      
+      // Fallback vers les comptes par défaut
+      console.log('Utilisation des comptes par défaut');
       setUsers(defaultAccounts);
+      setError('Utilisation des comptes par défaut');
+      
     } catch (error) {
       console.log('Erreur lors du chargement des utilisateurs:', error);
       setUsers(defaultAccounts);
-      setError('Utilisation des comptes par défaut');
+      setError('Erreur de chargement - comptes par défaut');
     } finally {
       setLoading(false);
     }
@@ -107,8 +130,13 @@ const AccountSelector: React.FC<AccountSelectorProps> = ({
   }, [users, searchQuery]);
 
   const handleAccountSelect = (user: User) => {
-    // Ne passer que l'email, sans le mot de passe
+    console.log('Sélection du compte:', user.email, user.username);
+    
+    // Passer l'email et un mot de passe vide (l'utilisateur devra le saisir)
     onAccountSelect(user.email, '');
+    
+    // Optionnel: fermer automatiquement la modale après sélection
+    // onClose();
   };
 
   const renderUserItem = ({ item }: { item: User }) => (
