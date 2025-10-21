@@ -24,7 +24,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { useIPDetection } from '../hooks/useIPDetection';
+import { useIPDetection } from '../hooks/useIPDetectionSimple';
 import { sendMessage, fetchMessages, clearError, loadMessagesFromCache } from '../store/messageSlice';
 import { updateUserXP, loadUserProfile } from '../store/authSlice';
 import { updateUserXP as updateUserXPInList } from '../store/userSlice';

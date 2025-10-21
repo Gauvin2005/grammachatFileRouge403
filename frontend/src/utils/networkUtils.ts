@@ -45,7 +45,12 @@ export const getTestUrls = (port: number = 3000): string[] => {
   
   // Ajouter des IPs locales communes (à adapter selon votre réseau)
   const localIPs = [
-    '10.8.252.74'
+    'http://10.8.252.74',   // IP actuelle
+    'http://10.8.251.148',  // Ancienne IP (compatibilité)
+    'http://192.168.1.100',
+    'http://192.168.0.100',
+    'http://192.168.1.1',
+    'http://192.168.0.1'
   ];
   
   const allUrls = [...baseUrls, ...localIPs];
@@ -60,14 +65,10 @@ export const getNetworkConfig = (): NetworkConfig => {
     const platform = Platform.OS;
     let baseUrl: string;
     
-    if (platform === 'android') {
-      // Pour Android, utiliser l'IP de la machine
-      baseUrl = 'http://10.8.252.74:3000/api';
-    } else if (platform === 'ios') {
-      baseUrl = 'http://localhost:3000/api';
-    } else {
-      baseUrl = 'http://10.8.252.74:3000/api';
-    }
+    // Force l'utilisation de l'IP actuelle pour tous les environnements de dev
+    baseUrl = 'http://10.8.252.74:3000/api';
+    
+    console.log('Configuration réseau:', { platform, baseUrl });
     
     return {
       baseUrl,

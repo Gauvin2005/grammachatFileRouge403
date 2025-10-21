@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { getWorkingIP, getApiUrl, startIPMonitoring } from '../utils/ipDetector';
+import { getWorkingIP, getApiUrl, startIPMonitoring } from '../utils/simpleIPDetector';
 import { apiService } from '../services/api';
 
 interface IPStatus {

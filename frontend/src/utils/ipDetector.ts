@@ -42,8 +42,8 @@ export const detectHostIP = async (): Promise<string | null> => {
  */
 const findWorkingIP = async (): Promise<string | null> => {
   const testIPs = [
-    '10.8.252.74',
-    '10.8.251.148',
+    '10.8.252.74',    // IP actuelle
+    '10.8.251.148',   // Ancienne IP (compatibilité)
     '192.168.1.100',
     '192.168.0.100',
     '192.168.1.1',
@@ -72,7 +72,7 @@ const findWorkingIP = async (): Promise<string | null> => {
 /**
  * Teste si une IP est accessible
  */
-const testIPConnection = async (ip: string): Promise<boolean> => {
+export const testIPConnection = async (ip: string): Promise<boolean> => {
   try {
     const url = `http://${ip}:3000/api/health`;
     const controller = new AbortController();
@@ -121,17 +121,10 @@ const getCachedIP = async (): Promise<string | null> => {
     const cacheData: IPDetectionResult = JSON.parse(cached);
     const now = Date.now();
     
-    // Vérifier si le cache est encore valide
+    // Vérifier si le cache est encore valide (sans tester la connectivité)
     if (now - cacheData.timestamp < IP_CACHE_TTL) {
-      // Tester si l'IP mise en cache fonctionne encore
-      const stillWorking = await testIPConnection(cacheData.ip);
-      if (stillWorking) {
-        console.log(`Utilisation de l'IP en cache: ${cacheData.ip}`);
-        return cacheData.ip;
-      } else {
-        console.log('IP en cache ne fonctionne plus, suppression du cache');
-        await AsyncStorage.removeItem(IP_CACHE_KEY);
-      }
+      console.log(`Utilisation de l'IP en cache: ${cacheData.ip}`);
+      return cacheData.ip;
     } else {
       console.log('Cache IP expiré');
       await AsyncStorage.removeItem(IP_CACHE_KEY);
@@ -199,7 +192,7 @@ export const getApiUrl = async (): Promise<string> => {
 };
 
 /**
- * Vérifie périodiquement si l'IP fonctionne encore
+ * Monitoring simplifié qui ne supprime pas le cache
  */
 export const startIPMonitoring = (intervalMs: number = 30000): () => void => {
   const interval = setInterval(async () => {
@@ -207,10 +200,11 @@ export const startIPMonitoring = (intervalMs: number = 30000): () => void => {
       const cached = await AsyncStorage.getItem(IP_CACHE_KEY);
       if (cached) {
         const cacheData: IPDetectionResult = JSON.parse(cached);
-        const stillWorking = await testIPConnection(cacheData.ip);
+        const now = Date.now();
         
-        if (!stillWorking) {
-          console.log('IP ne fonctionne plus, suppression du cache');
+        // Vérifier seulement si le cache est expiré (pas de test de connectivité)
+        if (now - cacheData.timestamp >= IP_CACHE_TTL) {
+          console.log('Cache IP expiré, suppression automatique');
           await AsyncStorage.removeItem(IP_CACHE_KEY);
         }
       }
