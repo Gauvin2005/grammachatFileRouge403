@@ -147,12 +147,12 @@ class DatabaseTester {
       }
       
       await mongoose.connect(mongoUri, {
-        serverSelectionTimeoutMS: 30000,
-        socketTimeoutMS: 30000,
-        connectTimeoutMS: 30000,
+        serverSelectionTimeoutMS: 60000,
+        socketTimeoutMS: 60000,
+        connectTimeoutMS: 60000,
         maxPoolSize: 1,
         minPoolSize: 1,
-        bufferCommands: true
+        bufferCommands: false
       });
       
       if (mongoose.connection.readyState !== 1) {
@@ -594,11 +594,21 @@ class DatabaseTester {
   }
 
   async cleanup(): Promise<void> {
-    if (this.mongoClient) {
-      await this.mongoClient.close();
+    try {
+      if (this.mongoClient) {
+        await this.mongoClient.close();
+        this.mongoClient = null;
+      }
+    } catch (error) {
+      console.log('Error closing MongoDB client:', error);
     }
-    if (mongoose.connection.readyState === 1) {
-      await mongoose.disconnect();
+    
+    try {
+      if (mongoose.connection.readyState === 1) {
+        await mongoose.disconnect();
+      }
+    } catch (error) {
+      console.log('Error disconnecting Mongoose:', error);
     }
   }
 }

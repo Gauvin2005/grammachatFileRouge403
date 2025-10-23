@@ -61,13 +61,25 @@ class TestRunner {
     console.log('\nExécution de la suite de tests complète...');
     
     return new Promise((resolve, reject) => {
-          const testProcess = spawn('npx', ['ts-node', 'comprehensiveTestRunner.ts'], {
-            cwd: __dirname,
-            stdio: 'inherit',
-            env: { ...process.env, MONGODB_URI: 'mongodb://localhost:27017' }
-          });
+      const testProcess = spawn('npx', ['ts-node', 'comprehensiveTestRunner.ts'], {
+        cwd: __dirname,
+        stdio: 'inherit',
+        env: { 
+          ...process.env, 
+          MONGODB_URI: 'mongodb://localhost:27017',
+          REDIS_URL: 'redis://localhost:6379',
+          NODE_ENV: 'test'
+        }
+      });
+
+      // Timeout après 10 minutes
+      const timeout = setTimeout(() => {
+        testProcess.kill('SIGTERM');
+        reject(new Error('Tests timeout after 10 minutes'));
+      }, 600000);
 
       testProcess.on('close', (code) => {
+        clearTimeout(timeout);
         if (code === 0) {
           console.log('\n[SUCCESS] Tous les tests sont passés avec succès!');
           resolve();
@@ -78,6 +90,7 @@ class TestRunner {
       });
 
       testProcess.on('error', (error) => {
+        clearTimeout(timeout);
         console.error('[ERROR] Erreur lors de l\'exécution des tests:', error);
         reject(error);
       });

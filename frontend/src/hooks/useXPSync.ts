@@ -8,8 +8,8 @@ import { fetchUsers, fetchLeaderboard } from '../store/userSlice';
  */
 export const useXPSync = () => {
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
-  const { users, leaderboard } = useAppSelector((state) => state.users);
+  const { user } = useAppSelector((state: any) => state.auth);
+  const { users, leaderboard } = useAppSelector((state: any) => state.users);
 
   useEffect(() => {
     // Charger les utilisateurs si la liste est vide

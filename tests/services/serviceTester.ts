@@ -112,7 +112,22 @@ class ServiceTester {
     });
 
     // Skip les autres tests Redis si la connexion échoue
-    if (!redisService.isRedisConnected()) {
+    try {
+      const isConnected = await redisService.isRedisConnected();
+      if (!isConnected) {
+        await this.runTest('User Session Cache', async () => {
+          throw new Error('Skipped - Redis not connected');
+        });
+        await this.runTest('Messages Cache', async () => {
+          throw new Error('Skipped - Redis not connected');
+        });
+        await this.runTest('Leaderboard Cache', async () => {
+          throw new Error('Skipped - Redis not connected');
+        });
+        return;
+      }
+    } catch (error) {
+      console.log('Redis connection check failed, skipping Redis tests');
       await this.runTest('User Session Cache', async () => {
         throw new Error('Skipped - Redis not connected');
       });

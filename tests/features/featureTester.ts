@@ -52,9 +52,9 @@ class FeatureTester {
       }
       
       await mongoose.connect('mongodb://localhost:27017/grammachat', {
-        serverSelectionTimeoutMS: 30000,
-        socketTimeoutMS: 30000,
-        connectTimeoutMS: 30000,
+        serverSelectionTimeoutMS: 60000,
+        socketTimeoutMS: 60000,
+        connectTimeoutMS: 60000,
         maxPoolSize: 1,
         minPoolSize: 1,
         bufferCommands: false
