@@ -17,7 +17,7 @@ function runTests() {
   return new Promise((resolve, reject) => {
     console.log('Execution des tests...\n');
     
-    const testProcess = spawn('npx', ['ts-node', 'runAllTests.ts'], {
+    const testProcess = spawn('npx', ['ts-node', '--project', './tsconfig.json', 'runAllTests.ts'], {
       cwd: __dirname,
       env: { ...process.env },
       stdio: 'inherit'
