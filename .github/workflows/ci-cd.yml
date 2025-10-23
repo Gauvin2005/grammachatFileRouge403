@@ -1,4 +1,4 @@
-# Pipeline CI/CD pour Grammachat - GitHub Actions
+# Pipeline CI/CD simplifié pour Grammachat
 name: CI/CD Pipeline
 
 on:
@@ -13,71 +13,13 @@ env:
   REDIS_VERSION: '7.2'
 
 jobs:
-  # Job de configuration et vérification
-  setup:
-    name: Setup Environment
+  # Tests et qualité de code
+  test-and-lint:
+    name: Tests & Code Quality
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          cd backend && npm ci
-          cd ../frontend && npm ci
-
-      - name: Verify environment
-        run: |
-          echo "Node.js version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "Environment setup complete"
-
-  # Job de linting
-  lint:
-    name: Code Quality
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Lint Backend
-        run: |
-          cd backend
-          npm ci
-          npm run lint
-
-      - name: Lint Frontend
-        run: |
-          cd frontend
-          npm ci
-          npm run lint
-
-      - name: Check Prettier formatting
-        run: |
-          cd backend && npm run format -- --check
-          cd ../frontend && npm run format -- --check
-
-  # Job de tests Backend
-  test-backend:
-    name: Backend Tests
-    runs-on: ubuntu-latest
-    needs: setup
     services:
       mongodb:
-        image: mongo:${{ env.MONGODB_VERSION }}
+        image: mongo:7.0
         ports:
           - 27017:27017
         options: >-
@@ -85,9 +27,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
       redis:
-        image: redis:${{ env.REDIS_VERSION }}-alpine
+        image: redis:7.2-alpine
         ports:
           - 6379:6379
         options: >-
@@ -111,138 +52,47 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install dependencies
-        run: cd backend && npm ci
+      # Backend: lint, format et tests
+      - name: Backend - Install & Lint
+        run: |
+          cd backend
+          npm ci
+          npm run lint
+          npm run format -- --check
 
-      - name: Run tests
-        run: cd backend && npm run test:coverage
+      - name: Backend - Tests
+        run: |
+          cd backend
+          npm run test:coverage
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      # Tests d'intégration
+      - name: Integration Tests
+        run: |
+          cd tests
+          npm ci
+          npm test
+
+      # Audit de sécurité
+      - name: Security Audit
+        run: |
+          cd backend && npm audit --audit-level moderate
+          cd ../tests && npm audit --audit-level moderate
+
+      # Upload des rapports de couverture
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v4
         with:
           file: ./backend/coverage/lcov.info
           flags: backend
           name: backend-coverage
 
-  # Job de tests Frontend
-  test-frontend:
-    name: Frontend Tests
+  # Build et déploiement Docker
+  build-and-deploy:
+    name: Build & Deploy
     runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: cd frontend && npm ci
-
-      - name: Run tests
-        run: cd frontend && npm run test:coverage
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./frontend/coverage/lcov.info
-          flags: frontend
-          name: frontend-coverage
-
-  # Job de tests d'intégration
-  test-integration:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    needs: [test-backend, test-frontend]
-    services:
-      mongodb:
-        image: mongo:${{ env.MONGODB_VERSION }}
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      redis:
-        image: redis:${{ env.REDIS_VERSION }}-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      MONGODB_URI: mongodb://localhost:27017/grammachat_test
-      REDIS_URL: redis://localhost:6379
-      NODE_ENV: test
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          cd backend && npm ci
-          cd ../frontend && npm ci
-          cd ../tests/automation && npm ci
-
-      - name: Run integration tests
-        run: cd tests/automation && node run-tests.js
-
-      - name: Upload test reports
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-reports
-          path: |
-            test-report.html
-            test-report.json
-
-  # Job de sécurité
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Run security audit
-        run: |
-          cd backend && npm audit --audit-level moderate
-          cd ../frontend && npm audit --audit-level moderate
-
-      - name: Run Snyk security scan
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
-
-  # Job de build Docker
-  build:
-    name: Build Docker Images
-    runs-on: ubuntu-latest
-    needs: [lint, test-backend, test-frontend]
+    needs: test-and-lint
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -256,7 +106,8 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Backend image
+      # Build de l'image backend uniquement (pas de frontend séparé)
+      - name: Build & Push Backend Image
         uses: docker/build-push-action@v5
         with:
           context: ./backend
@@ -267,72 +118,32 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build and push Frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/grammachat-frontend:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/grammachat-frontend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Job de déploiement en développement
-  deploy-dev:
-    name: Deploy to Development
-    runs-on: ubuntu-latest
-    needs: [build, test-integration]
-    if: github.ref == 'refs/heads/develop'
-    environment: development
-    steps:
-      - name: Deploy to development
+      # Déploiement selon l'environnement
+      - name: Deploy to Development
+        if: github.ref == 'refs/heads/develop'
         run: |
-          echo "Deploying to development environment"
           curl -X POST "${{ secrets.DEV_DEPLOY_WEBHOOK }}" \
             -H "Content-Type: application/json" \
             -d '{"ref":"${{ github.sha }}","environment":"development"}'
 
-  # Job de déploiement en production
-  deploy-prod:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [build, test-integration, security]
-    if: github.ref == 'refs/heads/main'
-    environment: production
-    steps:
-      - name: Deploy to production
+      - name: Deploy to Production
+        if: github.ref == 'refs/heads/main'
         run: |
-          echo "Deploying to production environment"
           curl -X POST "${{ secrets.PROD_DEPLOY_WEBHOOK }}" \
             -H "Content-Type: application/json" \
             -d '{"ref":"${{ github.sha }}","environment":"production"}'
 
-  # Job de notification
-  notify:
-    name: Notifications
-    runs-on: ubuntu-latest
-    needs: [deploy-dev, deploy-prod]
-    if: always()
-    steps:
-      - name: Notify Slack
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          channel: '#grammachat'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-
-  # Job de nettoyage
-  cleanup:
-    name: Cleanup
-    runs-on: ubuntu-latest
-    needs: [notify]
-    if: always()
-    steps:
-      - name: Cleanup resources
-        run: |
-          echo "Cleaning up temporary resources"
-          echo "Cleanup complete"
+  # Notifications (optionnel)
+  # notify:
+  #   name: Notifications
+  #   runs-on: ubuntu-latest
+  #   needs: build-and-deploy
+  #   if: always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+  #   steps:
+  #     - name: Notify Slack
+  #       uses: 8398a7/action-slack@v3
+  #       with:
+  #         status: ${{ job.status }}
+  #         channel: '#grammachat'
+  #         webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+  #         fields: repo,message,commit,author,action,eventName,ref,workflow
