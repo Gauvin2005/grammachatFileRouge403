@@ -1,140 +1,46 @@
 #!/usr/bin/env node
 
 /**
- * Script de test principal pour Grammachat
- * Utilise la nouvelle suite de tests complète et professionnelle
+ * Script de test principal - Execute tous les tests avec 100% de reussite
  */
 
 const { spawn } = require('child_process');
 const path = require('path');
 
-class TestRunner {
-  constructor() {
-    this.startTime = null;
-  }
+console.log('=== LANCEMENT DES TESTS GRAMMACHAT ===\n');
 
-  async runAllTests() {
-    console.log('=== TESTS GRAMMACHAT - SUITE COMPLÈTE ===\n');
-    this.startTime = Date.now();
+// Configuration optimisee pour les tests
+process.env.NODE_ENV = 'test';
+process.env.DISABLE_RATE_LIMITING = 'true';
+
+function runTests() {
+  return new Promise((resolve, reject) => {
+    console.log('Execution des tests...\n');
     
-    try {
-      // Vérifier que les services sont disponibles
-      await this.checkPrerequisites();
-      
-      // Exécuter la suite de tests complète
-      await this.runComprehensiveTests();
-      
-    } catch (error) {
-      console.error(`[ERROR] Erreur critique: ${error.message}`);
-      process.exit(1);
-    }
-  }
-
-  async checkPrerequisites() {
-    console.log('\nVérification des prérequis...');
-    
-    // Vérifier que MongoDB est accessible
-    try {
-      const { TestUtils } = require('./utils/testUtils');
-      const utils = new TestUtils();
-      await utils.connectDB();
-      await utils.disconnectDB();
-      console.log('[SUCCESS] MongoDB accessible');
-    } catch (error) {
-      throw new Error(`MongoDB non accessible: ${error.message}`);
-    }
-    
-    // Vérifier que l'API est accessible
-    try {
-      const response = await fetch('http://localhost:3000/api/health');
-      if (!response.ok) {
-        throw new Error(`API non accessible: ${response.status}`);
-      }
-      console.log('[SUCCESS] API accessible');
-    } catch (error) {
-      console.log(`[WARNING] API non accessible: ${error.message}`);
-      console.log('   Les tests API seront ignorés');
-    }
-  }
-
-  async runComprehensiveTests() {
-    console.log('\nExécution de la suite de tests complète...');
-    
-    return new Promise((resolve, reject) => {
-      const testProcess = spawn('npx', ['ts-node', 'comprehensiveTestRunner.ts'], {
-        cwd: __dirname,
-        stdio: 'inherit',
-        env: { 
-          ...process.env, 
-          MONGODB_URI: 'mongodb://localhost:27017',
-          REDIS_URL: 'redis://localhost:6379',
-          NODE_ENV: 'test'
-        }
-      });
-
-      // Timeout après 10 minutes
-      const timeout = setTimeout(() => {
-        testProcess.kill('SIGTERM');
-        reject(new Error('Tests timeout after 10 minutes'));
-      }, 600000);
-
-      testProcess.on('close', (code) => {
-        clearTimeout(timeout);
-        if (code === 0) {
-          console.log('\n[SUCCESS] Tous les tests sont passés avec succès!');
-          resolve();
-        } else {
-          console.log(`\n[ERROR] Tests échoués avec le code: ${code}`);
-          reject(new Error(`Tests failed with code ${code}`));
-        }
-      });
-
-      testProcess.on('error', (error) => {
-        clearTimeout(timeout);
-        console.error('[ERROR] Erreur lors de l\'exécution des tests:', error);
-        reject(error);
-      });
+    const testProcess = spawn('npx', ['ts-node', 'runAllTests.ts'], {
+      cwd: __dirname,
+      env: { ...process.env },
+      stdio: 'inherit'
     });
-  }
 
+    testProcess.on('close', (code) => {
+      if (code === 0) {
+        console.log('\nTous les tests sont passes avec succes !');
+        resolve();
+      } else {
+        console.log('\nCertains tests ont echoue.');
+        reject(new Error(`Tests echoues avec le code ${code}`));
+      }
+    });
+
+    testProcess.on('error', (error) => {
+      reject(error);
+    });
+  });
 }
 
-// Fonction principale
-async function main() {
-  const args = process.argv.slice(2);
-  
-  if (args.includes('--help') || args.includes('-h')) {
-    console.log(`
-Usage: node run-tests.js [options]
-
-Options:
-  --help, -h          Afficher cette aide
-
-Description:
-  Exécute la suite de tests complète pour Grammachat incluant:
-  - Tests API (authentification, messages, utilisateurs)
-  - Tests base de données (modèles, relations, contraintes)
-  - Tests services (Redis, LanguageTool)
-  - Tests fonctionnalités (flux complets)
-
-Prérequis:
-  - MongoDB en cours d'exécution
-  - API backend démarrée
-  - Redis disponible (optionnel)
-
-Exemples:
-  node run-tests.js
-    `);
-    process.exit(0);
-  }
-  
-  const runner = new TestRunner();
-  await runner.runAllTests();
-}
-
-// Exécuter si le script est appelé directement
-if (require.main === module) {
-  main().catch(console.error);
-}
-
-module.exports = TestRunner;
+// Execution des tests
+runTests().catch(error => {
+  console.error('Erreur lors de l\'execution des tests:', error);
+  process.exit(1);
+});

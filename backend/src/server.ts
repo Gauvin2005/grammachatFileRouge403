@@ -37,7 +37,7 @@ app.use(compression());
 
 // Rate limiting avec Redis (remplace express-rate-limit)
 // Désactivé automatiquement si Redis n'est pas disponible ou en mode test
-const isTestMode = process.env.NODE_ENV === 'test' || 
+const isTestMode = process.env.NODE_ENV === 'test' ||
                    process.env.DISABLE_RATE_LIMITING === 'true' ||
                    process.argv.includes('--test') ||
                    process.argv.includes('--no-rate-limit');
@@ -52,14 +52,14 @@ if (!isTestMode) {
 const corsOptions = {
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000', 'http://localhost:19006'],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
 
 // Middleware de parsing avec gestion des corps vides
-app.use(express.json({ 
+app.use(express.json({
   limit: '10mb',
-  strict: false
+  strict: false,
 }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -118,7 +118,7 @@ app.get('/api/health', (req, res) => {
     message: 'API Grammachat fonctionnelle',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
-    version: '1.0.0'
+    version: '1.0.0',
   });
 });
 
@@ -134,28 +134,35 @@ app.use('/api/users', userRoutes);
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route non trouvée'
+    message: 'Route non trouvée',
   });
 });
 
 // Middleware de gestion d'erreurs global
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Erreur globale:', err);
-  
+
   res.status(err.status || 500).json({
     success: false,
     message: process.env.NODE_ENV === 'development' ? err.message : 'Erreur serveur interne',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
 
 // Connexion à MongoDB
-const connectDB = async (): Promise<void> => {
+const connectDB = async(): Promise<void> => {
   try {
     // Utiliser l'URI MongoDB depuis les variables d'environnement
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat';
-    
-    await mongoose.connect(mongoURI);
+
+    await mongoose.connect(mongoURI, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 10000,
+      maxPoolSize: 10,
+      minPoolSize: 1,
+      bufferCommands: false,
+    });
     console.log('Connexion à MongoDB réussie');
   } catch (error) {
     console.error('Erreur de connexion à MongoDB:', error);
@@ -166,7 +173,7 @@ const connectDB = async (): Promise<void> => {
 };
 
 // Connexion à Redis
-const connectRedis = async (): Promise<void> => {
+const connectRedis = async(): Promise<void> => {
   try {
     await redisService.connect();
     console.log('Connexion à Redis réussie');
@@ -177,12 +184,12 @@ const connectRedis = async (): Promise<void> => {
 };
 
 // Démarrage du serveur
-const startServer = async (): Promise<void> => {
+const startServer = async(): Promise<void> => {
   try {
     // Essayer de se connecter à MongoDB et Redis, mais continuer même en cas d'échec
     await connectDB().catch(err => console.log('MongoDB non disponible, mode test activé'));
     await connectRedis().catch(err => console.log('Redis non disponible, mode dégradé'));
-    
+
     app.listen(PORT, () => {
       console.log(`Serveur Grammachat démarré sur le port ${PORT}`);
       console.log(`Environnement: ${process.env.NODE_ENV}`);
@@ -201,7 +208,7 @@ const startServer = async (): Promise<void> => {
 };
 
 // Gestion des signaux de fermeture
-process.on('SIGTERM', async () => {
+process.on('SIGTERM', async() => {
   console.log('Signal SIGTERM reçu, fermeture du serveur...');
   try {
     await mongoose.connection.close();
@@ -214,7 +221,7 @@ process.on('SIGTERM', async () => {
   }
 });
 
-process.on('SIGINT', async () => {
+process.on('SIGINT', async() => {
   console.log('Signal SIGINT reçu, fermeture du serveur...');
   try {
     await mongoose.connection.close();

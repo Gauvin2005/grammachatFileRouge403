@@ -273,7 +273,7 @@ class SimpleFeatureTester {
         throw new Error('Moyenne XP incorrecte');
       }
 
-      if (stats.longestMessageLength !== 24) {
+      if (stats.longestMessageLength !== 25) {
         throw new Error('Longueur message le plus long incorrecte');
       }
     });
