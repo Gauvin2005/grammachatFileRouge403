@@ -137,14 +137,17 @@ jobs:
   notify:
     name: Notifications
     runs-on: ubuntu-latest
-    needs: build-and-deploy
+    needs: [test-and-lint, build-and-deploy]
     if: always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     steps:
       - name: Notify Slack
         uses: 8398a7/action-slack@v3
         with:
-          status: ${{ job.status }}
+          status: ${{ needs.test-and-lint.result == 'success' && needs.build-and-deploy.result == 'success' && 'success' || 'failure' }}
           channel: '#Gavin'
           fields: repo,message,commit,author,action,eventName,ref,workflow
+          text: |
+            Tests: ${{ needs.test-and-lint.result }}
+            Build & Deploy: ${{ needs.build-and-deploy.result }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
