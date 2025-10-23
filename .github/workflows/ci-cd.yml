@@ -64,29 +64,15 @@ jobs:
 
       - name: Backend - Tests
         run: |
-          cd backend
-          npm run test:coverage
-
-      # Tests d'intégration
-      - name: Integration Tests
-        run: |
           cd tests
           npm ci
-          node ci-test-runner.js
+          node run-tests.js
 
       # Audit de sécurité
       - name: Security Audit
         run: |
           cd backend && npm audit --audit-level moderate
           cd ../tests && npm audit --audit-level moderate
-
-      # Upload des rapports de couverture
-      - name: Upload Coverage
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./backend/coverage/lcov.info
-          flags: backend
-          name: backend-coverage
 
   # Build et déploiement Docker
   build-and-deploy:
