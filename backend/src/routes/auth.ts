@@ -7,7 +7,7 @@ import {
   createAdmin,
   validateRegister,
   validateLogin,
-  validateCreateAdmin
+  validateCreateAdmin,
 } from '../controllers/authController';
 
 const router = Router();

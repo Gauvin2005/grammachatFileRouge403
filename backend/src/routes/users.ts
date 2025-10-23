@@ -8,7 +8,7 @@ import {
   deleteUser,
   getLeaderboard,
   validatePagination,
-  createUser
+  createUser,
 } from '../controllers/userController';
 
 const router = Router();
@@ -257,19 +257,19 @@ router.get('/leaderboard', getLeaderboard);
  *                         example: 2
  */
 // Route publique pour récupérer les utilisateurs (sans mot de passe) - DOIT être avant /:id
-router.get('/public', async (req, res) => {
+router.get('/public', async(req, res) => {
   try {
     console.log('Route /api/users/public appelée');
-    
+
     // Essayer de récupérer les vrais utilisateurs depuis MongoDB
     try {
       const users = await User.find({}, { password: 0 }).select('username email role xp level');
-      
+
       if (users && users.length > 0) {
         console.log(`Utilisateurs récupérés depuis MongoDB: ${users.length}`);
         return res.json({
           success: true,
-          data: users
+          data: users,
         });
       } else {
         console.log('Aucun utilisateur trouvé en base, utilisation des données mockées');
@@ -278,7 +278,7 @@ router.get('/public', async (req, res) => {
       console.log('Erreur MongoDB:', dbError.message);
       console.log('Utilisation des données mockées');
     }
-    
+
     // Fallback vers des données mockées si MongoDB n'est pas disponible
     const mockUsers = [
       {
@@ -287,7 +287,7 @@ router.get('/public', async (req, res) => {
         email: 'test1@example.com',
         role: 'user',
         xp: 150,
-        level: 2
+        level: 2,
       },
       {
         _id: '507f1f77bcf86cd799439012',
@@ -295,7 +295,7 @@ router.get('/public', async (req, res) => {
         email: 'test2@example.com',
         role: 'user',
         xp: 300,
-        level: 3
+        level: 3,
       },
       {
         _id: '507f1f77bcf86cd799439013',
@@ -303,20 +303,20 @@ router.get('/public', async (req, res) => {
         email: 'admin@example.com',
         role: 'admin',
         xp: 1000,
-        level: 5
-      }
+        level: 5,
+      },
     ];
-    
+
     console.log('Retour de données mockées');
     return res.json({
       success: true,
-      data: mockUsers
+      data: mockUsers,
     });
   } catch (error) {
     console.error('Erreur lors de la récupération des utilisateurs publics:', error);
     return res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la récupération des utilisateurs'
+      message: 'Erreur serveur lors de la récupération des utilisateurs',
     });
   }
 });

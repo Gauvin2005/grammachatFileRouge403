@@ -3,50 +3,56 @@ import { Message as IMessage, LanguageToolError } from '../types';
 
 export interface MessageDocument extends Omit<IMessage, '_id'>, Document {}
 
-const LanguageToolErrorSchema = new Schema({
-  message: String,
-  shortMessage: String,
-  replacements: [Schema.Types.Mixed], // Permet des objets complexes
-  offset: Number,
-  length: Number,
-  context: Schema.Types.Mixed, // Permet des objets complexes
-  sentence: String,
-  type: {
-    typeName: String
+const LanguageToolErrorSchema = new Schema(
+  {
+    message: String,
+    shortMessage: String,
+    replacements: [Schema.Types.Mixed], // Permet des objets complexes
+    offset: Number,
+    length: Number,
+    context: Schema.Types.Mixed, // Permet des objets complexes
+    sentence: String,
+    type: {
+      typeName: String,
+    },
+    rule: {
+      id: String,
+      description: String,
+      issueType: String,
+    },
   },
-  rule: {
-    id: String,
-    description: String,
-    issueType: String
-  }
-}, { _id: false });
+  { _id: false },
+);
 
-const MessageSchema = new Schema<MessageDocument>({
-  senderId: {
-    type: String,
-    ref: 'User',
-    required: [true, 'ID de l\'expéditeur requis']
+const MessageSchema = new Schema<MessageDocument>(
+  {
+    senderId: {
+      type: String,
+      ref: 'User',
+      required: [true, 'ID de l\'expéditeur requis'],
+    },
+    content: {
+      type: String,
+      required: [true, 'Contenu du message requis'],
+      trim: true,
+      minlength: [1, 'Le message ne peut pas être vide'],
+      maxlength: [1000, 'Le message ne peut pas dépasser 1000 caractères'],
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now,
+    },
+    xpEarned: {
+      type: Number,
+      default: 0,
+      min: [0, 'XP gagné ne peut pas être négatif'],
+    },
+    errorsFound: [LanguageToolErrorSchema],
   },
-  content: {
-    type: String,
-    required: [true, 'Contenu du message requis'],
-    trim: true,
-    minlength: [1, 'Le message ne peut pas être vide'],
-    maxlength: [1000, 'Le message ne peut pas dépasser 1000 caractères']
+  {
+    timestamps: true,
   },
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  xpEarned: {
-    type: Number,
-    default: 0,
-    min: [0, 'XP gagné ne peut pas être négatif']
-  },
-  errorsFound: [LanguageToolErrorSchema]
-}, {
-  timestamps: true
-});
+);
 
 // Index pour optimiser les requêtes
 MessageSchema.index({ senderId: 1, timestamp: -1 });

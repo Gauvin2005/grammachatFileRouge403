@@ -7,7 +7,7 @@ import { ApiResponse, RegisterRequest, AuthRequest } from '../types';
 /**
  * Inscription d'un nouvel utilisateur (rôle 'user' par défaut)
  */
-export const register = async (req: Request, res: Response): Promise<void> => {
+export const register = async(req: Request, res: Response): Promise<void> => {
   try {
     // Validation des erreurs
     const errors = validationResult(req);
@@ -15,7 +15,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({
         success: false,
         message: 'Données invalides',
-        error: errors.array()[0].msg
+        error: errors.array()[0].msg,
       });
       return;
     }
@@ -27,13 +27,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
+      $or: [{ email }, { username }],
     });
 
     if (existingUser) {
       res.status(409).json({
         success: false,
-        message: existingUser.email === email ? 'Email déjà utilisé' : 'Nom d\'utilisateur déjà utilisé'
+        message:
+          existingUser.email === email ? 'Email déjà utilisé' : 'Nom d\'utilisateur déjà utilisé',
       });
       return;
     }
@@ -45,7 +46,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       username,
       role: userRole,
       xp: 0,
-      level: 1
+      level: 1,
     });
 
     await user.save();
@@ -63,10 +64,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
           username: user.username,
           role: user.role,
           xp: user.xp,
-          level: user.level
+          level: user.level,
         },
-        token
-      }
+        token,
+      },
     };
 
     res.status(201).json(response);
@@ -75,7 +76,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de l\'inscription',
-      error: error instanceof Error ? error.message : 'Erreur inconnue'
+      error: error instanceof Error ? error.message : 'Erreur inconnue',
     });
   }
 };
@@ -83,7 +84,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 /**
  * Connexion d'un utilisateur
  */
-export const login = async (req: Request, res: Response): Promise<void> => {
+export const login = async(req: Request, res: Response): Promise<void> => {
   try {
     // Validation des erreurs
     const errors = validationResult(req);
@@ -91,7 +92,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({
         success: false,
         message: 'Données invalides',
-        error: errors.array()[0].msg
+        error: errors.array()[0].msg,
       });
       return;
     }
@@ -103,7 +104,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (!user) {
       res.status(401).json({
         success: false,
-        message: 'Email ou mot de passe incorrect'
+        message: 'Email ou mot de passe incorrect',
       });
       return;
     }
@@ -113,7 +114,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (!isPasswordValid) {
       res.status(401).json({
         success: false,
-        message: 'Email ou mot de passe incorrect'
+        message: 'Email ou mot de passe incorrect',
       });
       return;
     }
@@ -131,10 +132,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
           username: user.username,
           role: user.role,
           xp: user.xp,
-          level: user.level
+          level: user.level,
         },
-        token
-      }
+        token,
+      },
     };
 
     res.json(response);
@@ -142,7 +143,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     console.error('Erreur lors de la connexion:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la connexion'
+      message: 'Erreur serveur lors de la connexion',
     });
   }
 };
@@ -150,7 +151,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 /**
  * Obtenir le profil de l'utilisateur connecté
  */
-export const getProfile = async (req: Request, res: Response): Promise<void> => {
+export const getProfile = async(req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user!;
 
@@ -166,9 +167,9 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
           xp: user.xp,
           level: user.level,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt
-        }
-      }
+          updatedAt: user.updatedAt,
+        },
+      },
     };
 
     res.json(response);
@@ -176,7 +177,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
     console.error('Erreur lors de la récupération du profil:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la récupération du profil'
+      message: 'Erreur serveur lors de la récupération du profil',
     });
   }
 };
@@ -185,10 +186,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
  * Validation pour l'inscription
  */
 export const validateRegister = [
-  body('email')
-    .isEmail()
-    .withMessage('Email invalide')
-    .normalizeEmail(),
+  body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
   body('password')
     .isLength({ min: 6 })
     .withMessage('Le mot de passe doit contenir au moins 6 caractères'),
@@ -196,13 +194,13 @@ export const validateRegister = [
     .isLength({ min: 3, max: 20 })
     .withMessage('Le nom d\'utilisateur doit contenir entre 3 et 20 caractères')
     .matches(/^[a-zA-Z0-9_]+$/)
-    .withMessage('Le nom d\'utilisateur ne peut contenir que des lettres, chiffres et underscores')
+    .withMessage('Le nom d\'utilisateur ne peut contenir que des lettres, chiffres et underscores'),
 ];
 
 /**
  * Création d'un compte administrateur (réservé aux admins)
  */
-export const createAdmin = async (req: Request, res: Response): Promise<void> => {
+export const createAdmin = async(req: Request, res: Response): Promise<void> => {
   try {
     // Validation des erreurs
     const errors = validationResult(req);
@@ -210,7 +208,7 @@ export const createAdmin = async (req: Request, res: Response): Promise<void> =>
       res.status(400).json({
         success: false,
         message: 'Données invalides',
-        error: errors.array()[0].msg
+        error: errors.array()[0].msg,
       });
       return;
     }
@@ -219,13 +217,14 @@ export const createAdmin = async (req: Request, res: Response): Promise<void> =>
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
+      $or: [{ email }, { username }],
     });
 
     if (existingUser) {
       res.status(409).json({
         success: false,
-        message: existingUser.email === email ? 'Email déjà utilisé' : 'Nom d\'utilisateur déjà utilisé'
+        message:
+          existingUser.email === email ? 'Email déjà utilisé' : 'Nom d\'utilisateur déjà utilisé',
       });
       return;
     }
@@ -237,7 +236,7 @@ export const createAdmin = async (req: Request, res: Response): Promise<void> =>
       username,
       role: 'admin',
       xp: 0,
-      level: 1
+      level: 1,
     });
 
     await admin.save();
@@ -252,9 +251,9 @@ export const createAdmin = async (req: Request, res: Response): Promise<void> =>
           username: admin.username,
           role: admin.role,
           xp: admin.xp,
-          level: admin.level
-        }
-      }
+          level: admin.level,
+        },
+      },
     };
 
     res.status(201).json(response);
@@ -262,7 +261,7 @@ export const createAdmin = async (req: Request, res: Response): Promise<void> =>
     console.error('Erreur lors de la création de l\'administrateur:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la création de l\'administrateur'
+      message: 'Erreur serveur lors de la création de l\'administrateur',
     });
   }
 };
@@ -271,23 +270,15 @@ export const createAdmin = async (req: Request, res: Response): Promise<void> =>
  * Validation pour la connexion
  */
 export const validateLogin = [
-  body('email')
-    .isEmail()
-    .withMessage('Email invalide')
-    .normalizeEmail(),
-  body('password')
-    .notEmpty()
-    .withMessage('Mot de passe requis')
+  body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
+  body('password').notEmpty().withMessage('Mot de passe requis'),
 ];
 
 /**
  * Validation pour la création d'admin
  */
 export const validateCreateAdmin = [
-  body('email')
-    .isEmail()
-    .withMessage('Email invalide')
-    .normalizeEmail(),
+  body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
   body('password')
     .isLength({ min: 6 })
     .withMessage('Le mot de passe doit contenir au moins 6 caractères'),
@@ -295,5 +286,5 @@ export const validateCreateAdmin = [
     .isLength({ min: 3, max: 20 })
     .withMessage('Le nom d\'utilisateur doit contenir entre 3 et 20 caractères')
     .matches(/^[a-zA-Z0-9_]+$/)
-    .withMessage('Le nom d\'utilisateur ne peut contenir que des lettres, chiffres et underscores')
+    .withMessage('Le nom d\'utilisateur ne peut contenir que des lettres, chiffres et underscores'),
 ];

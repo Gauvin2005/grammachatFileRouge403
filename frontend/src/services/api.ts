@@ -41,7 +41,7 @@ class ApiService {
    */
   private getApiBaseUrl(): string {
     // URL fixe pour éviter les tests multiples
-    return 'http://10.8.252.251:3000/api';
+    return 'http://10.8.252.168:3000/api';
   }
 
   private setupInterceptors(): void {

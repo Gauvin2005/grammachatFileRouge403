@@ -11,7 +11,7 @@ const languageToolService = new LanguageToolService();
 /**
  * Envoyer un nouveau message
  */
-export const sendMessage = async (req: Request, res: Response): Promise<void> => {
+export const sendMessage = async(req: Request, res: Response): Promise<void> => {
   try {
     // Validation des erreurs
     const errors = validationResult(req);
@@ -19,7 +19,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
       res.status(400).json({
         success: false,
         message: 'Données invalides',
-        error: errors.array()[0].msg
+        error: errors.array()[0].msg,
       });
       return;
     }
@@ -28,14 +28,15 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
     const userId = req.user!._id;
 
     // Analyser le texte avec LanguageTool
-    const { errors: languageErrors, xpCalculation } = await languageToolService.analyzeText(content);
+    const { errors: languageErrors, xpCalculation } =
+      await languageToolService.analyzeText(content);
 
     // Créer le message
     const message = new Message({
       senderId: userId,
       content: content.trim(),
       xpEarned: xpCalculation.totalXP,
-      errorsFound: languageErrors
+      errorsFound: languageErrors,
     });
 
     await message.save();
@@ -48,7 +49,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
     if (user) {
       const oldLevel = user.level;
       await user.addXP(xpCalculation.totalXP);
-      
+
       // Vérifier si l'utilisateur a monté de niveau
       xpCalculation.levelUp = user.level > oldLevel;
       xpCalculation.newLevel = user.level;
@@ -75,11 +76,11 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
           sender: {
             id: user?._id,
             username: user?.username,
-            email: user?.email
+            email: user?.email,
           },
-          xpCalculation
-        }
-      }
+          xpCalculation,
+        },
+      },
     };
 
     res.status(201).json(response);
@@ -87,7 +88,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
     console.error('Erreur lors de l\'envoi du message:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de l\'envoi du message'
+      message: 'Erreur serveur lors de l\'envoi du message',
     });
   }
 };
@@ -95,7 +96,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
 /**
  * Récupérer les messages avec pagination
  */
-export const getMessages = async (req: Request, res: Response): Promise<void> => {
+export const getMessages = async(req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
@@ -138,8 +139,8 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
           sender: {
             id: (message.senderId as any)._id,
             username: (message.senderId as any).username,
-            email: (message.senderId as any).email
-          }
+            email: (message.senderId as any).email,
+          },
         })),
         pagination: {
           page,
@@ -147,9 +148,9 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
           total,
           totalPages: Math.ceil(total / limit),
           hasNext: page < Math.ceil(total / limit),
-          hasPrev: page > 1
-        }
-      }
+          hasPrev: page > 1,
+        },
+      },
     };
 
     // Mettre en cache la réponse
@@ -160,7 +161,7 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
     console.error('Erreur lors de la récupération des messages:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la récupération des messages'
+      message: 'Erreur serveur lors de la récupération des messages',
     });
   }
 };
@@ -168,14 +169,14 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
 /**
  * Récupérer un message spécifique
  */
-export const getMessage = async (req: Request, res: Response): Promise<void> => {
+export const getMessage = async(req: Request, res: Response): Promise<void> => {
   try {
     const messageId = req.params.id;
     const userId = req.user!._id;
 
     // Construire la requête
     const filter: any = { _id: messageId };
-    
+
     // Si l'utilisateur n'est pas admin, il ne peut voir que ses propres messages
     if (req.user!.role !== 'admin') {
       filter.senderId = userId;
@@ -186,7 +187,7 @@ export const getMessage = async (req: Request, res: Response): Promise<void> => 
     if (!message) {
       res.status(404).json({
         success: false,
-        message: 'Message non trouvé'
+        message: 'Message non trouvé',
       });
       return;
     }
@@ -204,10 +205,10 @@ export const getMessage = async (req: Request, res: Response): Promise<void> => 
           sender: {
             id: (message.senderId as any)._id,
             username: (message.senderId as any).username,
-            email: (message.senderId as any).email
-          }
-        }
-      }
+            email: (message.senderId as any).email,
+          },
+        },
+      },
     };
 
     res.json(response);
@@ -215,7 +216,7 @@ export const getMessage = async (req: Request, res: Response): Promise<void> => 
     console.error('Erreur lors de la récupération du message:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la récupération du message'
+      message: 'Erreur serveur lors de la récupération du message',
     });
   }
 };
@@ -223,14 +224,14 @@ export const getMessage = async (req: Request, res: Response): Promise<void> => 
 /**
  * Supprimer un message
  */
-export const deleteMessage = async (req: Request, res: Response): Promise<void> => {
+export const deleteMessage = async(req: Request, res: Response): Promise<void> => {
   try {
     const messageId = req.params.id;
     const userId = req.user!._id;
 
     // Construire la requête
     const filter: any = { _id: messageId };
-    
+
     // Si l'utilisateur n'est pas admin, il ne peut supprimer que ses propres messages
     if (req.user!.role !== 'admin') {
       filter.senderId = userId;
@@ -241,7 +242,7 @@ export const deleteMessage = async (req: Request, res: Response): Promise<void> 
     if (!message) {
       res.status(404).json({
         success: false,
-        message: 'Message non trouvé ou accès non autorisé'
+        message: 'Message non trouvé ou accès non autorisé',
       });
       return;
     }
@@ -251,7 +252,7 @@ export const deleteMessage = async (req: Request, res: Response): Promise<void> 
 
     const response: ApiResponse = {
       success: true,
-      message: 'Message supprimé avec succès'
+      message: 'Message supprimé avec succès',
     };
 
     res.json(response);
@@ -259,7 +260,7 @@ export const deleteMessage = async (req: Request, res: Response): Promise<void> 
     console.error('Erreur lors de la suppression du message:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la suppression du message'
+      message: 'Erreur serveur lors de la suppression du message',
     });
   }
 };
@@ -273,20 +274,16 @@ export const validateMessage = [
     .withMessage('Le contenu du message est requis')
     .isLength({ min: 1, max: 1000 })
     .withMessage('Le message doit contenir entre 1 et 1000 caractères')
-    .trim()
+    .trim(),
 ];
 
 /**
  * Validation pour la pagination des messages
  */
 export const validatePagination = [
-  query('page')
-    .optional()
-    .isInt({ min: 1 })
-    .withMessage('La page doit être un entier positif'),
+  query('page').optional().isInt({ min: 1 }).withMessage('La page doit être un entier positif'),
   query('limit')
     .optional()
     .isInt({ min: 1, max: 100 })
-    .withMessage('La limite doit être un entier entre 1 et 100')
+    .withMessage('La limite doit être un entier entre 1 et 100'),
 ];
-

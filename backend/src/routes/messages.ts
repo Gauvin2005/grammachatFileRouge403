@@ -6,7 +6,7 @@ import {
   getMessage,
   deleteMessage,
   validateMessage,
-  validatePagination
+  validatePagination,
 } from '../controllers/messageController';
 
 const router = Router();

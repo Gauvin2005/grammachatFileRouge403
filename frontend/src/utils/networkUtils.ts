@@ -45,7 +45,7 @@ export const getTestUrls = (port: number = 3000): string[] => {
   
   // Ajouter des IPs locales communes (à adapter selon votre réseau)
   const localIPs = [
-    'http://10.8.252.251',   // IP actuelle
+    'http://10.8.252.168',   // IP actuelle
     'http://10.8.251.148',  // Ancienne IP (compatibilité)
     'http://192.168.1.100',
     'http://192.168.0.100',
@@ -66,7 +66,7 @@ export const getNetworkConfig = (): NetworkConfig => {
     let baseUrl: string;
     
     // Force l'utilisation de l'IP actuelle pour tous les environnements de dev
-    baseUrl = 'http://10.8.252.251:3000/api';
+    baseUrl = 'http://10.8.252.168:3000/api';
     
     console.log('Configuration réseau:', { platform, baseUrl });
     

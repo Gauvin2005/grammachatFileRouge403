@@ -24,7 +24,7 @@ export interface Message {
 export interface LanguageToolError {
   message: string;
   shortMessage: string;
-  replacements: Array<{ value: string }> | string[]; // Peut être des objets ou des strings
+  replacements: { value: string }[] | string[]; // Peut être des objets ou des strings
   offset: number;
   length: number;
   context: { text: string; offset: number; length: number } | string; // Peut être un objet ou une string

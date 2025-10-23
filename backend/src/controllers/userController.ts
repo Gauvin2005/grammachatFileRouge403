@@ -7,7 +7,7 @@ import { ApiResponse, PaginationParams, PaginatedResponse } from '../types';
 /**
  * Créer un nouvel utilisateur (accessible uniquement par admin)
  */
-export const createUser = async (req: Request, res: Response): Promise<void> => {
+export const createUser = async(req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, username } = req.body;
 
@@ -15,7 +15,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     if (!email || !password || !username) {
       res.status(400).json({
         success: false,
-        message: 'Email, mot de passe et nom d\'utilisateur sont requis'
+        message: 'Email, mot de passe et nom d\'utilisateur sont requis',
       });
       return;
     }
@@ -25,7 +25,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     if (existingUserByEmail) {
       res.status(409).json({
         success: false,
-        message: 'Un compte avec cet email existe déjà'
+        message: 'Un compte avec cet email existe déjà',
       });
       return;
     }
@@ -35,7 +35,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     if (existingUserByUsername) {
       res.status(409).json({
         success: false,
-        message: 'Ce nom d\'utilisateur est déjà pris'
+        message: 'Ce nom d\'utilisateur est déjà pris',
       });
       return;
     }
@@ -47,7 +47,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       username,
       role: 'user', // Rôle forcé à 'user' par défaut
       xp: 0,
-      level: 1
+      level: 1,
     });
 
     await newUser.save();
@@ -61,15 +61,15 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       xp: newUser.xp,
       level: newUser.level,
       createdAt: newUser.createdAt,
-      updatedAt: newUser.updatedAt
+      updatedAt: newUser.updatedAt,
     };
 
     const response: ApiResponse = {
       success: true,
       message: 'Utilisateur créé avec succès',
       data: {
-        user: userResponse
-      }
+        user: userResponse,
+      },
     };
 
     res.status(201).json(response);
@@ -77,7 +77,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     console.error('Erreur lors de la création de l\'utilisateur:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la création de l\'utilisateur'
+      message: 'Erreur serveur lors de la création de l\'utilisateur',
     });
   }
 };
@@ -85,24 +85,20 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 /**
  * Récupérer tous les utilisateurs (admin seulement)
  */
-export const getUsers = async (req: Request, res: Response): Promise<void> => {
+export const getUsers = async(req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
-    const sortBy = req.query.sortBy as string || 'xp';
-    const sortOrder = req.query.sortOrder as 'asc' | 'desc' || 'desc';
+    const sortBy = (req.query.sortBy as string) || 'xp';
+    const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
 
     // Construire l'objet de tri
     const sort: any = {};
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
     // Récupérer les utilisateurs avec pagination
-    const users = await User.find({})
-      .select('-password')
-      .sort(sort)
-      .skip(skip)
-      .limit(limit);
+    const users = await User.find({}).select('-password').sort(sort).skip(skip).limit(limit);
 
     // Compter le total des utilisateurs
     const total = await User.countDocuments({});
@@ -119,7 +115,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
           xp: user.xp,
           level: user.level,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt
+          updatedAt: user.updatedAt,
         })),
         pagination: {
           page,
@@ -127,9 +123,9 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
           total,
           totalPages: Math.ceil(total / limit),
           hasNext: page < Math.ceil(total / limit),
-          hasPrev: page > 1
-        }
-      }
+          hasPrev: page > 1,
+        },
+      },
     };
 
     res.json(response);
@@ -137,7 +133,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
     console.error('Erreur lors de la récupération des utilisateurs:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la récupération des utilisateurs'
+      message: 'Erreur serveur lors de la récupération des utilisateurs',
     });
   }
 };
@@ -145,7 +141,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 /**
  * Récupérer un utilisateur spécifique
  */
-export const getUser = async (req: Request, res: Response): Promise<void> => {
+export const getUser = async(req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
 
@@ -154,7 +150,7 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
     if (!user) {
       res.status(404).json({
         success: false,
-        message: 'Utilisateur non trouvé'
+        message: 'Utilisateur non trouvé',
       });
       return;
     }
@@ -171,9 +167,9 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
           xp: user.xp,
           level: user.level,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt
-        }
-      }
+          updatedAt: user.updatedAt,
+        },
+      },
     };
 
     res.json(response);
@@ -181,7 +177,7 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
     console.error('Erreur lors de la récupération de l\'utilisateur:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la récupération de l\'utilisateur'
+      message: 'Erreur serveur lors de la récupération de l\'utilisateur',
     });
   }
 };
@@ -189,7 +185,7 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
 /**
  * Mettre à jour le profil utilisateur
  */
-export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateProfile = async(req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
     const { username } = req.body;
@@ -198,7 +194,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     if (req.user!._id?.toString() !== userId && req.user!.role !== 'admin') {
       res.status(403).json({
         success: false,
-        message: 'Accès non autorisé à cette ressource'
+        message: 'Accès non autorisé à cette ressource',
       });
       return;
     }
@@ -208,7 +204,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     if (!user) {
       res.status(404).json({
         success: false,
-        message: 'Utilisateur non trouvé'
+        message: 'Utilisateur non trouvé',
       });
       return;
     }
@@ -220,7 +216,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
       if (existingUser) {
         res.status(409).json({
           success: false,
-          message: 'Nom d\'utilisateur déjà utilisé'
+          message: 'Nom d\'utilisateur déjà utilisé',
         });
         return;
       }
@@ -241,9 +237,9 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
           xp: user.xp,
           level: user.level,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt
-        }
-      }
+          updatedAt: user.updatedAt,
+        },
+      },
     };
 
     res.json(response);
@@ -251,7 +247,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     console.error('Erreur lors de la mise à jour du profil:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la mise à jour du profil'
+      message: 'Erreur serveur lors de la mise à jour du profil',
     });
   }
 };
@@ -259,7 +255,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
 /**
  * Supprimer un utilisateur (admin seulement)
  */
-export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+export const deleteUser = async(req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
 
@@ -267,7 +263,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     if (req.user!._id?.toString() === userId) {
       res.status(400).json({
         success: false,
-        message: 'Vous ne pouvez pas supprimer votre propre compte'
+        message: 'Vous ne pouvez pas supprimer votre propre compte',
       });
       return;
     }
@@ -277,14 +273,14 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     if (!user) {
       res.status(404).json({
         success: false,
-        message: 'Utilisateur non trouvé'
+        message: 'Utilisateur non trouvé',
       });
       return;
     }
 
     const response: ApiResponse = {
       success: true,
-      message: 'Utilisateur supprimé avec succès'
+      message: 'Utilisateur supprimé avec succès',
     };
 
     res.json(response);
@@ -292,7 +288,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     console.error('Erreur lors de la suppression de l\'utilisateur:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la suppression de l\'utilisateur'
+      message: 'Erreur serveur lors de la suppression de l\'utilisateur',
     });
   }
 };
@@ -300,7 +296,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
 /**
  * Obtenir le classement des utilisateurs par XP
  */
-export const getLeaderboard = async (req: Request, res: Response): Promise<void> => {
+export const getLeaderboard = async(req: Request, res: Response): Promise<void> => {
   try {
     const limit = parseInt(req.query.limit as string) || 10;
 
@@ -312,10 +308,7 @@ export const getLeaderboard = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    const users = await User.find({})
-      .select('username xp level')
-      .sort({ xp: -1 })
-      .limit(limit);
+    const users = await User.find({}).select('username xp level').sort({ xp: -1 }).limit(limit);
 
     const response: ApiResponse = {
       success: true,
@@ -325,9 +318,9 @@ export const getLeaderboard = async (req: Request, res: Response): Promise<void>
           rank: index + 1,
           username: user.username,
           xp: user.xp,
-          level: user.level
-        }))
-      }
+          level: user.level,
+        })),
+      },
     };
 
     // Mettre en cache la réponse
@@ -338,7 +331,7 @@ export const getLeaderboard = async (req: Request, res: Response): Promise<void>
     console.error('Erreur lors de la récupération du classement:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la récupération du classement'
+      message: 'Erreur serveur lors de la récupération du classement',
     });
   }
 };
@@ -362,5 +355,5 @@ export const validatePagination = [
   query('sortOrder')
     .optional()
     .isIn(['asc', 'desc'])
-    .withMessage('L\'ordre de tri doit être asc ou desc')
+    .withMessage('L\'ordre de tri doit être asc ou desc'),
 ];

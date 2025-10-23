@@ -5,8 +5,8 @@ import { redisService } from '../services/redisService';
  * Middleware de rate limiting avec Redis
  * Plus efficace que express-rate-limit car partagé entre instances
  */
-export const redisRateLimit = (windowMs: number = 15 * 60 * 1000, maxRequests: number = 100) => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const redisRateLimit = (windowMs: number = 15 * 60 * 1000, maxRequests = 100) => {
+  return async(req: Request, res: Response, next: NextFunction): Promise<void> => {
     // Désactiver complètement en mode test
     if (process.env.NODE_ENV === 'test' || process.env.DISABLE_RATE_LIMITING === 'true') {
       return next();
@@ -29,7 +29,7 @@ export const redisRateLimit = (windowMs: number = 15 * 60 * 1000, maxRequests: n
       res.set({
         'X-RateLimit-Limit': maxRequests.toString(),
         'X-RateLimit-Remaining': Math.max(0, maxRequests - currentCount).toString(),
-        'X-RateLimit-Reset': new Date(Date.now() + windowMs).toISOString()
+        'X-RateLimit-Reset': new Date(Date.now() + windowMs).toISOString(),
       });
 
       // Vérifier si la limite est dépassée
@@ -37,7 +37,7 @@ export const redisRateLimit = (windowMs: number = 15 * 60 * 1000, maxRequests: n
         res.status(429).json({
           success: false,
           message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.',
-          retryAfter: Math.ceil(windowMs / 1000)
+          retryAfter: Math.ceil(windowMs / 1000),
         });
         return;
       }
@@ -67,9 +67,12 @@ export const messageRateLimit = redisRateLimit(60 * 1000, 10); // 10 messages pa
  * Rate limiting général pour l'API
  * Désactivé en mode test pour éviter les blocages pendant les tests
  */
-export const apiRateLimit = (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development' || process.env.DISABLE_RATE_LIMITING === 'true') 
-  ? (req: Request, res: Response, next: NextFunction) => next()
-  : redisRateLimit(15 * 60 * 1000, 100); // 100 requêtes par 15 minutes
+export const apiRateLimit =
+  process.env.NODE_ENV === 'test' ||
+  process.env.NODE_ENV === 'development' ||
+  process.env.DISABLE_RATE_LIMITING === 'true'
+    ? (req: Request, res: Response, next: NextFunction) => next()
+    : redisRateLimit(15 * 60 * 1000, 100); // 100 requêtes par 15 minutes
 
 /**
  * Rate limiting pour les tests - toujours désactivé

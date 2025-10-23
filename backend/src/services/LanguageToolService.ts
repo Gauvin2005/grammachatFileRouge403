@@ -13,17 +13,17 @@ export class LanguageToolService {
   /**
    * Vérifie l'orthographe et la grammaire d'un texte
    */
-  async checkText(text: string, language: string = 'fr'): Promise<LanguageToolResponse> {
+  async checkText(text: string, language = 'fr'): Promise<LanguageToolResponse> {
     try {
       const params = {
         text,
         language,
         enabledOnly: 'false',
-        level: 'picky'
+        level: 'picky',
       };
 
       const headers: Record<string, string> = {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       };
 
       if (this.apiKey) {
@@ -32,7 +32,7 @@ export class LanguageToolService {
 
       const response = await axios.post(this.apiUrl, new URLSearchParams(params), {
         headers,
-        timeout: 10000
+        timeout: 10000,
       });
 
       return response.data;
@@ -69,14 +69,17 @@ export class LanguageToolService {
       totalXP,
       errorsCount: errors.length,
       levelUp: false, // Sera calculé par le modèle User
-      newLevel: 0 // Sera calculé par le modèle User
+      newLevel: 0, // Sera calculé par le modèle User
     };
   }
 
   /**
    * Analyse un texte et retourne les erreurs avec calcul d'XP
    */
-  async analyzeText(text: string, language: string = 'fr'): Promise<{
+  async analyzeText(
+    text: string,
+    language = 'fr',
+  ): Promise<{
     errors: LanguageToolError[];
     xpCalculation: XPCalculationResult;
   }> {
@@ -91,8 +94,8 @@ export class LanguageToolService {
           totalXP: 0,
           errorsCount: 0,
           levelUp: false,
-          newLevel: 1
-        }
+          newLevel: 1,
+        },
       };
     }
 
@@ -101,7 +104,7 @@ export class LanguageToolService {
 
     return {
       errors: response.matches,
-      xpCalculation
+      xpCalculation,
     };
   }
 

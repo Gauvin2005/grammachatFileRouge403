@@ -18,7 +18,11 @@ export interface AuthRequest extends Request {
 /**
  * Middleware d'authentification JWT
  */
-export const authenticateToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const authenticateToken = async(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
@@ -26,7 +30,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     if (!token) {
       res.status(401).json({
         success: false,
-        message: 'Token d\'accès requis'
+        message: 'Token d\'accès requis',
       });
       return;
     }
@@ -42,7 +46,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     if (!user) {
       res.status(401).json({
         success: false,
-        message: 'Utilisateur non trouvé'
+        message: 'Utilisateur non trouvé',
       });
       return;
     }
@@ -53,12 +57,12 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     if (error instanceof jwt.JsonWebTokenError) {
       res.status(401).json({
         success: false,
-        message: 'Token invalide'
+        message: 'Token invalide',
       });
     } else {
       res.status(500).json({
         success: false,
-        message: 'Erreur d\'authentification'
+        message: 'Erreur d\'authentification',
       });
     }
   }
@@ -71,7 +75,7 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction): v
   if (!req.user) {
     res.status(401).json({
       success: false,
-      message: 'Authentification requise'
+      message: 'Authentification requise',
     });
     return;
   }
@@ -79,7 +83,7 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction): v
   if (req.user.role !== 'admin') {
     res.status(403).json({
       success: false,
-      message: 'Accès administrateur requis'
+      message: 'Accès administrateur requis',
     });
     return;
   }
@@ -94,17 +98,17 @@ export const requireOwnership = (req: Request, res: Response, next: NextFunction
   if (!req.user) {
     res.status(401).json({
       success: false,
-      message: 'Authentification requise'
+      message: 'Authentification requise',
     });
     return;
   }
 
   const userId = req.params.userId || req.params.id;
-  
+
   if (req.user.role !== 'admin' && req.user._id?.toString() !== userId) {
     res.status(403).json({
       success: false,
-      message: 'Accès non autorisé à cette ressource'
+      message: 'Accès non autorisé à cette ressource',
     });
     return;
   }

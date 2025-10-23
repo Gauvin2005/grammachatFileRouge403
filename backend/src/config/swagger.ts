@@ -8,25 +8,26 @@ const options: swaggerJsdoc.Options = {
     info: {
       title: 'Grammachat API',
       version: '1.0.0',
-      description: 'API Backend pour Grammachat - Application de messagerie gamifiée avec correction automatique',
+      description:
+        'API Backend pour Grammachat - Application de messagerie gamifiée avec correction automatique',
       contact: {
         name: 'Grammachat Team',
-        email: 'support@grammachat.com'
+        email: 'support@grammachat.com',
       },
       license: {
         name: 'MIT',
-        url: 'https://opensource.org/licenses/MIT'
-      }
+        url: 'https://opensource.org/licenses/MIT',
+      },
     },
     servers: [
       {
         url: 'http://localhost:3000',
-        description: 'Serveur de développement local'
+        description: 'Serveur de développement local',
       },
       {
         url: 'http://api:3000',
-        description: 'Serveur Docker (interne)'
-      }
+        description: 'Serveur Docker (interne)',
+      },
     ],
     components: {
       securitySchemes: {
@@ -34,8 +35,8 @@ const options: swaggerJsdoc.Options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Entrez votre token JWT obtenu via /api/auth/login'
-        }
+          description: 'Entrez votre token JWT obtenu via /api/auth/login',
+        },
       },
       schemas: {
         Error: {
@@ -43,82 +44,82 @@ const options: swaggerJsdoc.Options = {
           properties: {
             success: {
               type: 'boolean',
-              example: false
+              example: false,
             },
             message: {
               type: 'string',
-              example: 'Message d\'erreur'
-            }
-          }
+              example: 'Message d\'erreur',
+            },
+          },
         },
         Success: {
           type: 'object',
           properties: {
             success: {
               type: 'boolean',
-              example: true
+              example: true,
             },
             message: {
               type: 'string',
-              example: 'Opération réussie'
-            }
-          }
+              example: 'Opération réussie',
+            },
+          },
         },
         User: {
           type: 'object',
           properties: {
             _id: {
               type: 'string',
-              example: '507f1f77bcf86cd799439011'
+              example: '507f1f77bcf86cd799439011',
             },
             email: {
               type: 'string',
               format: 'email',
-              example: 'user@example.com'
+              example: 'user@example.com',
             },
             username: {
               type: 'string',
-              example: 'johndoe'
+              example: 'johndoe',
             },
             role: {
               type: 'string',
               enum: ['user', 'admin'],
-              example: 'user'
+              example: 'user',
             },
             xp: {
               type: 'number',
-              example: 150
+              example: 150,
             },
             level: {
               type: 'number',
-              example: 2
+              example: 2,
             },
             createdAt: {
               type: 'string',
               format: 'date-time',
-              example: '2023-12-01T10:00:00.000Z'
+              example: '2023-12-01T10:00:00.000Z',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              example: '2023-12-01T10:00:00.000Z'
-            }
-          }
+              example: '2023-12-01T10:00:00.000Z',
+            },
+          },
         },
         Message: {
           type: 'object',
           properties: {
             _id: {
               type: 'string',
-              example: '507f1f77bcf86cd799439012'
+              example: '507f1f77bcf86cd799439012',
             },
             content: {
               type: 'string',
-              example: 'Bonjour, comment allez-vous ?'
+              example: 'Bonjour, comment allez-vous ?',
             },
             correctedContent: {
               type: 'string',
-              example: 'Bonjour, comment allez-vous ?'
+              example: 'Bonjour, comment allez-vous ?',
             },
             errors: {
               type: 'array',
@@ -127,32 +128,32 @@ const options: swaggerJsdoc.Options = {
                 properties: {
                   message: {
                     type: 'string',
-                    example: 'Erreur de grammaire'
+                    example: 'Erreur de grammaire',
                   },
                   offset: {
                     type: 'number',
-                    example: 5
+                    example: 5,
                   },
                   length: {
                     type: 'number',
-                    example: 3
-                  }
-                }
-              }
+                    example: 3,
+                  },
+                },
+              },
             },
             xpEarned: {
               type: 'number',
-              example: 15
+              example: 15,
             },
             author: {
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/User',
             },
             createdAt: {
               type: 'string',
               format: 'date-time',
-              example: '2023-12-01T10:00:00.000Z'
-            }
-          }
+              example: '2023-12-01T10:00:00.000Z',
+            },
+          },
         },
         LoginRequest: {
           type: 'object',
@@ -161,14 +162,14 @@ const options: swaggerJsdoc.Options = {
             email: {
               type: 'string',
               format: 'email',
-              example: 'user@example.com'
+              example: 'user@example.com',
             },
             password: {
               type: 'string',
               minLength: 6,
-              example: 'password123'
-            }
-          }
+              example: 'password123',
+            },
+          },
         },
         RegisterRequest: {
           type: 'object',
@@ -177,40 +178,40 @@ const options: swaggerJsdoc.Options = {
             email: {
               type: 'string',
               format: 'email',
-              example: 'user@example.com'
+              example: 'user@example.com',
             },
             password: {
               type: 'string',
               minLength: 6,
-              example: 'password123'
+              example: 'password123',
             },
             username: {
               type: 'string',
               minLength: 3,
               maxLength: 20,
-              example: 'johndoe'
-            }
-          }
+              example: 'johndoe',
+            },
+          },
         },
         LoginResponse: {
           type: 'object',
           properties: {
             success: {
               type: 'boolean',
-              example: true
+              example: true,
             },
             message: {
               type: 'string',
-              example: 'Connexion réussie'
+              example: 'Connexion réussie',
             },
             token: {
               type: 'string',
-              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
             },
             user: {
-              $ref: '#/components/schemas/User'
-            }
-          }
+              $ref: '#/components/schemas/User',
+            },
+          },
         },
         MessageRequest: {
           type: 'object',
@@ -220,9 +221,9 @@ const options: swaggerJsdoc.Options = {
               type: 'string',
               minLength: 1,
               maxLength: 1000,
-              example: 'Bonjour, comment allez-vous ?'
-            }
-          }
+              example: 'Bonjour, comment allez-vous ?',
+            },
+          },
         },
         PaginationQuery: {
           type: 'object',
@@ -231,29 +232,26 @@ const options: swaggerJsdoc.Options = {
               type: 'integer',
               minimum: 1,
               default: 1,
-              example: 1
+              example: 1,
             },
             limit: {
               type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 10,
-              example: 10
-            }
-          }
-        }
-      }
+              example: 10,
+            },
+          },
+        },
+      },
     },
     security: [
       {
-        bearerAuth: []
-      }
-    ]
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: [
-    './src/routes/*.ts',
-    './src/controllers/*.ts'
-  ]
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts'],
 };
 
 const specs = swaggerJsdoc(options);
@@ -268,7 +266,7 @@ export const setupSwagger = (app: Express): void => {
     '/docs',
     '/documentation',
     '/api/docs',
-    '/api/documentation'
+    '/api/documentation',
   ];
 
   swaggerRedirects.forEach(route => {
@@ -278,18 +276,22 @@ export const setupSwagger = (app: Express): void => {
   });
 
   // Route pour la documentation Swagger UI
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
-    explorer: true,
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Grammachat API Documentation',
-    swaggerOptions: {
-      persistAuthorization: true,
-      displayRequestDuration: true,
-      filter: true,
-      showExtensions: true,
-      showCommonExtensions: true
-    }
-  }));
+  app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(specs, {
+      explorer: true,
+      customCss: '.swagger-ui .topbar { display: none }',
+      customSiteTitle: 'Grammachat API Documentation',
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        showExtensions: true,
+        showCommonExtensions: true,
+      },
+    }),
+  );
 
   // Route pour le JSON de la spec Swagger
   app.get('/api-docs.json', (req, res) => {
@@ -298,7 +300,9 @@ export const setupSwagger = (app: Express): void => {
   });
 
   console.log('Documentation Swagger disponible sur: http://localhost:3000/api-docs');
-  console.log('Redirections configurées pour: /, /swagger, /swagger-ui, /docs, /documentation, /api/docs');
+  console.log(
+    'Redirections configurées pour: /, /swagger, /swagger-ui, /docs, /documentation, /api/docs',
+  );
 };
 
 export default specs;
