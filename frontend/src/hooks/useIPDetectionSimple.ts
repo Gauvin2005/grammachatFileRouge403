@@ -14,7 +14,7 @@ interface IPStatus {
 
 export const useIPDetection = () => {
   const [status, setStatus] = useState<IPStatus>({
-    ip: '10.8.251.168', // IP fixe
+    ip: '10.29.251.81', // IP fixe
     isLoading: false,
     error: null,
     lastChecked: new Date()
@@ -24,7 +24,7 @@ export const useIPDetection = () => {
     // Pas de détection nécessaire - IP fixe
     setStatus(prev => ({ 
       ...prev, 
-      ip: '10.8.251.168',
+      ip: '10.29.251.81',
       isLoading: false, 
       error: null,
       lastChecked: new Date()
