@@ -48,8 +48,8 @@ services:
     environment:
       - NODE_ENV=development
       - DISABLE_RATE_LIMITING=true
-      - REDIS_URL=redis://redis:6379
-      - MONGODB_URI=mongodb://mongodb:27017/grammachat
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongodb:27017/grammachat}
     depends_on:
       mongodb:
         condition: service_healthy

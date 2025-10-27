@@ -3,13 +3,13 @@
 /**
  * Script pour créer le premier compte administrateur
  * Usage: npm run create-admin
- * 
+ *
  * Ce script crée un compte administrateur avec les informations
  * fournies dans les variables d'environnement ou utilise des valeurs par défaut.
- * 
+ *
  * Variables d'environnement requises :
  * - ADMIN_EMAIL : Email de l'administrateur
- * - ADMIN_USERNAME : Nom d'utilisateur de l'administrateur  
+ * - ADMIN_USERNAME : Nom d'utilisateur de l'administrateur
  * - ADMIN_PASSWORD : Mot de passe de l'administrateur
  * - MONGODB_URI : URI de connexion MongoDB
  * - JWT_SECRET : Clé secrète pour JWT (optionnel pour ce script)
@@ -30,7 +30,7 @@ interface AdminCreationResult {
   error?: string;
 }
 
-const createAdmin = async (): Promise<AdminCreationResult> => {
+const createAdmin = async(): Promise<AdminCreationResult> => {
   try {
     // Vérifier les variables d'environnement requises
     const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat';
@@ -57,7 +57,7 @@ const createAdmin = async (): Promise<AdminCreationResult> => {
       console.log(`   Email: ${existingAdmin.email}`);
       console.log(`   Username: ${existingAdmin.username}`);
       console.log(`   Créé le: ${existingAdmin.createdAt}`);
-      
+
       // Demander confirmation pour continuer
       const shouldContinue = process.argv.includes('--force');
       if (!shouldContinue) {
@@ -69,7 +69,7 @@ const createAdmin = async (): Promise<AdminCreationResult> => {
 
     // Vérifier si l'email ou username existe déjà
     const existingUser = await User.findOne({
-      $or: [{ email: adminEmail }, { username: adminUsername }]
+      $or: [{ email: adminEmail }, { username: adminUsername }],
     });
 
     if (existingUser) {
@@ -86,7 +86,7 @@ const createAdmin = async (): Promise<AdminCreationResult> => {
       password: adminPassword,
       role: 'admin' as const,
       xp: 0,
-      level: 1
+      level: 1,
     };
 
     const admin = new User(adminData);
@@ -102,10 +102,11 @@ const createAdmin = async (): Promise<AdminCreationResult> => {
     }
 
     console.log('\nSUCCÈS: Compte administrateur créé avec succès !');
-    console.log('Informations du compte:');
+    console.log('\nInformations du compte:');
     console.log(`   ID: ${admin._id}`);
     console.log(`   Email: ${admin.email}`);
     console.log(`   Username: ${admin.username}`);
+    console.log(`   Password: ${adminPassword}`);
     console.log(`   Rôle: ${admin.role}`);
     console.log(`   XP: ${admin.xp}`);
     console.log(`   Niveau: ${admin.level}`);
@@ -149,14 +150,15 @@ Options:
 Variables d'environnement:
   ADMIN_EMAIL      Email de l'administrateur (défaut: admin@grammachat.com)
   ADMIN_USERNAME   Nom d'utilisateur (défaut: admin)
-  ADMIN_PASSWORD   Mot de passe (défaut: admin123456)
+  ADMIN_PASSWORD   Mot de passe (défaut: admin123)
   MONGODB_URI      URI MongoDB (défaut: mongodb://localhost:27017/grammachat)
   JWT_SECRET       Clé secrète JWT (optionnel)
 
 Exemples:
   npm run create-admin
   npm run create-admin -- --force
-  ADMIN_EMAIL=admin@example.com npm run create-admin
+  MONGODB_URI=mongodb://localhost:27017/grammachat npm run create-admin
+  ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=admin123 npm run create-admin
 
 Sécurité:
   - Changez le mot de passe après la première connexion
