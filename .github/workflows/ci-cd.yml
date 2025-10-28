@@ -77,7 +77,7 @@ jobs:
   # Build et déploiement Docker
   build-and-deploy:
     name: Build & Deploy
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: test-and-lint
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
     
@@ -88,38 +88,59 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      # Build de l'image backend uniquement (pas de frontend séparé)
-      - name: Build & Push Backend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/grammachat-backend:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/grammachat-backend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      # Déploiement selon l'environnement
-      - name: Deploy to Development
-        if: github.ref == 'refs/heads/develop'
+      - name: Create production environment file
         run: |
-          curl -X POST "${{ secrets.DEV_DEPLOY_WEBHOOK }}" \
-            -H "Content-Type: application/json" \
-            -d '{"ref":"${{ github.sha }}","environment":"development"}'
+          cat > .env.prod << EOF
+          API_PORT=3000
+          MONGODB_PORT=27017
+          REDIS_PORT=6379
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+          MONGODB_DATABASE=${{ secrets.MONGODB_DATABASE }}
+          NODE_ENV=production
+          API_HOST=0.0.0.0
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN=7d
+          REDIS_URL=${{ secrets.REDIS_URL }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          REDIS_SESSION_TTL=604800
+          REDIS_MESSAGES_TTL=300
+          REDIS_LEADERBOARD_TTL=600
+          REDIS_PROFILE_TTL=900
+          REDIS_STATS_TTL=1800
+          LANGUAGETOOL_API_URL=https://api.languagetool.org/v2/check
+          LANGUAGETOOL_API_KEY=${{ secrets.LANGUAGETOOL_API_KEY }}
+          XP_PER_CHARACTER=1
+          XP_BONUS_NO_ERRORS=10
+          XP_PENALTY_PER_ERROR=5
+          LEVEL_UP_THRESHOLD=100
+          CORS_ORIGIN=*
+          EOF
 
-      - name: Deploy to Production
-        if: github.ref == 'refs/heads/main'
+      - name: Build, Tag, and Deploy Backend
         run: |
-          curl -X POST "${{ secrets.PROD_DEPLOY_WEBHOOK }}" \
-            -H "Content-Type: application/json" \
-            -d '{"ref":"${{ github.sha }}","environment":"production"}'
+          APP_VERSION=$(date +'%Y%m%d%H%M%S')
+          IMAGE_NAME="grammachat-backend"
+
+          echo "Deploying Grammachat version: $APP_VERSION"
+
+          docker stop $IMAGE_NAME || true
+          docker rm $IMAGE_NAME || true
+
+          docker build -t ${IMAGE_NAME}:${APP_VERSION} ./backend
+          docker tag ${IMAGE_NAME}:${APP_VERSION} ${IMAGE_NAME}:latest
+
+          docker run -d \
+            --name $IMAGE_NAME \
+            --restart unless-stopped \
+            -p 3000:3000 \
+            --env-file .env.prod \
+            ${IMAGE_NAME}:${APP_VERSION}
+
+      - name: Verify container is running
+        run: |
+          sleep 5
+          docker ps | grep grammachat-backend
+          docker logs --tail 50 grammachat-backend
 
   # Notifications (optionnel)
   notify:
