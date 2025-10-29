@@ -116,31 +116,42 @@ jobs:
           CORS_ORIGIN=*
           EOF
 
+      # Build et déploiement via docker-compose.prod.yml
       - name: Build, Tag, and Deploy Backend
         run: |
           APP_VERSION=$(date +'%Y%m%d%H%M%S')
-          IMAGE_NAME="grammachat-backend"
-
           echo "Deploying Grammachat version: $APP_VERSION"
 
-          docker stop $IMAGE_NAME || true
-          docker rm $IMAGE_NAME || true
+          # Arrêter et supprimer les anciens conteneurs s'ils existent
+          docker stop grammachat-api grammachat-mongodb grammachat-redis || true
+          docker rm grammachat-api grammachat-mongodb grammachat-redis || true
 
-          docker build -t ${IMAGE_NAME}:${APP_VERSION} ./backend
-          docker tag ${IMAGE_NAME}:${APP_VERSION} ${IMAGE_NAME}:latest
+          # Copier .env.prod vers .env pour que docker-compose.prod.yml le trouve
+          cp .env.prod .env
 
-          docker run -d \
-            --name $IMAGE_NAME \
-            --restart unless-stopped \
-            -p 3000:3000 \
-            --env-file .env.prod \
-            ${IMAGE_NAME}:${APP_VERSION}
+          # Arrêter proprement les services existants via docker compose (si réseau/volumes existent)
+          docker compose -f docker-compose.prod.yml down || true
+
+          # Reconstruire et lancer les trois services (mongodb, redis, api)
+          docker compose -f docker-compose.prod.yml up -d --build
+
+          # Attendre un peu pour que les services démarrent
+          sleep 10
+
+          # Vérifier que les conteneurs sont bien lancés
+          docker ps --filter "name=grammachat" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
       - name: Verify container is running
         run: |
           sleep 5
-          docker ps | grep grammachat-backend
-          docker logs --tail 50 grammachat-backend
+          echo "=== Vérification des conteneurs ==="
+          docker ps | grep grammachat
+          echo ""
+          echo "=== Logs API (grammachat-api) ==="
+          docker compose -f docker-compose.prod.yml logs api --tail 50
+          echo ""
+          echo "=== Status des services ==="
+          docker compose -f docker-compose.prod.yml ps
 
   # Notifications (optionnel)
   notify:
