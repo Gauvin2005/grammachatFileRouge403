@@ -56,7 +56,8 @@ export const IPDebugComponent: React.FC = () => {
       '10.8.251.148',
       '192.168.1.100',
       '127.0.0.1',
-      'localhost'
+      'localhost',
+      '10.6.0.2'
     ];
     
     for (const ip of testIPs) {
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   resultsTitle: {
-    ...typography.h4,
+    ...typography.h3,
     color: colors.text,
     marginBottom: spacing.sm,
   },

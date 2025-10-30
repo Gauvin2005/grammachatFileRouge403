@@ -44,6 +44,7 @@ const findWorkingIP = async (): Promise<string | null> => {
   const testIPs = [
     '10.29.251.81',    // IP actuelle
     '10.8.251.148',   // Ancienne IP (compatibilité)
+    '10.6.0.2', // IP server
     '192.168.1.100',
     '192.168.0.100',
     '192.168.1.1',
