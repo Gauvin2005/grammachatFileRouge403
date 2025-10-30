@@ -40,17 +40,20 @@ export const getTestUrls = (port: number = 3000): string[] => {
   const baseUrls = [
     'http://10.0.2.2',      // Android Emulator
     'http://localhost',     // iOS Simulator / Local
-    'http://127.0.0.1',     // Localhost alternatif
+    'http://127.0.0.1',
+    'http://10.6.0.2',   // IP server
   ];
   
   // Ajouter des IPs locales communes (à adapter selon votre réseau)
   const localIPs = [
-    'http://10.8.252.168',   // IP actuelle
+    'http://10.6.0.2',   // IP server
+    'http://10.8.251.187',   // IP actuelle
     'http://10.8.251.148',  // Ancienne IP (compatibilité)
     'http://192.168.1.100',
     'http://192.168.0.100',
     'http://192.168.1.1',
-    'http://192.168.0.1'
+    'http://192.168.0.1',
+    'http://10.8.252.210'
   ];
   
   const allUrls = [...baseUrls, ...localIPs];
@@ -66,7 +69,7 @@ export const getNetworkConfig = (): NetworkConfig => {
     let baseUrl: string;
     
     // Force l'utilisation de l'IP actuelle pour tous les environnements de dev
-    baseUrl = 'http://10.8.252.168:3000/api';
+    baseUrl = 'http://10.6.0.2:3000/api';
     
     console.log('Configuration réseau:', { platform, baseUrl });
     
@@ -78,7 +81,7 @@ export const getNetworkConfig = (): NetworkConfig => {
   }
   
   return {
-    baseUrl: 'https://ma-production-api.com/api',
+    baseUrl: 'http://10.6.0.2:3000/api',
     isLocal: false,
     platform: 'production'
   };

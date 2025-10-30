@@ -6,7 +6,7 @@ import { Platform } from 'react-native';
 
 export const quickConnectionTest = async (): Promise<boolean> => {
   try {
-    const testUrl = Platform.OS === 'android' ? 'http://10.8.252.168:3000/api' : 'http://localhost:3000/api';
+    const testUrl = Platform.OS === 'android' ? 'http://10.6.0.2:3000/api' : 'http://localhost:3000/api';
     
     const response = await fetch(`${testUrl}/health`, {
       method: 'GET',
@@ -22,7 +22,7 @@ export const quickConnectionTest = async (): Promise<boolean> => {
 
 export const quickLoginTest = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
   try {
-    const testUrl = Platform.OS === 'android' ? 'http://10.8.252.168:3000/api' : 'http://localhost:3000/api';
+    const testUrl = Platform.OS === 'android' ? 'http://10.6.0.2:3000/api' : 'http://localhost:3000/api';
     
     const response = await fetch(`${testUrl}/auth/login`, {
       method: 'POST',
@@ -50,7 +50,7 @@ export const quickLoginTest = async (email: string, password: string): Promise<{
 
 export const testAllUrlsQuickly = async (): Promise<{ url: string; success: boolean }[]> => {
   const testUrls = [
-    'http://10.8.252.168:3000/api',
+    'http://10.6.0.2:3000/api',
     'http://10.0.2.2:3000/api',
     'http://localhost:3000/api'
   ];
