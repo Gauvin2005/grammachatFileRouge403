@@ -25,7 +25,7 @@
 | Service | Port | Description |
 |---------|------|-------------|
 | API | 3000 | Backend Express |
-| MongoDB | 27017 | Base de données |
+| MongoDB | 27018 | Base de données |
 | Redis | 6379 | Cache |
 
 ## Endpoints Principaux

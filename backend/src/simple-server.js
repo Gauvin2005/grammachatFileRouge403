@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connexion MongoDB
-mongoose.connect('mongodb://localhost:27017/grammachat').then(() => {
+mongoose.connect('mongodb://localhost:27018/grammachat').then(() => {
   console.log('Connexion à MongoDB réussie');
 }).catch(err => {
   console.error('Erreur de connexion à MongoDB:', err);

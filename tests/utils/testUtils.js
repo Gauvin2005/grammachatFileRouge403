@@ -11,7 +11,7 @@ require('dotenv').config();
 
 // Configuration par défaut
 const DEFAULT_CONFIG = {
-  MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat',
+  MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27018/grammachat',
   API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3000',
   TEST_USER: {
     email: 'test@example.com',

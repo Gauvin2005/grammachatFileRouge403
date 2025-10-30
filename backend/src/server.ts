@@ -153,7 +153,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 const connectDB = async(): Promise<void> => {
   try {
     // Utiliser l'URI MongoDB depuis les variables d'environnement
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat';
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27018/grammachat';
 
     await mongoose.connect(mongoURI, {
       serverSelectionTimeoutMS: 5000,

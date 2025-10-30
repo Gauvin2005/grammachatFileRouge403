@@ -5,7 +5,7 @@
 ### Option 1: Script npm (recommandé)
 ```bash
 cd backend
-MONGODB_URI=mongodb://localhost:27017/grammachat npm run create-admin
+MONGODB_URI=mongodb://localhost:27018/grammachat npm run create-admin
 ```
 
 ### Option 2: Script shell à la racine du projet
@@ -16,7 +16,7 @@ MONGODB_URI=mongodb://localhost:27017/grammachat npm run create-admin
 ### Option 3: Avec des identifiants personnalisés
 ```bash
 cd backend
-MONGODB_URI=mongodb://localhost:27017/grammachat \
+MONGODB_URI=mongodb://localhost:27018/grammachat \
 ADMIN_EMAIL=monadmin@example.com \
 ADMIN_USERNAME=monadmin \
 ADMIN_PASSWORD=monsecurepassword \
@@ -26,14 +26,14 @@ npm run create-admin
 ### Forcer la création si un admin existe déjà
 ```bash
 cd backend
-MONGODB_URI=mongodb://localhost:27017/grammachat npm run create-admin -- --force
+MONGODB_URI=mongodb://localhost:27018/grammachat npm run create-admin -- --force
 ```
 
 ## Vérifier les utilisateurs dans la BDD
 
 ```bash
 cd backend
-MONGODB_URI=mongodb://localhost:27017/grammachat npx ts-node -r tsconfig-paths/register scripts/check-users.ts
+MONGODB_URI=mongodb://localhost:27018/grammachat npx ts-node -r tsconfig-paths/register scripts/check-users.ts
 ```
 
 ## Paramètres par défaut
@@ -41,7 +41,7 @@ MONGODB_URI=mongodb://localhost:27017/grammachat npx ts-node -r tsconfig-paths/r
 - **Email**: admin@grammachat.com
 - **Username**: admin
 - **Password**: admin123456
-- **MongoDB URI**: mongodb://localhost:27017/grammachat
+- **MongoDB URI**: mongodb://localhost:27018/grammachat
 
 ## Connexion au compte admin
 

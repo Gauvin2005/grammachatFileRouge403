@@ -2,7 +2,7 @@
 
 ##  Services Démarrés
 
- **MongoDB** : `localhost:27017` (Docker)  
+ **MongoDB** : `localhost:27018` (Docker)  
  **Redis** : `localhost:6379` (Docker)  
  **API Backend** : `localhost:3000` (Express)  
  **Frontend Expo** : En cours de démarrage...

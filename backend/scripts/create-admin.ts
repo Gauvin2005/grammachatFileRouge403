@@ -33,7 +33,7 @@ interface AdminCreationResult {
 const createAdmin = async(): Promise<AdminCreationResult> => {
   try {
     // Vérifier les variables d'environnement requises
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat';
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27018/grammachat';
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@grammachat.com';
     const adminUsername = process.env.ADMIN_USERNAME || 'admin';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123456';
@@ -151,13 +151,13 @@ Variables d'environnement:
   ADMIN_EMAIL      Email de l'administrateur (défaut: admin@grammachat.com)
   ADMIN_USERNAME   Nom d'utilisateur (défaut: admin)
   ADMIN_PASSWORD   Mot de passe (défaut: admin123)
-  MONGODB_URI      URI MongoDB (défaut: mongodb://localhost:27017/grammachat)
+  MONGODB_URI      URI MongoDB (défaut: mongodb://localhost:27018/grammachat)
   JWT_SECRET       Clé secrète JWT (optionnel)
 
 Exemples:
   npm run create-admin
   npm run create-admin -- --force
-  MONGODB_URI=mongodb://localhost:27017/grammachat npm run create-admin
+  MONGODB_URI=mongodb://localhost:27018/grammachat npm run create-admin
   ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=admin123 npm run create-admin
 
 Sécurité:

@@ -116,7 +116,7 @@ class CITestRunner {
         stdio: 'inherit',
         env: { 
           ...process.env, 
-          MONGODB_URI: 'mongodb://localhost:27017/grammachat_test',
+          MONGODB_URI: 'mongodb://localhost:27018/grammachat_test',
           REDIS_URL: 'redis://localhost:6379',
           NODE_ENV: 'test',
           CI: 'true'

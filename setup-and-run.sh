@@ -268,7 +268,7 @@ main() {
     log_success "=== Setup terminé avec succès! ==="
     log_info "Services disponibles:"
     log_info "- API: http://localhost:3000"
-    log_info "- MongoDB: localhost:27017"
+    log_info "- MongoDB: localhost:27018"
     log_info "- Redis: localhost:6379"
     log_info "- Documentation API: http://localhost:3000/api-docs"
     

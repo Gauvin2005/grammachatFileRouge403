@@ -13,7 +13,7 @@ console.log('🚀 Démarrage des tests optimisés Grammachat...\n');
 // Configuration optimisée pour les tests
 process.env.NODE_ENV = 'test';
 process.env.DISABLE_RATE_LIMITING = 'true';
-process.env.MONGODB_URI = 'mongodb://localhost:27017/grammachat_test';
+process.env.MONGODB_URI = 'mongodb://localhost:27018/grammachat_test';
 
 // Fonction pour exécuter les tests avec timeout
 function runTestWithTimeout(testFile, timeout = 30000) {

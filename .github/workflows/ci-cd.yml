@@ -21,7 +21,7 @@ jobs:
       mongodb:
         image: mongo:7.0
         ports:
-          - 27017:27017
+          - 27018:27018
         options: >-
           --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
           --health-interval 10s
@@ -40,7 +40,7 @@ jobs:
           --health-start-period 30s
 
     env:
-      MONGODB_URI: mongodb://localhost:27017/grammachat_test
+      MONGODB_URI: mongodb://localhost:27018/grammachat_test
       REDIS_URL: redis://localhost:6379
       NODE_ENV: test
 
@@ -92,7 +92,7 @@ jobs:
         run: |
           cat > .env.prod << EOF
           API_PORT=3000
-          MONGODB_PORT=27017
+          MONGODB_PORT=27018
           REDIS_PORT=6379
           MONGODB_URI=${{ secrets.MONGODB_URI }}
           MONGODB_DATABASE=${{ secrets.MONGODB_DATABASE }}

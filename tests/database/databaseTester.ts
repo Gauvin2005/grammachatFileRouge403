@@ -42,7 +42,7 @@ class SimpleDatabaseTester {
       await mongoose.disconnect();
     }
 
-    await mongoose.connect('mongodb://localhost:27017/grammachat_test', {
+    await mongoose.connect('mongodb://localhost:27018/grammachat_test', {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 30000,
       connectTimeoutMS: 10000,

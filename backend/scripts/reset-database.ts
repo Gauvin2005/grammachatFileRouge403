@@ -5,7 +5,7 @@ import { config } from 'dotenv';
 config({ path: require('path').resolve(__dirname, '../../.env') });
 
 // Configuration de la base de données
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/grammachat';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27018/grammachat';
 
 async function resetDatabase() {
   try {

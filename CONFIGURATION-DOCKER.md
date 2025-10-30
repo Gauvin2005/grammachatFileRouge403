@@ -35,7 +35,7 @@ LANGUAGETOOL_API_KEY=clé-api-languagetool
 ```bash
 # Ports de mon choix
 API_PORT=3000          # Port de l'API backend
-MONGODB_PORT=27017     # Port de MongoDB
+MONGODB_PORT=27018     # Port de MongoDB
 REDIS_PORT=6379        # Port de Redis
 ```
 
@@ -89,7 +89,7 @@ docker-compose up -d
 ```bash
 # .env personnalisé
 API_PORT=3000
-MONGODB_PORT=27017
+MONGODB_PORT=8
 REDIS_PORT=6379
 
 # Sécurité

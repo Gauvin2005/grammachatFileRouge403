@@ -9,7 +9,7 @@ BACKEND_DIR="$SCRIPT_DIR/.."
 PROJECT_ROOT="$BACKEND_DIR/.."
 
 # Variables par défaut
-MONGODB_URI="${MONGODB_URI:-mongodb://localhost:27017/grammachat}"
+MONGODB_URI="${MONGODB_URI:-mongodb://localhost:27018/grammachat}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-${1:-admin@grammachat.com}}"
 ADMIN_USERNAME="${ADMIN_USERNAME:-${2:-admin}}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-${3:-admin123}}"
@@ -27,7 +27,7 @@ echo ""
 
 # Vérifier si MongoDB est accessible
 echo "Vérification de la connexion MongoDB..."
-if ! nc -z localhost 27017 2>/dev/null && ! docker ps | grep -q grammachat-mongodb; then
+if ! nc -z localhost 27018 2>/dev/null && ! docker ps | grep -q grammachat-mongodb; then
     echo "ERREUR: MongoDB n'est pas accessible."
     echo "Assurez-vous que MongoDB est en cours d'exécution (via Docker ou localement)."
     echo "Pour démarrer avec Docker: docker compose up -d mongodb"

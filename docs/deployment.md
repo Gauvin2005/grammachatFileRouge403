@@ -160,7 +160,7 @@ kubectl logs deployment/grammachat-api
 
 ```bash
 # MongoDB
-mongodump --uri="mongodb://localhost:27017/grammachat" --out=./backup/
+mongodump --uri="mongodb://localhost:27018/grammachat" --out=./backup/
 
 # Docker volumes
 docker run --rm -v grammachat_mongodb_data:/data -v $(pwd):/backup alpine tar czf /backup/mongodb-backup.tar.gz /data

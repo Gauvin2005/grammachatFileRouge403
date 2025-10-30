@@ -120,7 +120,7 @@ ufw allow 443/tcp
 ufw allow 3000/tcp  # API Backend
 ufw allow 8081/tcp  # Frontend
 ufw allow 9000/tcp  # Webhook
-ufw allow 27017/tcp # MongoDB (si exposé)
+ufw allow 27018/tcp # MongoDB (si exposé)
 ufw allow 6379/tcp  # Redis (si exposé)
 
 log "Pare-feu configuré"

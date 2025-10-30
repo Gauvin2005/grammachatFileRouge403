@@ -9,5 +9,5 @@ echo "Création du compte administrateur..."
 echo ""
 
 cd "$BACKEND_DIR"
-MONGODB_URI=mongodb://localhost:27017/grammachat npm run create-admin
+MONGODB_URI=mongodb://localhost:27018/grammachat npm run create-admin
 

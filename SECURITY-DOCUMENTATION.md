@@ -335,7 +335,7 @@ api.interceptors.response.use(
 # .env (NE JAMAIS COMMITER)
 JWT_SECRET=your-super-secret-key-minimum-32-characters
 JWT_EXPIRES_IN=7d
-MONGODB_URI=mongodb://localhost:27017/grammachat
+MONGODB_URI=mongodb://localhost:27018/grammachat
 ADMIN_EMAIL=admin@grammachat.com
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=secure-admin-password

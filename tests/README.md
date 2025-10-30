@@ -102,7 +102,7 @@ npm start
 ### Variables d'Environnement
 ```bash
 API_URL=http://localhost:3000          # URL de l'API
-MONGODB_URI=mongodb://localhost:27017  # URI MongoDB
+MONGODB_URI=mongodb://localhost:27018  # URI MongoDB
 ```
 
 ## Résultats Attendus

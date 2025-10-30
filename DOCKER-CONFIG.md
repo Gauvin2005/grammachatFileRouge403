@@ -34,7 +34,7 @@ LANGUAGETOOL_API_KEY=clé-api-languagetool
 ```bash
 # Ports personnalisables
 API_PORT=3000          # Port de l'API backend
-MONGODB_PORT=27017     # Port de MongoDB
+MONGODB_PORT=27018     # Port de MongoDB
 REDIS_PORT=6379        # Port de Redis
 ```
 

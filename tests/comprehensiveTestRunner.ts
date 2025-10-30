@@ -20,7 +20,7 @@ class ComprehensiveTestRunner {
   private baseUrl: string;
   private mongoUri: string;
 
-  constructor(baseUrl: string = 'http://localhost:3000', mongoUri: string = 'mongodb://localhost:27017') {
+  constructor(baseUrl: string = 'http://localhost:3000', mongoUri: string = 'mongodb://localhost:27018') {
     this.baseUrl = baseUrl;
     this.mongoUri = mongoUri;
   }
@@ -189,7 +189,7 @@ class ComprehensiveTestRunner {
 
 async function main(): Promise<void> {
   const baseUrl = process.env.API_URL || 'http://localhost:3000';
-  const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+  const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27018';
   
   const runner = new ComprehensiveTestRunner(baseUrl, mongoUri);
   
